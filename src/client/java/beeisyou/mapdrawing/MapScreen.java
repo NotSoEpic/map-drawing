@@ -1,13 +1,13 @@
 package beeisyou.mapdrawing;
 
 import beeisyou.mapdrawing.mapmanager.MapManager;
-import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Mouse;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.util.Window;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.ColorHelper;
-import net.minecraft.util.math.MathHelper;
-import org.joml.Vector2d;
 import org.lwjgl.glfw.GLFW;
 
 public class MapScreen extends Screen {
@@ -16,46 +16,28 @@ public class MapScreen extends Screen {
         super(Text.translatable("map"));
         leftClick = false;
         manager = MapDrawingClient.mapManager;
+        manager.centerWorld(MinecraftClient.getInstance().player.getX(), MinecraftClient.getInstance().player.getZ());
     }
 
-    double panX;
-    double panZ;
-    int zoomval = 0;
-    double scale = 1;
-
-    public Vector2d mouseToMap(double mouseX, double mouseY) {
-        Vector2d map = new Vector2d(mouseX, mouseY);
-        map.add(panX, panZ);
-        map.div(scale);
-        return map;
-    }
-    public Vector2d mapToMouse(double mapX, double mapY) {
-        Vector2d mouse = new Vector2d(mapX, mapY);
-        mouse.mul(scale);
-        mouse.sub(panX, panZ);
-        return mouse;
-    }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        Mouse mouse = MinecraftClient.getInstance().mouse;
+        Window window = MinecraftClient.getInstance().getWindow();
+        // client mouse is per gui pixel (up to 4x less accurate)
+        double mx = mouse.getX() * window.getScaledWidth() / window.getWidth();
+        double my = mouse.getY() * window.getScaledHeight() / window.getHeight();
         if (leftClick) {
-            Vector2d prev = mouseToMap(prevX, prevY);
-            Vector2d curr = mouseToMap(mouseX, mouseY);
-            manager.drawLine(prev.x, prev.y, curr.x, curr.y,
+            manager.drawLineScreen(prevX, prevY, mx, my,
                     ColorHelper.getArgb(255, 255, 255, 255));
         }
         if (rightClick) {
-            panX += prevX - mouseX;
-            panZ += prevY - mouseY;
+            manager.pan(prevX - mx, prevY - my);
         }
-        prevX = mouseX;
-        prevY = mouseY;
+        prevX = mx;
+        prevY = my;
         super.render(context, mouseX, mouseY, delta);
-        context.getMatrices().push();
-        context.getMatrices().translate(-panX, -panZ, 0);
-        context.getMatrices().scale((float) scale, (float) scale, 1);
-        manager.render(context, -panX, -panZ, 100, 100, scale, scale < 1);
-        context.getMatrices().pop();
+        manager.render(context, width, height, mx, my);
     }
 
     boolean leftClick;
@@ -74,13 +56,7 @@ public class MapScreen extends Screen {
             leftClick = false;
         }
         if (button == GLFW.GLFW_MOUSE_BUTTON_MIDDLE) {
-            manager.clear();
-            panX = 0;
-            panZ = 0;
-            scale = 1;
-            zoomval = 0;
-            leftClick = false;
-            rightClick = false;
+            manager.reset();
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -98,12 +74,7 @@ public class MapScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        zoomval = (int) MathHelper.clamp(zoomval + verticalAmount, -4, 4);
-        Vector2d oldMapPos = mouseToMap(mouseX, mouseY);
-        scale = Math.pow(2, zoomval);
-        Vector2d newMousePos = mapToMouse(oldMapPos.x, oldMapPos.y);
-        panX += newMousePos.x - mouseX;
-        panZ += newMousePos.y - mouseY;
+        manager.deltaScale((int) verticalAmount, mouseX, mouseY);
         return true;
     }
 
