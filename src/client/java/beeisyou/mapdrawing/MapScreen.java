@@ -1,22 +1,42 @@
 package beeisyou.mapdrawing;
 
+import beeisyou.mapdrawing.mapmanager.ColorElement;
 import beeisyou.mapdrawing.mapmanager.MapManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.Window;
+import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.ColorHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import org.lwjgl.glfw.GLFW;
 
 public class MapScreen extends Screen {
     MapManager manager;
-    protected MapScreen() {
+    public int color = ColorHelper.getArgb(255, 255, 255);
+    protected MapScreen(ClientPlayerEntity player) {
         super(Text.translatable("map"));
         leftClick = false;
         manager = MapDrawingClient.mapManager;
-        manager.centerWorld(MinecraftClient.getInstance().player.getX(), MinecraftClient.getInstance().player.getZ());
+        if (player.getMainHandStack().isOf(Items.SPYGLASS) || player.getOffHandStack().isOf(Items.SPYGLASS)) {
+            Vec3d pos = player.getWorld().raycast(new RaycastContext(
+                    player.getEyePos(), player.getPos().add(player.getRotationVector().multiply(128)),
+                    RaycastContext.ShapeType.COLLIDER,
+                    RaycastContext.FluidHandling.ANY,
+                    player)).getPos();
+            manager.centerWorld(pos.x, pos.z);
+        } else {
+            manager.centerWorld(player.getX(), player.getZ());
+        }
+        addDrawableChild(new ColorElement(2, 2, 10, 10, ColorHelper.getArgb(255, 255, 255), this));
+        addDrawableChild(new ColorElement(14, 2, 10, 10, ColorHelper.getArgb(0, 0, 0, 0), this));
+        addDrawableChild(new ColorElement(26, 2, 10, 10, ColorHelper.getArgb(255, 0, 0), this));
+        addDrawableChild(new ColorElement(38, 2, 10, 10, ColorHelper.getArgb(0, 255, 0), this));
+        addDrawableChild(new ColorElement(50, 2, 10, 10, ColorHelper.getArgb(0, 0, 255), this));
     }
 
 
@@ -28,8 +48,7 @@ public class MapScreen extends Screen {
         double mx = mouse.getX() * window.getScaledWidth() / window.getWidth();
         double my = mouse.getY() * window.getScaledHeight() / window.getHeight();
         if (leftClick) {
-            manager.drawLineScreen(prevX, prevY, mx, my,
-                    ColorHelper.getArgb(255, 255, 255, 255));
+            manager.drawLineScreen(prevX, prevY, mx, my, color);
         }
         if (rightClick) {
             manager.pan(prevX - mx, prevY - my);
@@ -47,6 +66,8 @@ public class MapScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (super.mouseClicked(mouseX, mouseY, button))
+            return true;
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             leftClick = true;
             rightClick = false;
@@ -57,8 +78,9 @@ public class MapScreen extends Screen {
         }
         if (button == GLFW.GLFW_MOUSE_BUTTON_MIDDLE) {
             manager.reset();
+            MapDrawingClient.movementHistory.positions.clear();
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return true;
     }
 
     @Override

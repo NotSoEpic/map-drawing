@@ -16,7 +16,7 @@ public class MapBindings {
 
     public static void inputEvents(MinecraftClient client) {
         while (openMap.wasPressed()) {
-            client.setScreen(new MapScreen());
+            client.setScreen(new MapScreen(client.player));
         }
     }
 

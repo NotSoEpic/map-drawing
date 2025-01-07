@@ -1,5 +1,6 @@
 package beeisyou.mapdrawing.mapmanager;
 
+import beeisyou.mapdrawing.MapDrawingClient;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderLayer;
@@ -131,7 +132,7 @@ public class MapManager {
                 .min(new Vector2d(width, height)).max(new Vector2d());
         context.fill((int) player.x - 5, (int) player.y - 5, (int) player.x + 5, (int) player.y + 5,
                 ColorHelper.getArgb(255, 255, 0));
-
+        MapDrawingClient.movementHistory.render(context, this);
         context.getMatrices().pop();
     }
 
