@@ -1,6 +1,6 @@
 package beeisyou.mapdrawing;
 
-import beeisyou.mapdrawing.mapmanager.MapManager;
+import beeisyou.mapdrawing.mapmanager.MapWidget;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.ColorHelper;
@@ -31,9 +31,9 @@ public class PlayerMovementHistory {
 
 
 
-    public void render(DrawContext context, MapManager manager) {
+    public void render(DrawContext context, MapWidget manager) {
         positions.stream().forEach(v -> {
-            Vector2d p = manager.worldToScreen(v.x, v.y);
+            Vector2d p = manager.worldToScreen(v.x, v.y).round();
             RenderHelper.fill(context, p.x - 1, p.y - 1, p.x + 1, p.y + 1,
                     ColorHelper.getArgb(255, 255, 0));
         });

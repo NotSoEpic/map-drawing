@@ -1,11 +1,10 @@
 package beeisyou.mapdrawing;
 
-import beeisyou.mapdrawing.mapmanager.MapManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 
 public class MapDrawingClient implements ClientModInitializer {
-	public static MapManager mapManager = new MapManager();
+	public static MapRegions regions = new MapRegions();
 	public static PlayerMovementHistory movementHistory = new PlayerMovementHistory();
 	@Override
 	public void onInitializeClient() {

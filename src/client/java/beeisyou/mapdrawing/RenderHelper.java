@@ -1,10 +1,17 @@
 package beeisyou.mapdrawing;
 
 import beeisyou.mapdrawing.mixin.client.DrawContextAccessor;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Mouse;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.util.Window;
+import net.minecraft.util.Identifier;
 import org.joml.Matrix4f;
+import org.joml.Vector2d;
+
+import java.util.function.Function;
 
 public class RenderHelper {
     // DrawContext.fill only accepts integer coordinates, which isn't precise enough
@@ -28,5 +35,34 @@ public class RenderHelper {
         vertexConsumer.vertex(mat, (float)x1, (float)y2, 0).color(color);
         vertexConsumer.vertex(mat, (float)x2, (float)y2, 0).color(color);
         vertexConsumer.vertex(mat, (float)x2, (float)y1, 0).color(color);
+    }
+
+    public static void drawTexture(
+            DrawContext context, Function<Identifier, RenderLayer> renderLayers, Identifier sprite,
+            double x, double y, float u, float v, double width, double height, int textureWidth, int textureHeight
+    ) {
+        double x1 = x;
+        double y1 = y;
+        double x2 = x1 + width;
+        double y2 = y1 + height;
+        float u1 = u / textureWidth;
+        float u2 = (float) ((u + width) / textureWidth);
+        float v1 = v / textureHeight;
+        float v2 = (float) ((v + height) / textureHeight);
+        RenderLayer renderLayer = renderLayers.apply(sprite);
+        Matrix4f matrix4f = context.getMatrices().peek().getPositionMatrix();
+        VertexConsumer vertexConsumer = ((DrawContextAccessor)context).getVertexConsumers().getBuffer(renderLayer);
+        vertexConsumer.vertex(matrix4f, (float)x1, (float)y1, 0.0F).texture(u1, v1).color(-1);
+        vertexConsumer.vertex(matrix4f, (float)x1, (float)y2, 0.0F).texture(u1, v2).color(-1);
+        vertexConsumer.vertex(matrix4f, (float)x2, (float)y2, 0.0F).texture(u2, v2).color(-1);
+        vertexConsumer.vertex(matrix4f, (float)x2, (float)y1, 0.0F).texture(u2, v1).color(-1);
+    }
+
+    public static Vector2d smootherMouse() {
+        Mouse mouse = MinecraftClient.getInstance().mouse;
+        Window window = MinecraftClient.getInstance().getWindow();
+        // client mouse is per gui pixel (up to 4x less accurate)
+        return new Vector2d(mouse.getX() * window.getScaledWidth() / window.getWidth(),
+            mouse.getY() * window.getScaledHeight() / window.getHeight());
     }
 }
