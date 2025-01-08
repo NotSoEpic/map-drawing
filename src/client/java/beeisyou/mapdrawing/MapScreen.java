@@ -1,12 +1,13 @@
 package beeisyou.mapdrawing;
 
-import beeisyou.mapdrawing.mapmanager.ColorElement;
+import beeisyou.mapdrawing.mapmanager.DrawToolWidget;
 import beeisyou.mapdrawing.mapmanager.MapWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
+import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
@@ -14,6 +15,8 @@ import net.minecraft.world.RaycastContext;
 public class MapScreen extends Screen {
     MapWidget map;
     public int color = ColorHelper.getArgb(255, 255, 255);
+    public int size = 2;
+    public boolean highlight = false;
     protected MapScreen() {
         super(Text.translatable("map"));
     }
@@ -37,11 +40,11 @@ public class MapScreen extends Screen {
         }
 
         addDrawableChild(map);
-        addDrawableChild(new ColorElement(2, 2, 10, 10, ColorHelper.getArgb(255, 255, 255), this));
-        addDrawableChild(new ColorElement(14, 2, 10, 10, ColorHelper.getArgb(0, 0, 0, 0), this));
-        addDrawableChild(new ColorElement(26, 2, 10, 10, ColorHelper.getArgb(255, 0, 0), this));
-        addDrawableChild(new ColorElement(38, 2, 10, 10, ColorHelper.getArgb(0, 255, 0), this));
-        addDrawableChild(new ColorElement(50, 2, 10, 10, ColorHelper.getArgb(0, 0, 255), this));
+
+        for (int i = 0; i < DyeColor.values().length; i++) {
+            addDrawableChild(new DrawToolWidget(this, 2 + i * 10, 2, 8, 8, DyeColor.values()[i].getMapColor().color | 0xFF000000, 1));
+            addDrawableChild(new DrawToolWidget(this, 2 + i * 10, 12, 8, 8, DyeColor.values()[i].getMapColor().color | 0xFF000000, 3));
+        }
     }
 
     @Override

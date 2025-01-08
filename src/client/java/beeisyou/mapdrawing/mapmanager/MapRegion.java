@@ -37,12 +37,15 @@ public class MapRegion {
         return inBoundsRel(x - rx * 512, z - rz * 512);
     }
 
-    public boolean putPixelWorld(int x, int z, int color) {
+    public boolean putPixelWorld(int x, int z, int color, boolean highlight) {
         if (!inBoundsAbs(x, z))
             return false;
-        texture.getImage().setColorArgb(x - rx * 512, z - rz * 512, color);
-        dirty = true;
-        return true;
+        if (!highlight || texture.getImage().getColorArgb(x - rx * 512, z - rz * 512) == 0) {
+            texture.getImage().setColorArgb(x - rx * 512, z - rz * 512, color);
+            dirty = true;
+            return true;
+        }
+        return false;
     }
 
     public void checkDirty() {

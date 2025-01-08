@@ -10,6 +10,7 @@ import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import org.joml.Vector2d;
@@ -19,7 +20,8 @@ import org.lwjgl.glfw.GLFW;
 import java.util.function.Function;
 
 public class MapWidget extends ClickableWidget {
-    MapScreen parent;
+    public static final Identifier GRID_TEXTURE = Identifier.of("map_drawing", "textures/gui/grid.png");
+    private MapScreen parent;
     public final MapRegions regions = MapDrawingClient.regions;
     public Vector2d panning = new Vector2d();
     private int scaleNum = 0;
@@ -52,27 +54,27 @@ public class MapWidget extends ClickableWidget {
 
     public void putPixelScreen(int x, int z, int r, int color) {
         Vector2d pos = screenToWorld(x - getX(), z - getY());
-        putPixelWorld((int) pos.x, (int) pos.y, r, color);
+        putPixelWorld((int) pos.x, (int) pos.y, r, color, false);
     }
 
-    public void putPixelWorld(int x, int z, int r, int color) {
-        for (int i = -r; i <= r; i++) {
-            for (int j = -r; j <= r; j++) {
+    public void putPixelWorld(int x, int z, int r, int color, boolean highlight) {
+        for (int i = 1-r; i < r; i++) {
+            for (int j = 1-r; j < r; j++) {
                 int rx = Math.floorDiv(x + i, 512);
                 int rz = Math.floorDiv(z + j, 512);
                 MapRegion region = getOrCreate(rx, rz);
-                region.putPixelWorld(x + i, z + j, color);
+                region.putPixelWorld(x + i, z + j, color, highlight);
             }
         }
     }
 
-    public void drawLineScreen(double x0, double z0, double x1, double z1, int color) {
+    public void drawLineScreen(double x0, double z0, double x1, double z1, int color, int size, boolean highlight) {
         Vector2d pos0 = screenToWorld(x0 - getX(), z0 - getY());
         Vector2d pos1 = screenToWorld(x1 - getX(), z1 - getY());
-        drawLineWorld(pos0.x, pos0.y, pos1.x, pos1.y, color);
+        drawLineWorld(pos0.x, pos0.y, pos1.x, pos1.y, color, size, highlight);
     }
 
-    public void drawLineWorld(double x0, double z0, double x1, double z1, int color) {
+    public void drawLineWorld(double x0, double z0, double x1, double z1, int color, int size, boolean highlight) {
         double dx = x0 - x1;
         double dz = z0 - z1;
         int steps = (int) Math.max(1, Math.ceil(Math.max(Math.abs(dx), Math.abs(dz))));
@@ -81,7 +83,7 @@ public class MapWidget extends ClickableWidget {
         double x = x1;
         double z = z1;
         for (int i = 0; i < steps + 1; i++) {
-            putPixelWorld((int) Math.floor(x), (int) Math.floor(z), 1, color);
+            putPixelWorld((int) Math.floor(x), (int) Math.floor(z), size, color, highlight);
             x += dx;
             z += dz;
         }
@@ -127,9 +129,9 @@ public class MapWidget extends ClickableWidget {
             mouseButton = MouseButton.NONE;
 
         switch (mouseButton) {
-            case LEFT -> drawLineScreen(prevX, prevY, mouse.x, mouse.y, parent.color);
-            case RIGHT -> pan(prevX - mouse.x, prevY - mouse.y);
-            case MIDDLE -> reset();
+            case LEFT -> drawLineScreen(prevX, prevY, mouse.x, mouse.y, parent.color, parent.size, parent.highlight);
+            case RIGHT -> drawLineScreen(prevX, prevY, mouse.x, mouse.y, 0, parent.size, false);
+            case MIDDLE -> pan(prevX - mouse.x, prevY - mouse.y);
         }
         prevX = mouse.x;
         prevY = mouse.y;
@@ -137,8 +139,12 @@ public class MapWidget extends ClickableWidget {
         context.getMatrices().push();
         context.getMatrices().translate(getX(), getY(), 0);
 
+        context.drawTexture(RenderLayer::getGuiTextured, GRID_TEXTURE, 0, 0,
+                Math.floorMod((int)panning.x, 16), Math.floorMod((int)panning.y, 16), width, height, 16, 16, -1);
+
         Vector2d ul = screenToWorld(0, 0).div(512).floor();
         Vector2d lr = screenToWorld(width, height).div(512).ceil();
+
         for (int i = (int) ul.x; i < (int) lr.x; i++) {
             for (int j = (int) ul.y; j < (int) lr.y; j++) {
                 doIfPresent(i, j, r -> {
