@@ -1,7 +1,6 @@
-package beeisyou.mapdrawing;
+package beeisyou.mapdrawing.mapmanager;
 
-import beeisyou.mapdrawing.mapmanager.DrawToolWidget;
-import beeisyou.mapdrawing.mapmanager.MapWidget;
+import beeisyou.mapdrawing.MapBindings;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -12,12 +11,15 @@ import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 
+/**
+ * The entire screen that gets rendered, including map and drawing tools
+ */
 public class MapScreen extends Screen {
     MapWidget map;
     public int color = ColorHelper.getArgb(255, 255, 255);
     public int size = 2;
     public boolean highlight = false;
-    protected MapScreen() {
+    public MapScreen() {
         super(Text.translatable("map"));
     }
 

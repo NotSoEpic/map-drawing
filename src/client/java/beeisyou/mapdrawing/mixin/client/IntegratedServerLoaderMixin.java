@@ -1,7 +1,7 @@
 package beeisyou.mapdrawing.mixin.client;
 
 import beeisyou.mapdrawing.MapDrawingClient;
-import beeisyou.mapdrawing.MapRegions;
+import beeisyou.mapdrawing.mapmanager.MapRegions;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.server.integrated.IntegratedServerLoader;
 import net.minecraft.world.level.storage.LevelStorage;

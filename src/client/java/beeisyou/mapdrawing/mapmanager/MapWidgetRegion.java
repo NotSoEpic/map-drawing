@@ -11,45 +11,42 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 
-public class MapRegion {
+/**
+ * A 512x512 section of the map
+ */
+public class MapWidgetRegion {
     public final int rx;
     public final int rz;
     public final NativeImageBackedTexture texture;
     public final Identifier id;
     private boolean dirty = false; // unuploaded changes
     private boolean removed = false;
-    public MapRegion(int rx, int rz) {
+    public MapWidgetRegion(int rx, int rz) {
         this.rx = rx;
         this.rz = rz;
         texture = new NativeImageBackedTexture(512, 512, false); // each chunk region is 512x512 blocks, seems fitting
         id = Identifier.of("mapmanager", String.format("map_%d_%d", rx, rz));
         texture.getImage().apply(i -> 0); // reset to clear
-//        int l = ((rx * 21673 + rz * 2938437) % 32 + 32) % 32;
-//        texture.getImage().apply(i -> ColorHelper.getArgb(l, l, l)); // reset to clear
-//        texture.getImage().fillRect(10, 0, 3, 512, ColorHelper.getArgb(0, 255, 0));
-//        texture.getImage().fillRect(0, 10, 512, 3, ColorHelper.getArgb(0, 255, 0));
-//        texture.getImage().fillRect(501, 0, 3, 512, ColorHelper.getArgb(0, 255, 0));
-//        texture.getImage().fillRect(0, 501, 512, 3, ColorHelper.getArgb(0, 255, 0));
         texture.upload();
         MinecraftClient.getInstance().getTextureManager().registerTexture(id, texture);
     }
 
     public void save() {
-        MapDrawing.LOGGER.info("Saving map region");
         if (MinecraftClient.getInstance().isInSingleplayer()) {
             save(MinecraftClient.getInstance().getLevelStorage().getSavesDirectory().resolve("pages"));
         }
     }
 
     public void save(Path path) {
-        MapDrawing.LOGGER.info("Saving map region to {}", path);
+        Path file = path.resolve(String.format("%d_%d.png", rx, rz));
+        MapDrawing.LOGGER.info("Saving map region to {}", file);
         Util.getIoWorkerExecutor().execute(() -> {
             try {
-                Files.createDirectories(path);
+                Files.createDirectories(file);
                 // saves/world/pages/[rx]_[rz].png
-                texture.getImage().writeTo(path.resolve(String.format("%d_%d.png", rx, rz)));
+                texture.getImage().writeTo(file);
             } catch (IOException e) {
-                MapDrawing.LOGGER.warn("Failed to save map {} {} to {}\n{}", rx, rz, path, e);
+                MapDrawing.LOGGER.warn("Failed to save map {} {} to {}\n{}", rx, rz, file, e);
             }
         });
     }

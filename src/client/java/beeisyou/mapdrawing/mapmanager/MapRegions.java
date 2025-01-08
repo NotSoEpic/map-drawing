@@ -1,6 +1,6 @@
-package beeisyou.mapdrawing;
+package beeisyou.mapdrawing.mapmanager;
 
-import beeisyou.mapdrawing.mapmanager.MapRegion;
+import beeisyou.mapdrawing.MapDrawing;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import org.apache.commons.io.FilenameUtils;
@@ -13,7 +13,10 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.stream.Stream;
 
-public class MapRegions extends HashMap<Vector2i, MapRegion> {
+/**
+ * Stores regions in memory for quick access
+ */
+public class MapRegions extends HashMap<Vector2i, MapWidgetRegion> {
     public void save() {
         MapDrawing.LOGGER.info("Saving map");
         this.forEach((v, r) -> r.save());
@@ -35,7 +38,7 @@ public class MapRegions extends HashMap<Vector2i, MapRegion> {
                         int rx = Integer.parseInt(srx);
                         int rz = Integer.parseInt(srz);
                         InputStream inputStream = Files.newInputStream(p);
-                        MapRegion region = new MapRegion(rx, rz);
+                        MapWidgetRegion region = new MapWidgetRegion(rx, rz);
                         region.texture.setImage(NativeImage.read(inputStream));
                         region.texture.upload();
                         regions.put(new Vector2i(rx, rz), region);
@@ -54,7 +57,7 @@ public class MapRegions extends HashMap<Vector2i, MapRegion> {
         // this is a very normal piece of code that will not kill your computer and/or hard drive
 //        for (int i = 0; i < 1000; i++) {
 //            for (int j = 0; j < 1000; j++) {
-//                MapRegion region = new MapRegion(i, j);
+//                MapWidgetRegion region = new MapWidgetRegion(i, j);
 //                region.putPixelRelative(0, 0, ColorHelper.getArgb(255, 255, 255), false);
 //                regions.put(new Vector2i(i, j), region);
 //            }

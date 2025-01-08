@@ -1,8 +1,6 @@
 package beeisyou.mapdrawing.mapmanager;
 
 import beeisyou.mapdrawing.MapDrawingClient;
-import beeisyou.mapdrawing.MapRegions;
-import beeisyou.mapdrawing.MapScreen;
 import beeisyou.mapdrawing.RenderHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -19,6 +17,9 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.function.Function;
 
+/**
+ * The map, rendering drawn regions and player position
+ */
 public class MapWidget extends ClickableWidget {
     public static final Identifier GRID_TEXTURE = Identifier.of("map_drawing", "textures/gui/grid.png");
     private MapScreen parent;
@@ -32,11 +33,11 @@ public class MapWidget extends ClickableWidget {
         this.parent = parent;
     }
 
-    public MapRegion getOrCreate(int rx, int rz) {
-        return regions.computeIfAbsent(new Vector2i(rx, rz), v -> new MapRegion(v.x, v.y));
+    public MapWidgetRegion getOrCreate(int rx, int rz) {
+        return regions.computeIfAbsent(new Vector2i(rx, rz), v -> new MapWidgetRegion(v.x, v.y));
     }
 
-    public void doIfPresent(int rx, int rz, Function<MapRegion, Boolean> callback) {
+    public void doIfPresent(int rx, int rz, Function<MapWidgetRegion, Boolean> callback) {
         if (regions.containsKey(new Vector2i(rx, rz))) {
             if (callback.apply(regions.get(new Vector2i(rx, rz)))) {
                 regions.remove(new Vector2i(rx, rz));
@@ -74,7 +75,7 @@ public class MapWidget extends ClickableWidget {
             for (int j = 1-r; j < r; j++) {
                 int rx = Math.floorDiv(x + i, 512);
                 int rz = Math.floorDiv(z + j, 512);
-                MapRegion region = getOrCreate(rx, rz);
+                MapWidgetRegion region = getOrCreate(rx, rz);
                 region.putPixelWorld(x + i, z + j, color, highlight);
             }
         }
@@ -185,7 +186,7 @@ public class MapWidget extends ClickableWidget {
         context.getMatrices().pop();
     }
 
-    private void renderRegion(DrawContext context, MapRegion r) {
+    private void renderRegion(DrawContext context, MapWidgetRegion r) {
         Vector2d ul = worldToScreen(r.rx * 512, r.rz * 512, true).max(new Vector2d());
         Vector2d lr = worldToScreen(r.rx * 512 + 512, r.rz * 512 + 512, true).min(new Vector2d(width, height));
         if (ul.x > width || ul.y > height || lr.x < 0 || lr.y < 0)

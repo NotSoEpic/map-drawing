@@ -1,5 +1,7 @@
 package beeisyou.mapdrawing;
 
+import beeisyou.mapdrawing.mapmanager.MapRegions;
+import beeisyou.mapdrawing.mapmanager.PlayerMovementHistory;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 
