@@ -190,8 +190,10 @@ public class MapWidget extends ClickableWidget {
                 (float) uv.x, (float) uv.y,
                 wh.x, wh.y,
                 (int) (512 * scale),(int) (512 * scale));
-//        context.drawText(MinecraftClient.getInstance().textRenderer, r.id.toString(), (int) ul.x + 2, (int) ul.y + 2,
-//                ColorHelper.getArgb(0, 0, 255), false);
+        if (MinecraftClient.getInstance().getDebugHud().shouldShowDebugHud()) {
+            context.drawText(MinecraftClient.getInstance().textRenderer, r.id.toString(), (int) ul.x + 2, (int) ul.y + 2,
+                    ColorHelper.getArgb(0, 0, 255), false);
+        }
     }
 
     public void reset() {

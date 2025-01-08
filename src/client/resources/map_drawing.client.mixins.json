@@ -3,7 +3,9 @@
   "package": "beeisyou.mapdrawing.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "DrawContextAccessor"
+    "ClientConnectionMixin",
+    "DrawContextAccessor",
+    "IntegratedServerLoaderMixin"
   ],
   "injectors": {
     "defaultRequire": 1

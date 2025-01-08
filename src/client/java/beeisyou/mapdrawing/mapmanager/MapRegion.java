@@ -1,15 +1,20 @@
 package beeisyou.mapdrawing.mapmanager;
 
+import beeisyou.mapdrawing.MapDrawing;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 
 public class MapRegion {
     public final int rx;
     public final int rz;
-    private final NativeImageBackedTexture texture;
+    public final NativeImageBackedTexture texture;
     public final Identifier id;
     private boolean dirty = false; // unuploaded changes
     private boolean removed = false;
@@ -29,6 +34,27 @@ public class MapRegion {
         MinecraftClient.getInstance().getTextureManager().registerTexture(id, texture);
     }
 
+    public void save() {
+        MapDrawing.LOGGER.info("Saving map region");
+        if (MinecraftClient.getInstance().isInSingleplayer()) {
+            save(MinecraftClient.getInstance().getLevelStorage().getSavesDirectory().resolve("pages"));
+        }
+    }
+
+    public void save(Path path) {
+        MapDrawing.LOGGER.info("Saving map region to {}", path);
+        Util.getIoWorkerExecutor().execute(() -> {
+            try {
+                Files.createDirectories(path);
+                // saves/world/pages/[rx]_[rz].png
+                texture.getImage().writeTo(path.resolve(String.format("%d_%d.png", rx, rz)));
+            } catch (IOException e) {
+                MapDrawing.LOGGER.warn("Failed to save map {} {} to {}\n{}", rx, rz, path, e);
+            }
+        });
+    }
+
+
     public boolean inBoundsRel(int x, int z) {
         return x >= 0 && x < 512 && z >= 0 && z < 512;
     }
@@ -38,10 +64,14 @@ public class MapRegion {
     }
 
     public boolean putPixelWorld(int x, int z, int color, boolean highlight) {
-        if (!inBoundsAbs(x, z))
+        return putPixelRelative(x - rx * 512, z - rz * 512, color, highlight);
+    }
+
+    public boolean putPixelRelative(int x, int z, int color, boolean highlight) {
+        if (!inBoundsRel(x, z))
             return false;
         if (!highlight || texture.getImage().getColorArgb(x - rx * 512, z - rz * 512) == 0) {
-            texture.getImage().setColorArgb(x - rx * 512, z - rz * 512, color);
+            texture.getImage().setColorArgb(x, z, color);
             dirty = true;
             return true;
         }
