@@ -33,7 +33,7 @@ public class PlayerMovementHistory {
 
     public void render(DrawContext context, MapWidget manager) {
         positions.stream().forEach(v -> {
-            Vector2d p = manager.worldToScreen(v.x, v.y).round();
+            Vector2d p = manager.worldToScreen(v.x, v.y, true);
             RenderHelper.fill(context, p.x - 1, p.y - 1, p.x + 1, p.y + 1,
                     ColorHelper.getArgb(255, 255, 0));
         });

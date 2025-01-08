@@ -8,6 +8,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.Window;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.ColorHelper;
 import org.joml.Matrix4f;
 import org.joml.Vector2d;
 
@@ -56,6 +57,10 @@ public class RenderHelper {
         vertexConsumer.vertex(matrix4f, (float)x1, (float)y2, 0.0F).texture(u1, v2).color(-1);
         vertexConsumer.vertex(matrix4f, (float)x2, (float)y2, 0.0F).texture(u2, v2).color(-1);
         vertexConsumer.vertex(matrix4f, (float)x2, (float)y1, 0.0F).texture(u2, v1).color(-1);
+    }
+
+    public static void badDebugText(DrawContext context, int x, int y, String text) {
+        context.drawText(MinecraftClient.getInstance().textRenderer, text, x, y, ColorHelper.getArgb(0, 0, 255), false);
     }
 
     public static Vector2d smootherMouse() {

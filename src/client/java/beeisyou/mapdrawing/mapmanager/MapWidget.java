@@ -48,8 +48,20 @@ public class MapWidget extends ClickableWidget {
         return (new Vector2d(x, z).sub(width / 2, height / 2).add(panning)).div(scale);
     }
 
+    public Vector2d worldToScreen(double x, double z, boolean round) {
+       Vector2d vec = new Vector2d(x, z).mul(scale);
+       if (round) {
+           vec.round();
+       }
+       vec.add(width / 2, height / 2).sub(panning);
+       if (round) {
+           vec.round();
+       }
+       return vec;
+    }
+
     public Vector2d worldToScreen(double x, double z) {
-        return new Vector2d(x, z).mul(scale).add(width / 2, height / 2).sub(panning);
+        return worldToScreen(x, z, false);
     }
 
     public void putPixelScreen(int x, int z, int r, int color) {
@@ -140,7 +152,7 @@ public class MapWidget extends ClickableWidget {
         context.getMatrices().translate(getX(), getY(), 0);
 
         context.drawTexture(RenderLayer::getGuiTextured, GRID_TEXTURE, 0, 0,
-                Math.floorMod((int)panning.x, 16), Math.floorMod((int)panning.y, 16), width, height, 16, 16, -1);
+                Math.floorMod((int)Math.round(panning.x), 16), Math.floorMod((int)Math.round(panning.y), 16), width, height, 16, 16, -1);
 
         Vector2d ul = screenToWorld(0, 0).div(512).floor();
         Vector2d lr = screenToWorld(width, height).div(512).ceil();
@@ -160,13 +172,11 @@ public class MapWidget extends ClickableWidget {
         context.drawHorizontalLine(0, width, height, ColorHelper.getArgb(255,0,0));
 
         Vector2d cursorWorld = screenToWorld(mouse.x - getX(), mouse.y - getY());
-        context.drawText(MinecraftClient.getInstance().textRenderer, String.format("%d, %d", (int)cursorWorld.x, (int)cursorWorld.y),
-                0, height + 10, ColorHelper.getArgb(0, 0, 255), false);
-        context.drawText(MinecraftClient.getInstance().textRenderer, String.format("%d, %d", (int)panning.x, (int)panning.y),
-                100, height + 10, ColorHelper.getArgb(0, 0, 255), false);
+        RenderHelper.badDebugText(context, 0, height + 10, String.format("%d, %d", (int)cursorWorld.x, (int)cursorWorld.y));
+        RenderHelper.badDebugText(context, 100, height + 10, String.format("%d, %d", (int)panning.x, (int)panning.y));
 
-        Vector2d player = worldToScreen(MinecraftClient.getInstance().player.getX(), MinecraftClient.getInstance().player.getZ())
-                .min(new Vector2d(width, height)).max(new Vector2d()).round();
+        Vector2d player = worldToScreen(MinecraftClient.getInstance().player.getX(), MinecraftClient.getInstance().player.getZ(), true)
+                .min(new Vector2d(width, height)).max(new Vector2d());
         RenderHelper.fill(context, player.x - 5, player.y - 5, player.x + 5, player.y + 5,
                 ColorHelper.getArgb(255, 255, 0));
 
@@ -176,14 +186,14 @@ public class MapWidget extends ClickableWidget {
     }
 
     private void renderRegion(DrawContext context, MapRegion r) {
-        Vector2d ul = worldToScreen(r.rx * 512, r.rz * 512).round().max(new Vector2d());
-        Vector2d lr = worldToScreen(r.rx * 512 + 512, r.rz * 512 + 512).round().min(new Vector2d(width, height));
+        Vector2d ul = worldToScreen(r.rx * 512, r.rz * 512, true).max(new Vector2d());
+        Vector2d lr = worldToScreen(r.rx * 512 + 512, r.rz * 512 + 512, true).min(new Vector2d(width, height));
         if (ul.x > width || ul.y > height || lr.x < 0 || lr.y < 0)
             return;
         r.checkDirty();
         if (r.isRemoved())
             return;
-        Vector2d uv = worldToScreen(r.rx * 512, r.rz * 512).round().sub(ul).mul(-1);
+        Vector2d uv = worldToScreen(r.rx * 512, r.rz * 512, true).sub(ul).mul(-1);
         Vector2d wh = new Vector2d(lr).sub(ul);
         RenderHelper.drawTexture(context, RenderLayer::getGuiTextured, r.id,
                 ul.x, ul.y,
@@ -191,8 +201,7 @@ public class MapWidget extends ClickableWidget {
                 wh.x, wh.y,
                 (int) (512 * scale),(int) (512 * scale));
         if (MinecraftClient.getInstance().getDebugHud().shouldShowDebugHud()) {
-            context.drawText(MinecraftClient.getInstance().textRenderer, r.id.toString(), (int) ul.x + 2, (int) ul.y + 2,
-                    ColorHelper.getArgb(0, 0, 255), false);
+            RenderHelper.badDebugText(context, (int)ul.x + 2, (int)ul.y + 2, r.id.toString());
         }
     }
 

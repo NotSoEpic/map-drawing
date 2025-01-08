@@ -42,7 +42,7 @@ public class MapRegions extends HashMap<Vector2i, MapRegion> {
                     } catch (NumberFormatException e) {
                         MapDrawing.LOGGER.warn("Invalid filename {}", p);
                     } catch (IOException e) {
-                        MapDrawing.LOGGER.warn("Failed to load map from {}\n{}", path, e);
+                        MapDrawing.LOGGER.warn("Failed to load map from {}\n{}", p, e);
                     }
                 } else {
                     MapDrawing.LOGGER.warn("Invalid filename {}", p);
