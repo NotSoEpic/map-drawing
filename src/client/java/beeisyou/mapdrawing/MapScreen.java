@@ -47,11 +47,13 @@ public class MapScreen extends Screen {
         // client mouse is per gui pixel (up to 4x less accurate)
         double mx = mouse.getX() * window.getScaledWidth() / window.getWidth();
         double my = mouse.getY() * window.getScaledHeight() / window.getHeight();
-        if (leftClick) {
-            manager.drawLineScreen(prevX, prevY, mx, my, color);
-        }
-        if (rightClick) {
-            manager.pan(prevX - mx, prevY - my);
+        if (manager.inScreenBounds(mx, my)) {
+            if (leftClick) {
+                manager.drawLineScreen(prevX, prevY, mx, my, color);
+            }
+            if (rightClick) {
+                manager.pan(prevX - mx, prevY - my);
+            }
         }
         prevX = mx;
         prevY = my;

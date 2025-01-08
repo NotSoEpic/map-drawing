@@ -1,6 +1,7 @@
 package beeisyou.mapdrawing.mapmanager;
 
 import beeisyou.mapdrawing.MapDrawingClient;
+import beeisyou.mapdrawing.RenderHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderLayer;
@@ -16,7 +17,6 @@ import org.joml.Vector2d;
 import org.joml.Vector2i;
 
 import java.util.HashMap;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class MapManager {
@@ -54,9 +54,11 @@ public class MapManager {
         return regions.computeIfAbsent(new Vector2i(rx, rz), v -> new MapRegion(v.x, v.y));
     }
 
-    public void doIfPresent(int rx, int rz, Consumer<MapRegion> callback) {
+    public void doIfPresent(int rx, int rz, Function<MapRegion, Boolean> callback) {
         if (regions.containsKey(new Vector2i(rx, rz))) {
-            callback.accept(regions.get(new Vector2i(rx, rz)));
+            if (callback.apply(regions.get(new Vector2i(rx, rz)))) {
+                regions.remove(new Vector2i(rx, rz));
+            }
         }
     }
 
@@ -105,6 +107,12 @@ public class MapManager {
         }
     }
 
+    public boolean inScreenBounds(double x, double y) {
+        x = x - leftPad;
+        y = y - topPad;
+        return x > 0 && x < width && y > 0 && y < height;
+    }
+
     public void render(DrawContext context, int screenWidth, int screenHeight, double mouseX, double mouseY) {
         width = (screenWidth - leftPad * 2);
         height = (screenHeight - topPad * 2);
@@ -116,34 +124,44 @@ public class MapManager {
         Vector2d lr = screenToWorld(width, height).div(512).ceil();
         for (int i = (int) ul.x; i < (int) lr.x; i++) {
             for (int j = (int) ul.y; j < (int) lr.y; j++) {
-                doIfPresent(i, j, r -> renderRegion(context, r));
+                doIfPresent(i, j, r -> {
+                    renderRegion(context, r);
+                    return r.isRemoved();
+                });
             }
         }
+
         context.drawVerticalLine(0, 0, (int) height, ColorHelper.getArgb(255,0,0));
         context.drawVerticalLine((int) width, 0, (int) height, ColorHelper.getArgb(255,0,0));
         context.drawHorizontalLine(0, (int) width, 0, ColorHelper.getArgb(255,0,0));
         context.drawHorizontalLine(0, (int) width, (int) height, ColorHelper.getArgb(255,0,0));
+
         Vector2d cursorWorld = screenToWorld(mouseX - leftPad, mouseY - topPad);
         context.drawText(MinecraftClient.getInstance().textRenderer, String.format("%d, %d", (int)cursorWorld.x, (int)cursorWorld.y),
                 0, (int) (height + 10), ColorHelper.getArgb(0, 0, 255), false);
         context.drawText(MinecraftClient.getInstance().textRenderer, String.format("%d, %d", (int)panning.x, (int)panning.y),
                 100, (int) (height + 10), ColorHelper.getArgb(0, 0, 255), false);
+
         Vector2d player = worldToScreen(MinecraftClient.getInstance().player.getX(), MinecraftClient.getInstance().player.getZ())
                 .min(new Vector2d(width, height)).max(new Vector2d());
-        context.fill((int) player.x - 5, (int) player.y - 5, (int) player.x + 5, (int) player.y + 5,
+        RenderHelper.fill(context, player.x - 5, player.y - 5, player.x + 5, player.y + 5,
                 ColorHelper.getArgb(255, 255, 0));
+
         MapDrawingClient.movementHistory.render(context, this);
+
         context.getMatrices().pop();
     }
 
     // todo: specific floating point issue on boundary
     private void renderRegion(DrawContext context, MapRegion r) {
-        Vector2d ul = worldToScreen(r.rx * 512, r.rz * 512).max(new Vector2d());
-        Vector2d lr = worldToScreen(r.rx * 512 + 512, r.rz * 512 + 512).min(new Vector2d(width, height));
+        Vector2d ul = worldToScreen(r.rx * 512, r.rz * 512).round().max(new Vector2d());
+        Vector2d lr = worldToScreen(r.rx * 512 + 512, r.rz * 512 + 512).round().min(new Vector2d(width, height));
         if (ul.x > width || ul.y > height || lr.x < 0 || lr.y < 0)
             return;
         r.checkDirty();
-        Vector2d uv = worldToScreen(r.rx * 512, r.rz * 512).sub(ul).mul(-1);
+        if (r.isRemoved())
+            return;
+        Vector2d uv = worldToScreen(r.rx * 512, r.rz * 512).round().sub(ul).mul(-1);
         Vector2d wh = new Vector2d(lr).sub(ul);
         context.drawTexture(RenderLayer::getGuiTextured, r.id,
                 (int) ul.x, (int) ul.y,

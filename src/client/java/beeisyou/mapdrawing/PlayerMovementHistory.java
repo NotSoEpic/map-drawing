@@ -29,10 +29,12 @@ public class PlayerMovementHistory {
         }
     }
 
+
+
     public void render(DrawContext context, MapManager manager) {
         positions.stream().forEach(v -> {
             Vector2d p = manager.worldToScreen(v.x, v.y);
-            context.fill((int) p.x - 1, (int) p.y - 1, (int) p.x + 1, (int) p.y + 1,
+            RenderHelper.fill(context, p.x - 1, p.y - 1, p.x + 1, p.y + 1,
                     ColorHelper.getArgb(255, 255, 0));
         });
     }

@@ -4,12 +4,15 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.util.Identifier;
 
+import java.util.Arrays;
+
 public class MapRegion {
     public final int rx;
     public final int rz;
     private final NativeImageBackedTexture texture;
     public final Identifier id;
     private boolean dirty = false; // unuploaded changes
+    private boolean removed = false;
     public MapRegion(int rx, int rz) {
         this.rx = rx;
         this.rz = rz;
@@ -44,9 +47,18 @@ public class MapRegion {
 
     public void checkDirty() {
         if (dirty) {
-            texture.upload();
-            dirty = false;
+            if (Arrays.stream(texture.getImage().copyPixelsAbgr()).allMatch(i -> i == 0)) {
+                removed = true;
+                clear();
+            } else {
+                texture.upload();
+                dirty = false;
+            }
         }
+    }
+
+    public boolean isRemoved() {
+        return removed;
     }
 
     public void clear() {
