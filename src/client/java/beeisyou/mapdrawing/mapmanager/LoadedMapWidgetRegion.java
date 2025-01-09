@@ -70,8 +70,9 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
         Path file = getPath(regionPath);
         Util.getIoWorkerExecutor().execute(() -> {
             try {
-                Files.createDirectories(regionPath);
+                Files.createDirectories(file.getParent());
                 texture.getImage().writeTo(file);
+                MapDrawing.LOGGER.info("Saving {} {} to {}", rx(), rz(), file);
             } catch (IOException e) {
                 MapDrawing.LOGGER.warn("Failed to save region {} {} to {}\n{}", rx(), rz(), file, e);
             }
@@ -79,8 +80,8 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
     }
 
     private void clearFile() {
-        if (regions.regionPath != null) {
-            Path file = getPath(regions.regionPath);
+        Path file = getPath(regions.getRegionPath());
+        if (file != null) {
             Util.getIoWorkerExecutor().execute(() -> {
                 try {
                     Files.deleteIfExists(file);

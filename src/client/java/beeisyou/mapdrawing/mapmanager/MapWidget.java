@@ -201,10 +201,11 @@ public class MapWidget extends ClickableWidget {
 
     private void drawDebugText(DrawContext context, Vector2d mouse) {
         Vector2d cursorWorld = screenToWorld(mouse.x - getX(), mouse.y - getY());
-        RenderHelper.badDebugText(context, 0, height + 10, String.format("%d, %d", (int)cursorWorld.x, (int)cursorWorld.y));
-        RenderHelper.badDebugText(context, 100, height + 10, String.format("%d, %d", (int)panning.x, (int)panning.y));
-        RenderHelper.badDebugText(context, 200, height + 10, String.format("%d (%d / %d)",
+        RenderHelper.badDebugText(context, 0, height + 2, String.format("%d, %d", (int)cursorWorld.x, (int)cursorWorld.y));
+        RenderHelper.badDebugText(context, 100, height + 2, String.format("%d, %d", (int)panning.x, (int)panning.y));
+        RenderHelper.badDebugText(context, 200, height + 2, String.format("%d (%d / %d)",
                 regions.getLoaded() + regions.getUnloaded(), regions.getLoaded(), regions.getUnloaded()));
+        RenderHelper.badDebugText(context, 0, height + 12, regions.getRegionPath().toString());
     }
 
     private void drawMouse(DrawContext context, Vector2d mouse) {

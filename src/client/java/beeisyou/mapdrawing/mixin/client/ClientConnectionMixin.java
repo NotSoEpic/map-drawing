@@ -15,6 +15,8 @@ import java.net.InetSocketAddress;
 public class ClientConnectionMixin {
     @Inject(method = "Lnet/minecraft/network/ClientConnection;connect(Ljava/net/InetSocketAddress;ZLnet/minecraft/network/ClientConnection;)Lio/netty/channel/ChannelFuture;", at = @At("HEAD"))
     private static void setMapPath(InetSocketAddress address, boolean useEpoll, ClientConnection connection, CallbackInfoReturnable cir) {
+        MapDrawingClient.regions.save();
+        MapDrawingClient.regions.clear();
         MapDrawingClient.regions.setRegionPathServer(address);
     }
 

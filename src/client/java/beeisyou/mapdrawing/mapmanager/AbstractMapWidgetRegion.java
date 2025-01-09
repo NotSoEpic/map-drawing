@@ -66,6 +66,8 @@ public abstract class AbstractMapWidgetRegion {
 
     public abstract boolean putPixelRelative(int x, int z, int color, boolean highlight);
     public Path getPath(Path regionFile) {
+        if (regionFile == null)
+            return null;
         return regionFile.resolve(String.format("%s.png", id().getPath()));
     }
     public abstract void save(Path regionPath);

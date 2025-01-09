@@ -3,6 +3,7 @@ package beeisyou.mapdrawing.mapmanager;
 import beeisyou.mapdrawing.MapDrawing;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Util;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 
 import java.net.InetSocketAddress;
@@ -15,7 +16,7 @@ import java.util.Map;
  * Stores regions in memory for quick access
  */
 public class MapRegions extends HashMap<Vector2i, AbstractMapWidgetRegion> {
-    public Path regionPath;
+    private Path regionPath;
     private int unloaded;
     private int loaded;
     private void deltaStats(AbstractMapWidgetRegion region, int delta) {
@@ -62,10 +63,18 @@ public class MapRegions extends HashMap<Vector2i, AbstractMapWidgetRegion> {
         regionPath = MinecraftClient.getInstance().getLevelStorage().resolve(directoryName).resolve("map");
     }
 
+    @Nullable
+    public Path getRegionPath() {
+        if (regionPath != null && MinecraftClient.getInstance().world != null) {
+            return regionPath.resolve(MinecraftClient.getInstance().world.getRegistryKey().getValue().toUnderscoreSeparatedString());
+        }
+        return null;
+    }
+
     public void save() {
         if (regionPath != null) {
             this.forEach((v, r) -> {
-                r.save(regionPath);
+                r.save(getRegionPath());
             });
         }
     }
@@ -90,7 +99,7 @@ public class MapRegions extends HashMap<Vector2i, AbstractMapWidgetRegion> {
         for (Iterator<Entry<Vector2i, AbstractMapWidgetRegion>> it = entrySet().iterator(); it.hasNext();) {
             Map.Entry<Vector2i, AbstractMapWidgetRegion> entry = it.next();
             if (rendertime - entry.getValue().getLastRenderTime() > msThreshold) {
-                entry.getValue().save(regionPath);
+                entry.getValue().save(getRegionPath());
                 deltaStats(entry.getValue(), -1);
                 it.remove();
             }

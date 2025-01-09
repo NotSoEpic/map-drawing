@@ -29,8 +29,8 @@ public class UnloadedMapWidgetRegion extends AbstractMapWidgetRegion {
     }
 
     private void loadRegionIO() {
-        if (regions.regionPath != null) {
-            Path path = getPath(regions.regionPath);
+        Path path = getPath(regions.getRegionPath());
+        if (path != null) {
             try {
                 File file = new File(path.toUri());
                 if (file.isFile()) {
