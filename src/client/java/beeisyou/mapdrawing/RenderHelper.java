@@ -7,6 +7,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.Window;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 import org.joml.Matrix4f;
@@ -18,7 +19,12 @@ public class RenderHelper {
     // DrawContext.fill only accepts integer coordinates, which isn't precise enough
     public static void fill(DrawContext context, double x1, double y1, double x2, double y2, int color) {
         RenderLayer layer = RenderLayer.getGui();
-        Matrix4f mat = context.getMatrices().peek().getPositionMatrix();
+        MatrixStack matrices = context.getMatrices();
+        matrices.push();
+
+        Matrix4f mat = matrices.peek().getPositionMatrix();
+        mat.rotate(0, 0, 0, 0);
+
         if (x1 < x2) {
             double i = x1;
             x1 = x2;
@@ -36,6 +42,8 @@ public class RenderHelper {
         vertexConsumer.vertex(mat, (float)x1, (float)y2, 0).color(color);
         vertexConsumer.vertex(mat, (float)x2, (float)y2, 0).color(color);
         vertexConsumer.vertex(mat, (float)x2, (float)y1, 0).color(color);
+
+        matrices.pop();
     }
 
     public static void drawTexture(
@@ -51,12 +59,17 @@ public class RenderHelper {
         float v1 = v / textureHeight;
         float v2 = (float) ((v + height) / textureHeight);
         RenderLayer renderLayer = renderLayers.apply(sprite);
-        Matrix4f matrix4f = context.getMatrices().peek().getPositionMatrix();
+        MatrixStack matrices = context.getMatrices();
+        matrices.push();
+
+        Matrix4f posMat = matrices.peek().getPositionMatrix();
         VertexConsumer vertexConsumer = ((DrawContextAccessor)context).getVertexConsumers().getBuffer(renderLayer);
-        vertexConsumer.vertex(matrix4f, (float)x1, (float)y1, 0.0F).texture(u1, v1).color(-1);
-        vertexConsumer.vertex(matrix4f, (float)x1, (float)y2, 0.0F).texture(u1, v2).color(-1);
-        vertexConsumer.vertex(matrix4f, (float)x2, (float)y2, 0.0F).texture(u2, v2).color(-1);
-        vertexConsumer.vertex(matrix4f, (float)x2, (float)y1, 0.0F).texture(u2, v1).color(-1);
+        vertexConsumer.vertex(posMat, (float)x1, (float)y1, 0.0F).texture(u1, v1).color(-1);
+        vertexConsumer.vertex(posMat, (float)x1, (float)y2, 0.0F).texture(u1, v2).color(-1);
+        vertexConsumer.vertex(posMat, (float)x2, (float)y2, 0.0F).texture(u2, v2).color(-1);
+        vertexConsumer.vertex(posMat, (float)x2, (float)y1, 0.0F).texture(u2, v1).color(-1);
+
+        matrices.pop();
     }
 
     public static void badDebugText(DrawContext context, int x, int y, String text) {

@@ -41,13 +41,22 @@ public class MapDrawingClient implements ClientModInitializer {
 		});
 
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+			boolean connectedTolocal = client.isConnectedToLocalServer();
 			MapDrawing.LOGGER.debug("Connecting to {}", client.world);
 
 			long seed = ((BiomeAccessAccessor) client.world.getBiomeAccess()).getSeed();
-			UUID uuid = MathHelper.randomUuid(Random.create(seed));
-			MapDrawing.LOGGER.debug("Generating UUID from {}; {}", seed, uuid);
 
-			MapDrawingClient.regions.setRegionPathGeneral(uuid);
+			String name;
+			if (connectedTolocal) {
+				name = client.getServer().getSaveProperties().getLevelName();
+			} else {
+				name = client.getCurrentServerEntry().name;
+			}
+
+			UUID uuid = MathHelper.randomUuid(Random.create(seed));
+			MapDrawing.LOGGER.debug("Generating UUID from {}; {}_{}", seed, uuid, name);
+
+			MapDrawingClient.regions.setRegionPathGeneral(uuid, name, connectedTolocal);
 		});
 
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {

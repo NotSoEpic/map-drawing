@@ -59,13 +59,17 @@ public class MapRegions extends HashMap<Vector2i, AbstractMapWidgetRegion> {
      * Sets the region path for this map for saving / loading
      *
      * @param folderID The UUID of the folder
+     * @param name the secondary name of the folder, usually the name of the server / world
+     * @param client whether map data should be saved as singleplayer information or server information
      * @author Cyvack
      */
-    public void setRegionPathGeneral(UUID folderID) {
+    public void setRegionPathGeneral(UUID folderID, String name, boolean client) {
         File mainDir = MinecraftClient.getInstance().runDirectory;
-        Path wayfinderMaps = mainDir.toPath().resolve("wayfinder_maps");
 
-        regionPath = wayfinderMaps.resolve(folderID.toString());
+        regionPath = mainDir.toPath()
+                .resolve("wayfinder_maps")
+                .resolve(client ? "singleplayer" : "multiplayer")
+                .resolve(folderID.toString() + "_" + name);
     }
 
     @Nullable
