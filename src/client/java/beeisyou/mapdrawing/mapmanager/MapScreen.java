@@ -42,9 +42,11 @@ public class MapScreen extends Screen {
     }
 
     public Vec3d spyglassPinRaycast(ClientPlayerEntity player) {
+        int distance = MinecraftClient.getInstance().options.getClampedViewDistance(); //client side view distance so we don't always cast into unloaded chunks
+
         if ((player.getMainHandStack().isOf(Items.SPYGLASS) || player.getOffHandStack().isOf(Items.SPYGLASS)) && player.isUsingItem()) {
             BlockHitResult hitResult = player.getWorld().raycast(new RaycastContext(
-                    player.getEyePos(), player.getPos().add(player.getRotationVector().multiply(1024)), // this is a bit excessive but what if 64 render distance,,,
+                    player.getEyePos(), player.getPos().add(player.getRotationVector().multiply(distance * 16)), // this is a bit excessive but what if 64 render distance,,, // <- star was a nerd
                     RaycastContext.ShapeType.COLLIDER,
                     RaycastContext.FluidHandling.ANY,
                     player));
