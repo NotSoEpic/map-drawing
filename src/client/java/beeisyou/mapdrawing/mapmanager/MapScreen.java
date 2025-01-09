@@ -7,6 +7,8 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 
@@ -15,6 +17,7 @@ import net.minecraft.world.RaycastContext;
  */
 public class MapScreen extends Screen {
     MapWidget map;
+
     public MapScreen() {
         super(Text.translatable("map"));
     }
@@ -26,16 +29,9 @@ public class MapScreen extends Screen {
         map = new MapWidget(this, 50, 30, width - 100, height - 60);
 
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
-        if (player.getMainHandStack().isOf(Items.SPYGLASS) || player.getOffHandStack().isOf(Items.SPYGLASS)) {
-            Vec3d pos = player.getWorld().raycast(new RaycastContext(
-                    player.getEyePos(), player.getPos().add(player.getRotationVector().multiply(128)),
-                    RaycastContext.ShapeType.COLLIDER,
-                    RaycastContext.FluidHandling.ANY,
-                    player)).getPos();
-            map.centerWorld(pos.x, pos.z);
-        } else {
-            map.centerWorld(player.getX(), player.getZ());
-        }
+        Vec3d spyglassPinPos = spyglassPinRaycast(player);
+        if (spyglassPinPos != null) map.centerWorld(spyglassPinPos.getX(), spyglassPinPos.getZ());
+        else map.centerWorld(player.getX(), player.getZ());
 
         addDrawableChild(map);
 
@@ -43,6 +39,20 @@ public class MapScreen extends Screen {
             addDrawableChild(new DrawToolWidget(this, 2 + i * 10, 2, 8, 8, DyeColor.values()[i].getMapColor().color | 0xFF000000, 1));
             addDrawableChild(new DrawToolWidget(this, 2 + i * 10, 12, 8, 8, DyeColor.values()[i].getMapColor().color | 0xFF000000, 3));
         }
+    }
+
+    public Vec3d spyglassPinRaycast(ClientPlayerEntity player) {
+        if ((player.getMainHandStack().isOf(Items.SPYGLASS) || player.getOffHandStack().isOf(Items.SPYGLASS)) && player.isUsingItem()) {
+            BlockHitResult hitResult = player.getWorld().raycast(new RaycastContext(
+                    player.getEyePos(), player.getPos().add(player.getRotationVector().multiply(1024)), // this is a bit excessive but what if 64 render distance,,,
+                    RaycastContext.ShapeType.COLLIDER,
+                    RaycastContext.FluidHandling.ANY,
+                    player));
+            if (hitResult.getType() != HitResult.Type.MISS) {
+                return hitResult.getPos();
+            }
+        }
+        return null;
     }
 
     @Override
