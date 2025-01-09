@@ -7,6 +7,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
@@ -80,6 +81,7 @@ public class MapWidget extends ClickableWidget {
     public void drawLineScreen(double x0, double z0, double x1, double z1, int color, int size, boolean highlight) {
         Vector2d pos0 = screenToWorld(x0 - getX(), z0 - getY());
         Vector2d pos1 = screenToWorld(x1 - getX(), z1 - getY());
+        MapDrawingClient.lastDrawnPos = pos1;
         drawLineWorld(pos0.x, pos0.y, pos1.x, pos1.y, color, size, highlight);
     }
 
@@ -137,10 +139,29 @@ public class MapWidget extends ClickableWidget {
         if (!hovered && mouseButton != MouseButton.RIGHT)
             mouseButton = MouseButton.NONE;
 
-        switch (mouseButton) {
-            case LEFT -> drawLineScreen(prevX, prevY, mouse.x, mouse.y, MapDrawingClient.penColor, MapDrawingClient.penSize, MapDrawingClient.highlight);
-            case RIGHT -> drawLineScreen(prevX, prevY, mouse.x, mouse.y, 0, MapDrawingClient.penSize, false);
-            case MIDDLE -> pan(prevX - mouse.x, prevY - mouse.y);
+        boolean shift = InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT)
+                || InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_RIGHT_SHIFT);
+        if (shift && MapDrawingClient.lastDrawnPos != null) {
+            Vector2d mouseWorld = screenToWorld(mouse.x - getX(), mouse.y - getY());
+            switch (mouseButton) {
+                case LEFT -> {
+                    drawLineWorld(MapDrawingClient.lastDrawnPos.x, MapDrawingClient.lastDrawnPos.y, mouseWorld.x, mouseWorld.y,
+                            MapDrawingClient.penColor, MapDrawingClient.penSize, MapDrawingClient.highlight);
+                    MapDrawingClient.lastDrawnPos = mouseWorld;
+                }
+                case RIGHT -> {
+                    drawLineWorld(MapDrawingClient.lastDrawnPos.x, MapDrawingClient.lastDrawnPos.y, mouseWorld.x, mouseWorld.y,
+                            0, MapDrawingClient.penSize, false);
+                    MapDrawingClient.lastDrawnPos = mouseWorld;
+                }
+                case MIDDLE -> pan(prevX - mouse.x, prevY - mouse.y);
+            }
+        } else {
+            switch (mouseButton) {
+                case LEFT -> drawLineScreen(prevX, prevY, mouse.x, mouse.y, MapDrawingClient.penColor, MapDrawingClient.penSize, MapDrawingClient.highlight);
+                case RIGHT -> drawLineScreen(prevX, prevY, mouse.x, mouse.y, 0, MapDrawingClient.penSize, false);
+                case MIDDLE -> pan(prevX - mouse.x, prevY - mouse.y);
+            }
         }
         prevX = mouse.x;
         prevY = mouse.y;
