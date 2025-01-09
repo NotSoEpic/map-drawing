@@ -4,8 +4,7 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "ClientConnectionMixin",
-    "DrawContextAccessor",
-    "IntegratedServerLoaderMixin"
+    "DrawContextAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

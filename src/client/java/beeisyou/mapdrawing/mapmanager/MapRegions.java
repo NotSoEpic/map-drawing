@@ -1,67 +1,74 @@
 package beeisyou.mapdrawing.mapmanager;
 
-import beeisyou.mapdrawing.MapDrawing;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.texture.NativeImage;
-import org.apache.commons.io.FilenameUtils;
+import net.minecraft.util.Util;
 import org.joml.Vector2i;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.stream.Stream;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Stores regions in memory for quick access
  */
-public class MapRegions extends HashMap<Vector2i, MapWidgetRegion> {
-    public void save() {
-        MapDrawing.LOGGER.info("Saving map");
-        this.forEach((v, r) -> r.save());
+public class MapRegions extends HashMap<Vector2i, AbstractMapWidgetRegion> {
+    private int unloaded;
+    private int loaded;
+    private void deltaStats(AbstractMapWidgetRegion region, int delta) {
+        if (region instanceof UnloadedMapWidgetRegion)
+            unloaded += delta;
+        else if (region instanceof LoadedMapWidgetRegion)
+            loaded += delta;
     }
 
-    public static MapRegions fromFolder(Path path) {
-        MapDrawing.LOGGER.info("Reading map data from {}", path);
-        MapRegions regions = new MapRegions();
-        try {
-            MinecraftClient.getInstance().getLevelStorage().getSavesDirectory().resolve("pages");
-            Stream<Path> stream = Files.list(path);
-            stream.forEach(p -> {
-                String filename = FilenameUtils.removeExtension(p.getFileName().toString());
-                int i = filename.lastIndexOf("_");
-                if (i != -1) {
-                    String srx = filename.substring(0, i);
-                    String srz = filename.substring(i + 1);
-                    try {
-                        int rx = Integer.parseInt(srx);
-                        int rz = Integer.parseInt(srz);
-                        InputStream inputStream = Files.newInputStream(p);
-                        MapWidgetRegion region = new MapWidgetRegion(rx, rz);
-                        region.texture.setImage(NativeImage.read(inputStream));
-                        region.texture.upload();
-                        regions.put(new Vector2i(rx, rz), region);
-                    } catch (NumberFormatException e) {
-                        MapDrawing.LOGGER.warn("Invalid filename {}", p);
-                    } catch (IOException e) {
-                        MapDrawing.LOGGER.warn("Failed to load map from {}\n{}", p, e);
-                    }
-                } else {
-                    MapDrawing.LOGGER.warn("Invalid filename {}", p);
-                }
-            });
-        } catch (IOException e) {
-            MapDrawing.LOGGER.warn("Failed to load map from {}\n{}", path, e);
+    public AbstractMapWidgetRegion put(int rx, int rz, AbstractMapWidgetRegion region) {
+        deltaStats(region, 1);
+        AbstractMapWidgetRegion prev = put(new Vector2i(rx, rz), region);
+        deltaStats(prev, -1);
+        return prev;
+    }
+
+    public AbstractMapWidgetRegion get(int rx, int rz) {
+        return get(new Vector2i(rx, rz));
+    }
+
+    public boolean contains(int rx, int rz) {
+        return containsKey(new Vector2i(rx, rz));
+    }
+
+    public int getLoaded() {
+        return loaded;
+    }
+
+    public int getUnloaded() {
+        return unloaded;
+    }
+
+    public void save() {
+        this.forEach((v, r) -> {
+            if (r instanceof LoadedMapWidgetRegion loaded) {
+                loaded.save();
+            }
+        });
+    }
+
+    int cleanupTimer = 0;
+    public void tick() {
+        cleanupTimer--;
+        if (cleanupTimer < 0) {
+            cleanupTimer = 20 * 10;
+            cleanup(1000 * 10);
         }
-        // this is a very normal piece of code that will not kill your computer and/or hard drive
-//        for (int i = 0; i < 1000; i++) {
-//            for (int j = 0; j < 1000; j++) {
-//                MapWidgetRegion region = new MapWidgetRegion(i, j);
-//                region.putPixelRelative(0, 0, ColorHelper.getArgb(255, 255, 255), false);
-//                regions.put(new Vector2i(i, j), region);
-//            }
-//        }
-        return regions;
+    }
+    public void cleanup(long msThreshold) {
+        long rendertime = Util.getMeasuringTimeMs();
+        for (Iterator<Entry<Vector2i, AbstractMapWidgetRegion>> it = entrySet().iterator(); it.hasNext();) {
+            Map.Entry<Vector2i, AbstractMapWidgetRegion> entry = it.next();
+            if (rendertime - entry.getValue().getLastRenderTime() > msThreshold) {
+                entry.getValue().save();
+                entry.getValue().clear();
+                deltaStats(entry.getValue(), -1);
+                it.remove();
+            }
+        }
     }
 }

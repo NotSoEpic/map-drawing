@@ -12,17 +12,14 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import org.joml.Vector2d;
-import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
-
-import java.util.function.Function;
 
 /**
  * The map, rendering drawn regions and player position
  */
 public class MapWidget extends ClickableWidget {
     public static final Identifier GRID_TEXTURE = Identifier.of("map_drawing", "textures/gui/grid.png");
-    private MapScreen parent;
+    private final MapScreen parent;
     public final MapRegions regions = MapDrawingClient.regions;
     public Vector2d panning = new Vector2d();
     private int scaleNum = 0;
@@ -33,15 +30,13 @@ public class MapWidget extends ClickableWidget {
         this.parent = parent;
     }
 
-    public MapWidgetRegion getOrCreate(int rx, int rz) {
-        return regions.computeIfAbsent(new Vector2i(rx, rz), v -> new MapWidgetRegion(v.x, v.y));
-    }
-
-    public void doIfPresent(int rx, int rz, Function<MapWidgetRegion, Boolean> callback) {
-        if (regions.containsKey(new Vector2i(rx, rz))) {
-            if (callback.apply(regions.get(new Vector2i(rx, rz)))) {
-                regions.remove(new Vector2i(rx, rz));
-            }
+    public AbstractMapWidgetRegion getOrLoad(int rx, int rz) {
+        if (regions.contains(rx, rz)) {
+            return regions.get(rx, rz);
+        } else {
+            AbstractMapWidgetRegion region = new UnloadedMapWidgetRegion(rx, rz, regions);
+            regions.put(rx, rz, region);
+            return region;
         }
     }
 
@@ -75,7 +70,7 @@ public class MapWidget extends ClickableWidget {
             for (int j = 1-r; j < r; j++) {
                 int rx = Math.floorDiv(x + i, 512);
                 int rz = Math.floorDiv(z + j, 512);
-                MapWidgetRegion region = getOrCreate(rx, rz);
+                AbstractMapWidgetRegion region = getOrLoad(rx, rz);
                 region.putPixelWorld(x + i, z + j, color, highlight);
             }
         }
@@ -160,10 +155,8 @@ public class MapWidget extends ClickableWidget {
 
         for (int i = (int) ul.x; i < (int) lr.x; i++) {
             for (int j = (int) ul.y; j < (int) lr.y; j++) {
-                doIfPresent(i, j, r -> {
-                    renderRegion(context, r);
-                    return r.isRemoved();
-                });
+                AbstractMapWidgetRegion region = getOrLoad(i, j);
+                region.render(context, this);
             }
         }
 
@@ -175,6 +168,8 @@ public class MapWidget extends ClickableWidget {
         Vector2d cursorWorld = screenToWorld(mouse.x - getX(), mouse.y - getY());
         RenderHelper.badDebugText(context, 0, height + 10, String.format("%d, %d", (int)cursorWorld.x, (int)cursorWorld.y));
         RenderHelper.badDebugText(context, 100, height + 10, String.format("%d, %d", (int)panning.x, (int)panning.y));
+        RenderHelper.badDebugText(context, 200, height + 10, String.format("%d (%d / %d)",
+                regions.getLoaded() + regions.getUnloaded(), regions.getLoaded(), regions.getUnloaded()));
 
         Vector2d player = worldToScreen(MinecraftClient.getInstance().player.getX(), MinecraftClient.getInstance().player.getZ(), true)
                 .min(new Vector2d(width, height)).max(new Vector2d());
@@ -186,24 +181,8 @@ public class MapWidget extends ClickableWidget {
         context.getMatrices().pop();
     }
 
-    private void renderRegion(DrawContext context, MapWidgetRegion r) {
-        Vector2d ul = worldToScreen(r.rx * 512, r.rz * 512, true).max(new Vector2d());
-        Vector2d lr = worldToScreen(r.rx * 512 + 512, r.rz * 512 + 512, true).min(new Vector2d(width, height));
-        if (ul.x > width || ul.y > height || lr.x < 0 || lr.y < 0)
-            return;
-        r.checkDirty();
-        if (r.isRemoved())
-            return;
-        Vector2d uv = worldToScreen(r.rx * 512, r.rz * 512, true).sub(ul).mul(-1);
-        Vector2d wh = new Vector2d(lr).sub(ul);
-        RenderHelper.drawTexture(context, RenderLayer::getGuiTextured, r.id,
-                ul.x, ul.y,
-                (float) uv.x, (float) uv.y,
-                wh.x, wh.y,
-                (int) (512 * scale),(int) (512 * scale));
-        if (MinecraftClient.getInstance().getDebugHud().shouldShowDebugHud()) {
-            RenderHelper.badDebugText(context, (int)ul.x + 2, (int)ul.y + 2, r.id.toString());
-        }
+    public void applyLoadedRegion(UnloadedMapWidgetRegion unloaded, LoadedMapWidgetRegion loaded) {
+        regions.put(unloaded.rx(), unloaded.rz(), loaded);
     }
 
     public void reset() {

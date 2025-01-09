@@ -14,6 +14,7 @@ public class MapDrawingClient implements ClientModInitializer {
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			MapBindings.inputEvents(client);
 			movementHistory.tick(client.player);
+			regions.tick();
 		});
 	}
 }
