@@ -32,8 +32,6 @@ public class PlayerMovementHistory {
         }
     }
 
-
-
     public void render(DrawContext context, MapWidget manager) {
         positions.stream().forEach(v -> {
             Vector2d p = manager.worldToScreen(v.x, v.y, true);
@@ -42,5 +40,9 @@ public class PlayerMovementHistory {
                         ColorHelper.getArgb(255, 255, 0));
             }
         });
+    }
+
+    public void clear() {
+        positions.clear();
     }
 }

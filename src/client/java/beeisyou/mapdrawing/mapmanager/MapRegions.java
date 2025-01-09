@@ -1,8 +1,12 @@
 package beeisyou.mapdrawing.mapmanager;
 
+import beeisyou.mapdrawing.MapDrawing;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Util;
 import org.joml.Vector2i;
 
+import java.net.InetSocketAddress;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -11,6 +15,7 @@ import java.util.Map;
  * Stores regions in memory for quick access
  */
 public class MapRegions extends HashMap<Vector2i, AbstractMapWidgetRegion> {
+    public Path regionPath;
     private int unloaded;
     private int loaded;
     private void deltaStats(AbstractMapWidgetRegion region, int delta) {
@@ -43,28 +48,49 @@ public class MapRegions extends HashMap<Vector2i, AbstractMapWidgetRegion> {
         return unloaded;
     }
 
+    public void clearRegionPath() {
+        regionPath = null;
+    }
+
+    // todo: actually test this
+    public void setRegionPathServer(InetSocketAddress server) {
+        regionPath = MinecraftClient.getInstance().runDirectory.toPath().resolve("server_maps")
+                .resolve(server.getAddress().getHostAddress() + "_" + server.getPort());
+    }
+
+    public void setRegionPathSingleplayer(String directoryName) {
+        regionPath = MinecraftClient.getInstance().getLevelStorage().resolve(directoryName).resolve("map");
+    }
+
     public void save() {
-        this.forEach((v, r) -> {
-            if (r instanceof LoadedMapWidgetRegion loaded) {
-                loaded.save();
-            }
-        });
+        if (regionPath != null) {
+            this.forEach((v, r) -> {
+                r.save(regionPath);
+            });
+        }
     }
 
     int cleanupTimer = 0;
     public void tick() {
-        cleanupTimer--;
-        if (cleanupTimer < 0) {
-            cleanupTimer = 20 * 10;
-            cleanup(1000 * 10);
+        if (regionPath != null) {
+            cleanupTimer--;
+            if (cleanupTimer < 0) {
+                cleanupTimer = 20 * 10;
+                cleanup(1000 * 10);
+            }
         }
     }
+
     public void cleanup(long msThreshold) {
+        if (regionPath == null) {
+            MapDrawing.LOGGER.warn("No path for map to save");
+            return;
+        }
         long rendertime = Util.getMeasuringTimeMs();
         for (Iterator<Entry<Vector2i, AbstractMapWidgetRegion>> it = entrySet().iterator(); it.hasNext();) {
             Map.Entry<Vector2i, AbstractMapWidgetRegion> entry = it.next();
             if (rendertime - entry.getValue().getLastRenderTime() > msThreshold) {
-                entry.getValue().save();
+                entry.getValue().save(regionPath);
                 deltaStats(entry.getValue(), -1);
                 it.remove();
             }

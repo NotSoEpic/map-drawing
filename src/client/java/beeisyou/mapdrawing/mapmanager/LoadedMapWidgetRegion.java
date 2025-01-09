@@ -19,7 +19,8 @@ import java.util.Arrays;
  */
 public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
     public final NativeImageBackedTexture texture;
-    private boolean dirty = false; // unuploaded changes
+    private boolean dirtyVisual = false; // unuploaded changes
+    private boolean dirtySave = false;
     private boolean removed = false;
     public LoadedMapWidgetRegion(int rx, int rz, MapRegions regions) {
         super(rx, rz, regions);
@@ -63,11 +64,13 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
     }
 
     @Override
-    public void save() {
-        Path file = getPath();
+    public void save(Path regionPath) {
+        if (!dirtySave)
+            return;
+        Path file = getPath(regionPath);
         Util.getIoWorkerExecutor().execute(() -> {
             try {
-                Files.createDirectories(file.getParent());
+                Files.createDirectories(regionPath);
                 texture.getImage().writeTo(file);
             } catch (IOException e) {
                 MapDrawing.LOGGER.warn("Failed to save region {} {} to {}\n{}", rx(), rz(), file, e);
@@ -76,14 +79,19 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
     }
 
     private void clearFile() {
-        Path file = getPath();
-        Util.getIoWorkerExecutor().execute(() -> {
-            try {
-                Files.deleteIfExists(file);
-            } catch (IOException e) {
-                MapDrawing.LOGGER.warn("Failed to delete region {} {} of {}\n{}", rx(), rz(), file, e);
-            }
-        });
+        if (regions.regionPath != null) {
+            Path file = getPath(regions.regionPath);
+            Util.getIoWorkerExecutor().execute(() -> {
+                try {
+                    Files.deleteIfExists(file);
+                    dirtySave = false;
+                } catch (IOException e) {
+                    MapDrawing.LOGGER.warn("Failed to delete region {} {} of {}\n{}", rx(), rz(), file, e);
+                }
+            });
+        } else {
+            MapDrawing.LOGGER.warn("No path for map to clear");
+        }
     }
 
     public boolean putPixelRelative(int x, int z, int color, boolean highlight) {
@@ -91,19 +99,20 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
             return false;
         if (!highlight || texture.getImage().getColorArgb(x - rx() * 512, z - rz() * 512) == 0) {
             texture.getImage().setColorArgb(x, z, color);
-            dirty = true;
+            dirtyVisual = true;
+            dirtySave = true;
             return true;
         }
         return false;
     }
 
     public void checkDirty() {
-        if (dirty) {
+        if (dirtyVisual) {
             if (Arrays.stream(texture.getImage().copyPixelsAbgr()).allMatch(i -> i == 0)) {
                 removed = true;
             } else {
                 texture.upload();
-                dirty = false;
+                dirtyVisual = false;
             }
         }
     }

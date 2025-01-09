@@ -29,17 +29,22 @@ public class UnloadedMapWidgetRegion extends AbstractMapWidgetRegion {
     }
 
     private void loadRegionIO() {
-        Path path = getPath();
-        try {
-            File file = new File(path.toUri());
-            if (file.isFile()) {
-                InputStream inputStream = Files.newInputStream(path);
-                loadedImage = NativeImage.read(inputStream);
+        if (regions.regionPath != null) {
+            Path path = getPath(regions.regionPath);
+            try {
+                File file = new File(path.toUri());
+                if (file.isFile()) {
+                    InputStream inputStream = Files.newInputStream(path);
+                    loadedImage = NativeImage.read(inputStream);
+                }
+                loading = false;
+            } catch (IOException e) {
+                MapDrawing.LOGGER.warn("Failed to load {}\n{}", path, e);
+                loading = false;
             }
+        } else {
             loading = false;
-        } catch (IOException e) {
-            MapDrawing.LOGGER.warn("Failed to load {}\n{}", path, e);
-            loading = false;
+            MapDrawing.LOGGER.warn("No path for map to load");
         }
     }
 
@@ -68,5 +73,5 @@ public class UnloadedMapWidgetRegion extends AbstractMapWidgetRegion {
     }
 
     @Override
-    public void save() {}
+    public void save(Path path) {}
 }

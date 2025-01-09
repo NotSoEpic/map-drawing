@@ -135,7 +135,20 @@ public class MapWidget extends ClickableWidget {
 
     @Override
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+        context.getMatrices().push();
+        context.getMatrices().translate(getX(), getY(), 0);
+
         Vector2d mouse = RenderHelper.smootherMouse();
+        handleMouse(context, mouse);
+        drawRegions(context);
+        drawDebugText(context, mouse);
+        drawMouse(context, mouse);
+        drawPlayer(context);
+
+        context.getMatrices().pop();
+    }
+
+    private void handleMouse(DrawContext context, Vector2d mouse) {
         if (!hovered && mouseButton != MouseButton.RIGHT)
             mouseButton = MouseButton.NONE;
 
@@ -165,10 +178,8 @@ public class MapWidget extends ClickableWidget {
         }
         prevX = mouse.x;
         prevY = mouse.y;
-
-        context.getMatrices().push();
-        context.getMatrices().translate(getX(), getY(), 0);
-
+    }
+    private void drawRegions(DrawContext context) {
         context.drawTexture(RenderLayer::getGuiTextured, GRID_TEXTURE, 0, 0,
                 Math.floorMod((int)Math.round(panning.x), 16), Math.floorMod((int)Math.round(panning.y), 16), width, height, 16, 16, -1);
 
@@ -186,21 +197,31 @@ public class MapWidget extends ClickableWidget {
         context.drawVerticalLine(width, 0, height, ColorHelper.getArgb(255,0,0));
         context.drawHorizontalLine(0, width, 0, ColorHelper.getArgb(255,0,0));
         context.drawHorizontalLine(0, width, height, ColorHelper.getArgb(255,0,0));
+    }
 
+    private void drawDebugText(DrawContext context, Vector2d mouse) {
         Vector2d cursorWorld = screenToWorld(mouse.x - getX(), mouse.y - getY());
         RenderHelper.badDebugText(context, 0, height + 10, String.format("%d, %d", (int)cursorWorld.x, (int)cursorWorld.y));
         RenderHelper.badDebugText(context, 100, height + 10, String.format("%d, %d", (int)panning.x, (int)panning.y));
         RenderHelper.badDebugText(context, 200, height + 10, String.format("%d (%d / %d)",
                 regions.getLoaded() + regions.getUnloaded(), regions.getLoaded(), regions.getUnloaded()));
+    }
 
+    private void drawMouse(DrawContext context, Vector2d mouse) {
+        double mx = Math.floor((mouse.x + panning.x) / scale) * scale - panning.x - getX();
+        double my = Math.floor((mouse.y + panning.y) / scale) * scale - panning.y - getY();
+        double ps = MapDrawingClient.penSize * scale / 2;
+        context.fill((int)(mx - ps), (int)(my - ps),
+                (int)(mx + ps), (int)(my + ps), MapDrawingClient.penColor);
+    }
+
+    private void drawPlayer(DrawContext context) {
         Vector2d player = worldToScreen(MinecraftClient.getInstance().player.getX(), MinecraftClient.getInstance().player.getZ(), true)
                 .min(new Vector2d(width, height)).max(new Vector2d());
         RenderHelper.fill(context, player.x - 5, player.y - 5, player.x + 5, player.y + 5,
                 ColorHelper.getArgb(255, 255, 0));
 
         MapDrawingClient.movementHistory.render(context, this);
-
-        context.getMatrices().pop();
     }
 
     public void applyLoadedRegion(UnloadedMapWidgetRegion unloaded, LoadedMapWidgetRegion loaded) {
