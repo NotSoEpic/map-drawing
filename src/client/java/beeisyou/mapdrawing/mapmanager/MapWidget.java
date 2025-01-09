@@ -209,11 +209,33 @@ public class MapWidget extends ClickableWidget {
     }
 
     private void drawMouse(DrawContext context, Vector2d mouse) {
-        double mx = Math.floor((mouse.x + panning.x) / scale) * scale - panning.x - getX();
-        double my = Math.floor((mouse.y + panning.y) / scale) * scale - panning.y - getY();
-        double ps = MapDrawingClient.penSize * scale / 2;
-        context.fill((int)(mx - ps), (int)(my - ps),
-                (int)(mx + ps), (int)(my + ps), MapDrawingClient.penColor);
+        Vector2d ul = screenToWorld((int)mouse.x - getX(), (int)mouse.y - getY()).sub(MapDrawingClient.penSize - 0.5, MapDrawingClient.penSize - 0.5).round();
+        Vector2d w = screenToWorld((int)mouse.x - getX(), (int)mouse.y - getY()).add(MapDrawingClient.penSize - 0.5, MapDrawingClient.penSize - 0.5).round();
+        boolean shift = InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT)
+                || InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_RIGHT_SHIFT);
+        if (shift && MapDrawingClient.lastDrawnPos != null) {
+            // todo: this is slightly off
+            Vector2d oul = new Vector2d(MapDrawingClient.lastDrawnPos).sub(MapDrawingClient.penSize - 0.5, MapDrawingClient.penSize - 0.5).round();
+            double dx = oul.x - ul.x;
+            double dz = oul.y - ul.y;
+            int steps = (int) Math.max(1, Math.ceil(Math.max(Math.abs(dx), Math.abs(dz))));
+            dx /= steps;
+            dz /= steps;
+            double x = ul.x;
+            double z = ul.y;
+            ul = worldToScreen(ul.x, ul.y, true);
+            w = worldToScreen(w.x, w.y, true).sub(ul);
+            for (int i = 0; i < steps + 1; i++) {
+                Vector2d awawa = worldToScreen(Math.round(x), Math.round(z), true);
+                context.fill((int) awawa.x, (int) awawa.y, (int) (awawa.x + w.x), (int) (awawa.y + w.y), MapDrawingClient.penColor);
+                x += dx;
+                z += dz;
+            }
+        } else {
+            ul = worldToScreen(ul.x, ul.y, true);
+            w = worldToScreen(w.x, w.y, true).sub(ul);
+            context.fill((int) Math.floor(ul.x), (int) Math.floor(ul.y), (int) Math.floor(ul.x + w.x), (int) Math.floor(ul.y + w.y), MapDrawingClient.penColor);
+        }
     }
 
     private void drawPlayer(DrawContext context) {

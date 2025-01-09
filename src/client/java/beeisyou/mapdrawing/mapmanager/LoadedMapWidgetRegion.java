@@ -72,7 +72,6 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
             try {
                 Files.createDirectories(file.getParent());
                 texture.getImage().writeTo(file);
-                MapDrawing.LOGGER.info("Saving {} {} to {}", rx(), rz(), file);
             } catch (IOException e) {
                 MapDrawing.LOGGER.warn("Failed to save region {} {} to {}\n{}", rx(), rz(), file, e);
             }
