@@ -244,7 +244,7 @@ public class MapWidget extends ClickableWidget {
         RenderHelper.fill(context, player.x - 5, player.y - 5, player.x + 5, player.y + 5,
                 ColorHelper.getArgb(255, 255, 0));
 
-        MapDrawingClient.movementHistory.render(context, this);
+        if (InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_ALT)) MapDrawingClient.movementHistory.render(context, this);
     }
 
     public void applyLoadedRegion(UnloadedMapWidgetRegion unloaded, LoadedMapWidgetRegion loaded) {
