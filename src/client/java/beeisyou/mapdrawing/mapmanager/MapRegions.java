@@ -6,11 +6,13 @@ import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 
+import java.io.File;
 import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Stores regions in memory for quick access
@@ -53,14 +55,17 @@ public class MapRegions extends HashMap<Vector2i, AbstractMapWidgetRegion> {
         regionPath = null;
     }
 
-    // todo: actually test this
-    public void setRegionPathServer(InetSocketAddress server) {
-        regionPath = MinecraftClient.getInstance().runDirectory.toPath().resolve("server_maps")
-                .resolve(server.getAddress().getHostAddress() + "_" + server.getPort());
-    }
+    /**
+     * Sets the region path for this map for saving / loading
+     *
+     * @param folderID The UUID of the folder
+     * @author Cyvack
+     */
+    public void setRegionPathGeneral(UUID folderID) {
+        File mainDir = MinecraftClient.getInstance().runDirectory;
+        Path wayfinderMaps = mainDir.toPath().resolve("wayfinder_maps");
 
-    public void setRegionPathSingleplayer(String directoryName) {
-        regionPath = MinecraftClient.getInstance().getLevelStorage().resolve(directoryName).resolve("map");
+        regionPath = wayfinderMaps.resolve(folderID.toString());
     }
 
     @Nullable
@@ -68,6 +73,7 @@ public class MapRegions extends HashMap<Vector2i, AbstractMapWidgetRegion> {
         if (regionPath != null && MinecraftClient.getInstance().world != null) {
             return regionPath.resolve(MinecraftClient.getInstance().world.getRegistryKey().getValue().toUnderscoreSeparatedString());
         }
+
         return null;
     }
 

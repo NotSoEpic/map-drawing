@@ -3,9 +3,8 @@
   "package": "beeisyou.mapdrawing.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "ClientConnectionMixin",
     "DrawContextAccessor",
-    "MinecraftClientMixin"
+    "BiomeAccessAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
