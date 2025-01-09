@@ -137,8 +137,8 @@ public class MapWidget extends ClickableWidget {
             mouseButton = MouseButton.NONE;
 
         switch (mouseButton) {
-            case LEFT -> drawLineScreen(prevX, prevY, mouse.x, mouse.y, parent.color, parent.size, parent.highlight);
-            case RIGHT -> drawLineScreen(prevX, prevY, mouse.x, mouse.y, 0, parent.size, false);
+            case LEFT -> drawLineScreen(prevX, prevY, mouse.x, mouse.y, MapDrawingClient.penColor, MapDrawingClient.penSize, MapDrawingClient.highlight);
+            case RIGHT -> drawLineScreen(prevX, prevY, mouse.x, mouse.y, 0, MapDrawingClient.penSize, false);
             case MIDDLE -> pan(prevX - mouse.x, prevY - mouse.y);
         }
         prevX = mouse.x;
@@ -213,7 +213,7 @@ public class MapWidget extends ClickableWidget {
     }
 
     public void deltaScale(int num, double mouseX, double mouseY) {
-        setScale(MathHelper.clamp(scaleNum + num, -3, 1), mouseX, mouseY);
+        setScale(MathHelper.clamp(scaleNum + num, -3, 2), mouseX, mouseY);
     }
 
     @Override

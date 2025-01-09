@@ -4,10 +4,15 @@ import beeisyou.mapdrawing.mapmanager.MapRegions;
 import beeisyou.mapdrawing.mapmanager.PlayerMovementHistory;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.minecraft.block.MapColor;
 
 public class MapDrawingClient implements ClientModInitializer {
 	public static MapRegions regions = new MapRegions();
 	public static PlayerMovementHistory movementHistory = new PlayerMovementHistory();
+
+	public static int penColor = MapColor.WHITE.color | 0xFF000000;
+	public static int penSize = 3;
+	public static boolean highlight = false;
 	@Override
 	public void onInitializeClient() {
 		MapBindings.init();

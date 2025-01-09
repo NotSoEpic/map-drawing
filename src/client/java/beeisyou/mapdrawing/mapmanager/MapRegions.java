@@ -65,7 +65,6 @@ public class MapRegions extends HashMap<Vector2i, AbstractMapWidgetRegion> {
             Map.Entry<Vector2i, AbstractMapWidgetRegion> entry = it.next();
             if (rendertime - entry.getValue().getLastRenderTime() > msThreshold) {
                 entry.getValue().save();
-                entry.getValue().clear();
                 deltaStats(entry.getValue(), -1);
                 it.remove();
             }

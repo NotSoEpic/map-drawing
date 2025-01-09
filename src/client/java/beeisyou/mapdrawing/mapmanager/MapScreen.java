@@ -7,7 +7,6 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
-import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 
@@ -16,9 +15,6 @@ import net.minecraft.world.RaycastContext;
  */
 public class MapScreen extends Screen {
     MapWidget map;
-    public int color = ColorHelper.getArgb(255, 255, 255);
-    public int size = 2;
-    public boolean highlight = false;
     public MapScreen() {
         super(Text.translatable("map"));
     }
