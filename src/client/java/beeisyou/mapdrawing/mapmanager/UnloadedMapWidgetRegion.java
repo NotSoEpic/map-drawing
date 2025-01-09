@@ -15,17 +15,20 @@ import java.nio.file.Path;
  * A 512x512 section of the map, either still in the state of loading or having no image
  */
 public class UnloadedMapWidgetRegion extends AbstractMapWidgetRegion {
-    private boolean loading;
+    private boolean loading = false;
     private LoadedMapWidgetRegion loaded = null;
     private NativeImage loadedImage = null;
 
     public UnloadedMapWidgetRegion(int rx, int rz, MapRegions regions) {
         super(rx, rz, regions);
-        loading = true;
-        Util.getIoWorkerExecutor().execute(this::tryLoadRegion);
     }
 
-    private void tryLoadRegion() {
+    public void tryLoadRegion() {
+        loading = true;
+        Util.getIoWorkerExecutor().execute(this::loadRegionIO);
+    }
+
+    private void loadRegionIO() {
         Path path = getPath();
         try {
             File file = new File(path.toUri());
@@ -63,9 +66,6 @@ public class UnloadedMapWidgetRegion extends AbstractMapWidgetRegion {
             regions.put(rx(), rz(), loaded);
         }
     }
-
-    @Override
-    public void clear() {}
 
     @Override
     public void save() {}

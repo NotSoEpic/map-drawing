@@ -45,8 +45,11 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
         if (!shouldBeRendered(parent, ul, lr))
             return;
         checkDirty();
-        if (isRemoved())
+        if (isRemoved()) {
+            clearFile();
+            regions.put(rx(), rz(), new UnloadedMapWidgetRegion(rx(), rz(), regions));
             return;
+        }
         Vector2d uv = parent.worldToScreen(rx() * 512, rz() * 512, true).sub(ul).mul(-1);
         Vector2d wh = new Vector2d(lr).sub(ul);
         RenderHelper.drawTexture(context, RenderLayer::getGuiTextured, id(),
@@ -67,7 +70,18 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
                 Files.createDirectories(file.getParent());
                 texture.getImage().writeTo(file);
             } catch (IOException e) {
-                MapDrawing.LOGGER.warn("Failed to save map {} {} to {}\n{}", rx(), rz(), file, e);
+                MapDrawing.LOGGER.warn("Failed to save region {} {} to {}\n{}", rx(), rz(), file, e);
+            }
+        });
+    }
+
+    private void clearFile() {
+        Path file = getPath();
+        Util.getIoWorkerExecutor().execute(() -> {
+            try {
+                Files.deleteIfExists(file);
+            } catch (IOException e) {
+                MapDrawing.LOGGER.warn("Failed to delete region {} {} of {}\n{}", rx(), rz(), file, e);
             }
         });
     }
@@ -87,7 +101,6 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
         if (dirty) {
             if (Arrays.stream(texture.getImage().copyPixelsAbgr()).allMatch(i -> i == 0)) {
                 removed = true;
-                clear();
             } else {
                 texture.upload();
                 dirty = false;
@@ -97,9 +110,5 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
 
     public boolean isRemoved() {
         return removed;
-    }
-
-    public void clear() {
-        texture.close();
     }
 }

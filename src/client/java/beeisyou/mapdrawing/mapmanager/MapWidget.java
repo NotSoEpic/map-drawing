@@ -34,7 +34,8 @@ public class MapWidget extends ClickableWidget {
         if (regions.contains(rx, rz)) {
             return regions.get(rx, rz);
         } else {
-            AbstractMapWidgetRegion region = new UnloadedMapWidgetRegion(rx, rz, regions);
+            UnloadedMapWidgetRegion region = new UnloadedMapWidgetRegion(rx, rz, regions);
+            region.tryLoadRegion();
             regions.put(rx, rz, region);
             return region;
         }
@@ -186,7 +187,6 @@ public class MapWidget extends ClickableWidget {
     }
 
     public void reset() {
-        regions.forEach((v, r) -> r.clear());
         regions.clear();
         setScale(0);
         centerWorld(MinecraftClient.getInstance().player.getX(), MinecraftClient.getInstance().player.getZ());

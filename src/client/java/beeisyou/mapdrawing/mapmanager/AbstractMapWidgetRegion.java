@@ -65,7 +65,6 @@ public abstract class AbstractMapWidgetRegion {
     }
 
     public abstract boolean putPixelRelative(int x, int z, int color, boolean highlight);
-    public abstract void clear();
     public Path getPath() {
         return MinecraftClient.getInstance().getLevelStorage().getSavesDirectory()
                 .resolve("pages").resolve(String.format("%s.png", id().getPath()));
