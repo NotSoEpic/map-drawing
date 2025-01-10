@@ -3,11 +3,11 @@ package beeisyou.mapdrawing;
 import beeisyou.mapdrawing.mapmanager.MapRegions;
 import beeisyou.mapdrawing.mapmanager.PlayerMovementHistory;
 import beeisyou.mapdrawing.mixin.client.BiomeAccessAccessor;
+import beeisyou.mapdrawing.stampitem.StampTextureTooltipData;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.minecraft.block.MapColor;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.MathHelper;
@@ -15,7 +15,6 @@ import net.minecraft.util.math.random.Random;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
 
-import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.UUID;
 
@@ -67,5 +66,12 @@ public class MapDrawingClient implements ClientModInitializer {
 			MapDrawingClient.regions.clearRegionPath();
 			MapDrawingClient.movementHistory.clear();
 		});
+
+		TooltipComponentCallback.EVENT.register((data -> {
+			if (data instanceof StampTextureTooltipData stampTextureComponent) {
+				return new StampTooltipComponent(stampTextureComponent.texture());
+			}
+			return null;
+		}));
 	}
 }

@@ -15,6 +15,9 @@
 	"icon": "assets/map_drawing/icon.png",
 	"environment": "*",
 	"entrypoints": {
+		"fabric-datagen": [
+			"beeisyou.mapdrawing.datagen.DataGenerator"
+		],
 		"main": [
 			"beeisyou.mapdrawing.MapDrawing"
 		],
