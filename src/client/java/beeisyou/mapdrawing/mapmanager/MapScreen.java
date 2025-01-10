@@ -4,6 +4,7 @@ import beeisyou.mapdrawing.MapBindings;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.util.Window;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
@@ -11,6 +12,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
+import org.lwjgl.glfw.GLFW;
 
 /**
  * The entire screen that gets rendered, including map and drawing tools
@@ -32,6 +34,9 @@ public class MapScreen extends Screen {
         Vec3d spyglassPinPos = spyglassPinRaycast(player);
         if (spyglassPinPos != null) map.centerWorld(spyglassPinPos.getX(), spyglassPinPos.getZ());
         else map.centerWorld(player.getX(), player.getZ());
+
+        Window window = MinecraftClient.getInstance().getWindow();
+        GLFW.glfwSetInputMode(window.getHandle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
 
         addDrawableChild(map);
 
