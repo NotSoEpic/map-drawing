@@ -1,5 +1,7 @@
 package beeisyou.mapdrawing;
 
+import beeisyou.mapdrawing.color.ColorPalette;
+import beeisyou.mapdrawing.color.ColorPaletteManager;
 import beeisyou.mapdrawing.mapmanager.MapRegions;
 import beeisyou.mapdrawing.mapmanager.PlayerMovementHistory;
 import beeisyou.mapdrawing.mixin.client.BiomeAccessAccessor;
@@ -9,7 +11,9 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.minecraft.block.MapColor;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.resource.ResourceType;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.random.Random;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +26,8 @@ public class MapDrawingClient implements ClientModInitializer {
 	public static MapRegions regions = new MapRegions();
 	public static PlayerMovementHistory movementHistory = new PlayerMovementHistory();
 
-	public static int penColor = MapColor.WHITE.color | 0xFF000000;
+	public static ColorPalette palette;
+	public static int penColorIndex = 0;
 	public static int penSize = 3;
 	public static boolean highlight = false;
 	@Nullable
@@ -73,5 +78,7 @@ public class MapDrawingClient implements ClientModInitializer {
 			}
 			return null;
 		}));
+
+		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new ColorPaletteManager());
 	}
 }

@@ -2,6 +2,7 @@ package beeisyou.mapdrawing.mapmanager;
 
 import beeisyou.mapdrawing.MapDrawing;
 import beeisyou.mapdrawing.RenderHelper;
+import beeisyou.mapdrawing.rendering.MapDrawingRenderLayers;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderLayer;
@@ -53,7 +54,7 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
         }
         Vector2d uv = parent.worldToScreen(rx() * 512, rz() * 512, true).sub(ul).mul(-1);
         Vector2d wh = new Vector2d(lr).sub(ul);
-        RenderHelper.drawTexture(context, RenderLayer::getGuiTextured, id(),
+        RenderHelper.drawTexture(context, MapDrawingRenderLayers::getPaletteSwap, id(),
                 ul.x, ul.y,
                 (float) uv.x, (float) uv.y,
                 wh.x, wh.y,

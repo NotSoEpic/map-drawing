@@ -1,0 +1,13 @@
+{
+  "name": "Debug",
+  "colors": [
+    "000000",
+    "FF0000",
+    "00FF00",
+    "0000FF",
+    "00FFFF",
+    "FF00FF",
+    "FFFF00",
+    "FFFFFF"
+  ]
+}

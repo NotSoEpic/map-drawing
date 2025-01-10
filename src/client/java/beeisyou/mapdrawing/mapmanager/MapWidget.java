@@ -2,6 +2,7 @@ package beeisyou.mapdrawing.mapmanager;
 
 import beeisyou.mapdrawing.MapDrawingClient;
 import beeisyou.mapdrawing.RenderHelper;
+import beeisyou.mapdrawing.color.ColorPalette;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
@@ -14,6 +15,8 @@ import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import org.joml.Vector2d;
 import org.lwjgl.glfw.GLFW;
+
+import java.awt.*;
 
 /**
  * The map, rendering drawn regions and player position
@@ -152,6 +155,9 @@ public class MapWidget extends ClickableWidget {
         if (!hovered && mouseButton != MouseButton.RIGHT)
             mouseButton = MouseButton.NONE;
 
+        Color color = ColorPalette.GRAYSCALE.colors().get(MapDrawingClient.penColorIndex);
+        int penColor = color.getRGB() | 0xFF000000;
+
         boolean shift = InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT)
                 || InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_RIGHT_SHIFT);
         if (shift && MapDrawingClient.lastDrawnPos != null) {
@@ -159,7 +165,7 @@ public class MapWidget extends ClickableWidget {
             switch (mouseButton) {
                 case LEFT -> {
                     drawLineWorld(MapDrawingClient.lastDrawnPos.x, MapDrawingClient.lastDrawnPos.y, mouseWorld.x, mouseWorld.y,
-                            MapDrawingClient.penColor, MapDrawingClient.penSize, MapDrawingClient.highlight);
+                            penColor, MapDrawingClient.penSize, MapDrawingClient.highlight);
                     MapDrawingClient.lastDrawnPos = mouseWorld;
                 }
                 case RIGHT -> {
@@ -171,7 +177,7 @@ public class MapWidget extends ClickableWidget {
             }
         } else {
             switch (mouseButton) {
-                case LEFT -> drawLineScreen(prevX, prevY, mouse.x, mouse.y, MapDrawingClient.penColor, MapDrawingClient.penSize, MapDrawingClient.highlight);
+                case LEFT -> drawLineScreen(prevX, prevY, mouse.x, mouse.y, penColor, MapDrawingClient.penSize, MapDrawingClient.highlight);
                 case RIGHT -> drawLineScreen(prevX, prevY, mouse.x, mouse.y, 0, MapDrawingClient.penSize, false);
                 case MIDDLE -> pan(prevX - mouse.x, prevY - mouse.y);
             }
@@ -209,6 +215,10 @@ public class MapWidget extends ClickableWidget {
     }
 
     private void drawMouse(DrawContext context, Vector2d mouse) {
+
+        Color color = MapDrawingClient.palette.colors().get(MapDrawingClient.penColorIndex);
+        int penColor = color.getRGB() | 0xFF000000;
+
         Vector2d ul = screenToWorld((int)mouse.x - getX(), (int)mouse.y - getY()).sub(MapDrawingClient.penSize - 0.5, MapDrawingClient.penSize - 0.5).round();
         Vector2d w = screenToWorld((int)mouse.x - getX(), (int)mouse.y - getY()).add(MapDrawingClient.penSize - 0.5, MapDrawingClient.penSize - 0.5).round();
         boolean shift = InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT)
@@ -227,14 +237,14 @@ public class MapWidget extends ClickableWidget {
             w = worldToScreen(w.x, w.y, true).sub(ul);
             for (int i = 0; i < steps + 1; i++) {
                 Vector2d awawa = worldToScreen(Math.round(x), Math.round(z), true);
-                context.fill((int) awawa.x, (int) awawa.y, (int) (awawa.x + w.x), (int) (awawa.y + w.y), MapDrawingClient.penColor);
+                context.fill((int) awawa.x, (int) awawa.y, (int) (awawa.x + w.x), (int) (awawa.y + w.y), penColor);
                 x += dx;
                 z += dz;
             }
         } else {
             ul = worldToScreen(ul.x, ul.y, true);
             w = worldToScreen(w.x, w.y, true).sub(ul);
-            context.fill((int) Math.floor(ul.x), (int) Math.floor(ul.y), (int) Math.floor(ul.x + w.x), (int) Math.floor(ul.y + w.y), MapDrawingClient.penColor);
+            context.fill((int) Math.floor(ul.x), (int) Math.floor(ul.y), (int) Math.floor(ul.x + w.x), (int) Math.floor(ul.y + w.y), penColor);
         }
     }
 

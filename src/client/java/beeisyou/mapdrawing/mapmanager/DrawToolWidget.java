@@ -1,20 +1,23 @@
 package beeisyou.mapdrawing.mapmanager;
 
 import beeisyou.mapdrawing.MapDrawingClient;
+import beeisyou.mapdrawing.color.ColorPalette;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
+import java.awt.*;
+
 public class DrawToolWidget extends ClickableWidget {
     private final MapScreen parent;
-    private final int color;
+    private final int colorIndex;
     private final int size;
-    public DrawToolWidget(MapScreen parent, int x, int y, int width, int height, int color, int size) {
+    public DrawToolWidget(MapScreen parent, int x, int y, int width, int height, int colorIndex, int size) {
         super(x, y, width, height, Text.of("draw tool"));
         this.parent = parent;
-        this.color = color;
+        this.colorIndex = colorIndex;
         this.size = size;
     }
 
@@ -26,7 +29,7 @@ public class DrawToolWidget extends ClickableWidget {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (super.mouseClicked(mouseX, mouseY, button)) {
-            MapDrawingClient.penColor = color;
+            MapDrawingClient.penColorIndex = colorIndex;
             MapDrawingClient.penSize = size;
             MapDrawingClient.highlight = button == GLFW.GLFW_MOUSE_BUTTON_RIGHT;
             return true;
@@ -36,9 +39,19 @@ public class DrawToolWidget extends ClickableWidget {
 
     @Override
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-        context.fill(getX(), getY(), getRight(), getBottom(), color);
+        context.fill(getX(), getY(), getRight(), getBottom(), getVisualColor());
     }
 
     @Override
     protected void appendClickableNarrations(NarrationMessageBuilder builder) {}
+
+    private int getVisualColor() {
+        Color color = MapDrawingClient.palette.colors().get(colorIndex);
+        return color.getRGB() | 0xFF000000;
+    }
+
+    private int getDrawnColor() {
+        Color color = ColorPalette.GRAYSCALE.colors().get(colorIndex);
+        return color.getRGB() | 0xFF000000;
+    }
 }

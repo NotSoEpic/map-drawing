@@ -1,6 +1,10 @@
 package beeisyou.mapdrawing.mapmanager;
 
 import beeisyou.mapdrawing.MapBindings;
+import beeisyou.mapdrawing.MapDrawing;
+import beeisyou.mapdrawing.MapDrawingClient;
+import beeisyou.mapdrawing.color.ColorPalette;
+import beeisyou.mapdrawing.color.ColorPaletteManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -40,9 +44,11 @@ public class MapScreen extends Screen {
 
         addDrawableChild(map);
 
-        for (int i = 0; i < DyeColor.values().length; i++) {
-            addDrawableChild(new DrawToolWidget(this, 2 + i * 10, 2, 8, 8, DyeColor.values()[i].getMapColor().color | 0xFF000000, 1));
-            addDrawableChild(new DrawToolWidget(this, 2 + i * 10, 12, 8, 8, DyeColor.values()[i].getMapColor().color | 0xFF000000, 3));
+        MapDrawingClient.palette = ColorPaletteManager.get(MapDrawing.id("default"));
+
+        for (int i = 0; i < ColorPalette.SIZE; i++) {
+            addDrawableChild(new DrawToolWidget(this, 2 + i * 10, 2, 8, 8, i, 1));
+            addDrawableChild(new DrawToolWidget(this, 2 + i * 10, 12, 8, 8, i, 3));
         }
     }
 

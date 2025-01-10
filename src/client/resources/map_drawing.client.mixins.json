@@ -3,8 +3,9 @@
   "package": "beeisyou.mapdrawing.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "BiomeAccessAccessor",
     "DrawContextAccessor",
-    "BiomeAccessAccessor"
+    "ShaderProgramMixin"
   ],
   "injectors": {
     "defaultRequire": 1
