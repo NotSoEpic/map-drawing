@@ -1,15 +1,16 @@
 package wawa.wayfinder.rendering;
 
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.Util;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.TriState;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormat;
+
 import java.util.function.Function;
 
-public class WayfinderRenderLayers {
+public class WayfinderRenderTypes {
 
 	private static final Function<ResourceLocation, RenderType> PALETTE_SWAP = Util.memoize((id) -> RenderType.create(
 			"texture_palette_swap",

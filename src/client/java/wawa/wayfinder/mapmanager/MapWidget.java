@@ -20,7 +20,7 @@ import wawa.wayfinder.RenderHelper;
 import wawa.wayfinder.Wayfinder;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.color.ColorPalette;
-import wawa.wayfinder.rendering.WayfinderRenderLayers;
+import wawa.wayfinder.rendering.WayfinderRenderTypes;
 
 import java.awt.*;
 
@@ -256,7 +256,7 @@ public class MapWidget extends AbstractWidget {
             for (int i = 0; i < steps + 1; i++) {
                 Vector2d ul = worldToScreen(Math.round(x), Math.round(z), true)
                         .sub(new Vector2d(WayfinderClient.penSize - 1).floor().mul(scale));
-                context.blit(WayfinderRenderLayers::getPaletteSwap, Wayfinder.id("pen"),
+                context.blit(WayfinderRenderTypes::getPaletteSwap, Wayfinder.id("pen"),
                         (int) ul.x, (int) ul.y, 0, 0,
                         (int) (wh * scale), (int) (wh * scale), (int) (wh * scale), (int) (wh * scale)
                 );
@@ -266,7 +266,7 @@ public class MapWidget extends AbstractWidget {
         } else {
             mouse = worldToScreen(mouse, true)
                     .sub(new Vector2d(WayfinderClient.penSize - 1).floor().mul(scale));
-            context.blit(WayfinderRenderLayers::getPaletteSwap, Wayfinder.id("pen"),
+            context.blit(WayfinderRenderTypes::getPaletteSwap, Wayfinder.id("pen"),
                     (int) mouse.x, (int) mouse.y, 0, 0,
                     (int) (wh * scale), (int) (wh * scale), (int) (wh * scale), (int) (wh * scale)
             );

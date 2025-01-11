@@ -8,7 +8,7 @@ import org.joml.RoundingMode;
 import org.joml.Vector2i;
 import wawa.wayfinder.RenderHelper;
 import wawa.wayfinder.Wayfinder;
-import wawa.wayfinder.rendering.WayfinderRenderLayers;
+import wawa.wayfinder.rendering.WayfinderRenderTypes;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -52,9 +52,9 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
         }
         Vector2i ul = new Vector2i(parent.worldToScreen(rx() * 512, rz() * 512, true), RoundingMode.FLOOR);
         Vector2i wh = new Vector2i(512 * parent.scale, 512 * parent.scale, RoundingMode.FLOOR);
-        context.blit(WayfinderRenderLayers::getPaletteSwap, id(), ul.x, ul.y, 0, 0, wh.x, wh.y, wh.x, wh.y);
+        context.blit(WayfinderRenderTypes::getPaletteSwap, id(), ul.x, ul.y, 0, 0, wh.x, wh.y, wh.x, wh.y);
         if (Minecraft.getInstance().getDebugOverlay().showDebugScreen()) {
-            RenderHelper.badDebugText(context, (int)ul.x + 2, (int)ul.y + 2, id().getPath());
+            RenderHelper.badDebugText(context, ul.x + 2, ul.y + 2, id().getPath());
         }
     }
 
