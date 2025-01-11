@@ -21,27 +21,32 @@ public abstract class Tool {
 
     protected abstract void onSelect();
 
+    public void leftDown(MapWidget widget, boolean shift, Vector2d mouse, Vector2i world) {}
+
     /**
      * Called every frame left click is held on the map
      * @param widget the map
-     * @param initial if this is the first frame
      * @param shift if shift is held
      * @param mouse screen position of the mouse, (0,0) being top left of the map
      * @param world world position of the mouse
-     * @return whether to capture the input
      */
-    public abstract boolean leftClick(MapWidget widget, boolean initial, boolean shift, Vector2d mouse, Vector2i world);
+    public void leftHold(MapWidget widget, boolean shift, Vector2d mouse, Vector2i world) {}
+    public void leftUp(MapWidget widget, boolean shift, Vector2d mouse, Vector2i world) {}
 
+
+    public void rightDown(MapWidget widget, boolean shift, Vector2d mouse, Vector2i world) {}
     /**
      * Called every frame right click is held on the map
      * @param widget the map
-     * @param initial if this is the first frame
      * @param shift if shift is held
      * @param mouse screen position of the mouse, (0,0) being top left of the map
      * @param world world position of the mouse
-     * @return whether to capture the input
      */
-    public abstract boolean rightClick(MapWidget widget, boolean initial, boolean shift, Vector2d mouse, Vector2i world);
+    public void rightHold(MapWidget widget, boolean shift, Vector2d mouse, Vector2i world) {}
+    public void rightUp(MapWidget widget, boolean shift, Vector2d mouse, Vector2i world) {}
+
+    public void ctrlScroll(MapWidget widget, Vector2d mouse, Vector2i world, double verticalAmount) {}
+
     public abstract void render(MapWidget widget, GuiGraphics context, boolean shift, Vector2d mouse, Vector2i world);
     public abstract boolean hideMouse(MapWidget widget, Vector2d mouse, Vector2i world);
 }

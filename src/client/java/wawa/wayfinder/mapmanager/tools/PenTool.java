@@ -2,8 +2,10 @@ package wawa.wayfinder.mapmanager.tools;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import org.joml.RoundingMode;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
@@ -12,6 +14,8 @@ import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.color.ColorPalette;
 import wawa.wayfinder.mapmanager.MapWidget;
 import wawa.wayfinder.rendering.WayfinderRenderTypes;
+
+import java.awt.*;
 
 public class PenTool extends Tool {
     public int size;
@@ -32,7 +36,7 @@ public class PenTool extends Tool {
     }
 
     @Override
-    public boolean leftClick(MapWidget widget, boolean initial, boolean shift, Vector2d mouse, Vector2i world) {
+    public void leftHold(MapWidget widget, boolean shift, Vector2d mouse, Vector2i world) {
         if (shift) {
             Vector2i lastWorld = WayfinderClient.lastDrawnPos;
             if (lastWorld == null) {
@@ -44,11 +48,25 @@ public class PenTool extends Tool {
             widget.drawLineScreen(widget.prevX, widget.prevY, mouse.x, mouse.y, getDrawnColor(), size, highlight);
         }
         WayfinderClient.lastDrawnPos = new Vector2i(world);
-        return true;
     }
 
     @Override
-    public boolean rightClick(MapWidget widget, boolean initial, boolean shift, Vector2d mouse, Vector2i world) {
+    public void leftDown(MapWidget widget, boolean shift, Vector2d mouse, Vector2i world) {
+        if (Screen.hasAltDown()) {
+            Color color = new Color(widget.getPixelWorld(world.x, world.y));
+            if (color.getAlpha() != 0) {
+                int i = ColorPalette.GRAYSCALE.colors().indexOf(color);
+                if (i != -1) {
+                    setColorIndex(i);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void rightHold(MapWidget widget, boolean shift, Vector2d mouse, Vector2i world) {
+        if (Screen.hasAltDown())
+            return;
         if (shift) {
             Vector2i lastWorld = WayfinderClient.lastDrawnPos;
             if (lastWorld == null) {
@@ -60,7 +78,11 @@ public class PenTool extends Tool {
             widget.drawLineScreen(widget.prevX, widget.prevY, mouse.x, mouse.y, 0, size, false);
         }
         WayfinderClient.lastDrawnPos = new Vector2i(world);
-        return true;
+    }
+
+    @Override
+    public void ctrlScroll(MapWidget widget, Vector2d mouse, Vector2i world, double verticalAmount) {
+        size = Mth.clamp(size + (int)verticalAmount, 1, 5);
     }
 
     @Override

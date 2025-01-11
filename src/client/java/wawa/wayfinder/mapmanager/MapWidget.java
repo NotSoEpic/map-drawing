@@ -1,12 +1,12 @@
 package wawa.wayfinder.mapmanager;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -88,6 +88,13 @@ public class MapWidget extends AbstractWidget {
         }
     }
 
+    public int getPixelWorld(int x, int z) {
+        int rx = Math.floorDiv(x, 512);
+        int rz = Math.floorDiv(z, 512);
+        AbstractMapWidgetRegion region = getOrLoad(rx, rz);
+        return region.getPixelWorld(x, z);
+    }
+
     public void putTextureWorld(int x, int z, NativeImage pixels) {
         int w = pixels.getWidth();
         int h = pixels.getHeight();
@@ -127,7 +134,6 @@ public class MapWidget extends AbstractWidget {
     enum MouseButton {
         NONE, LEFT, RIGHT, MIDDLE
     }
-    boolean firstClick = false;
     MouseButton mouseButton = MouseButton.NONE;
     public double prevX;
     public double prevY;
@@ -135,10 +141,6 @@ public class MapWidget extends AbstractWidget {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (active && visible && isMouseOver(mouseX, mouseY)) {
-            if (mouseButton == MouseButton.NONE)
-                firstClick = true;
-            else
-                firstClick = false;
             if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
                 mouseButton = MouseButton.LEFT;
             } else if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
@@ -146,19 +148,43 @@ public class MapWidget extends AbstractWidget {
             } else if (button == GLFW.GLFW_MOUSE_BUTTON_MIDDLE) {
                 mouseButton = MouseButton.MIDDLE;
             }
+            if (Tool.get() != null) {
+                Vector2d mouse = new Vector2d(mouseX, mouseY);
+                Vector2i world = new Vector2i(screenToWorld(mouse.x - getX(), mouse.y - getY()), RoundingMode.FLOOR);
+                boolean shift = Screen.hasShiftDown();
+                switch (mouseButton) {
+                    case LEFT -> Tool.get().leftDown(this, shift, mouse, world);
+                    case RIGHT -> Tool.get().rightDown(this, shift, mouse, world);
+                }
+            }
         }
         return false;
     }
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (Tool.get() != null) {
+            Vector2d mouse = new Vector2d(mouseX, mouseY);
+            Vector2i world = new Vector2i(screenToWorld(mouse.x - getX(), mouse.y - getY()), RoundingMode.FLOOR);
+            boolean shift = Screen.hasShiftDown();
+            switch (mouseButton) {
+                case LEFT -> Tool.get().leftUp(this, shift, mouse, world);
+                case RIGHT -> Tool.get().rightUp(this, shift, mouse, world);
+            }
+        }
         mouseButton = MouseButton.NONE;
         return true;
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        deltaScale((int)verticalAmount, mouseX, mouseY);
+        if (Tool.get() != null && Screen.hasControlDown()) {
+            Vector2d mouse = new Vector2d(mouseX, mouseY);
+            Vector2i world = new Vector2i(screenToWorld(mouse.x - getX(), mouse.y - getY()), RoundingMode.FLOOR);
+            Tool.get().ctrlScroll(this, mouse, world, verticalAmount);
+        } else {
+            deltaScale((int) verticalAmount, mouseX, mouseY);
+        }
         return true;
     }
 
@@ -183,25 +209,23 @@ public class MapWidget extends AbstractWidget {
         if (!isHovered && mouseButton != MouseButton.RIGHT)
             mouseButton = MouseButton.NONE;
 
-//        mouse = new Vector2d(mouse).floor();
         Vector2i world = new Vector2i(screenToWorld(mouse.x - getX(), mouse.y - getY()), RoundingMode.FLOOR);
 
         if (Tool.get() != null) {
-            boolean shift = InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT)
-                    || InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_RIGHT_SHIFT);
+            boolean shift = Screen.hasShiftDown();
             switch (mouseButton) {
-                case LEFT -> Tool.get().leftClick(this, firstClick, shift, mouse, world);
-                case RIGHT -> Tool.get().rightClick(this, firstClick, shift, mouse, world);
+                case LEFT -> Tool.get().leftHold(this, shift, mouse, world);
+                case RIGHT -> Tool.get().rightHold(this, shift, mouse, world);
                 case MIDDLE -> pan(prevX - mouse.x, prevY - mouse.y);
             }
         } else if (mouseButton == MouseButton.MIDDLE) {
             pan(prevX - mouse.x, prevY - mouse.y);
         }
-        firstClick = false;
 
         prevX = mouse.x;
         prevY = mouse.y;
     }
+
     private void drawRegions(GuiGraphics context) {
         context.blit(RenderType::guiTextured, GRID_TEXTURE, 0, 0,
                 Math.floorMod((int)Math.round(panning.x), 16), Math.floorMod((int)Math.round(panning.y), 16), width, height, 16, 16, -1);
@@ -246,8 +270,7 @@ public class MapWidget extends AbstractWidget {
             GLFW.glfwSetInputMode(window.getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
         }
 
-        boolean shift = InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT)
-                || InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_RIGHT_SHIFT);
+        boolean shift = Screen.hasShiftDown();
         Tool.get().render(this, context, shift, mouse, world);
     }
 
@@ -257,7 +280,7 @@ public class MapWidget extends AbstractWidget {
         RenderHelper.fill(context, player.x - 5, player.y - 5, player.x + 5, player.y + 5,
                 ARGB.color(255, 255, 0));
 
-        if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_ALT)) WayfinderClient.movementHistory.render(context, this);
+        if (Screen.hasAltDown()) WayfinderClient.movementHistory.render(context, this);
     }
 
     public void applyLoadedRegion(UnloadedMapWidgetRegion unloaded, LoadedMapWidgetRegion loaded) {

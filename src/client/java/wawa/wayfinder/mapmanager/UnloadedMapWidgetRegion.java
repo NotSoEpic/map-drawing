@@ -1,14 +1,15 @@
 package wawa.wayfinder.mapmanager;
 
-import wawa.wayfinder.Wayfinder;
 import com.mojang.blaze3d.platform.NativeImage;
+import net.minecraft.Util;
+import net.minecraft.client.gui.GuiGraphics;
+import wawa.wayfinder.Wayfinder;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import net.minecraft.Util;
-import net.minecraft.client.gui.GuiGraphics;
 
 /**
  * A 512x512 section of the map, either still in the state of loading or having no image
@@ -56,6 +57,11 @@ public class UnloadedMapWidgetRegion extends AbstractMapWidgetRegion {
             return loaded.putPixelRelative(x, z, color, highlight);
         }
         return false;
+    }
+
+    @Override
+    public int getPixelRelative(int x, int z) {
+        return 0;
     }
 
     @Override

@@ -38,15 +38,8 @@ public class StampTool extends Tool {
     }
 
     @Override
-    public boolean leftClick(MapWidget widget, boolean initial, boolean shift, Vector2d mouse, Vector2i world) {
-        if (initial)
-            widget.putTextureWorld(world.x, world.y, texture.getPixels());
-        return false;
-    }
-
-    @Override
-    public boolean rightClick(MapWidget widget, boolean initial, boolean shift, Vector2d mouse, Vector2i world) {
-        return false;
+    public void leftDown(MapWidget widget, boolean shift, Vector2d mouse, Vector2i world) {
+        widget.putTextureWorld(world.x, world.y, texture.getPixels());
     }
 
     @Override

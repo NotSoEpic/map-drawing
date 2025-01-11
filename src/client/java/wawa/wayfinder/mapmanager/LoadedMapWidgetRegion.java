@@ -101,6 +101,13 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
         return false;
     }
 
+    @Override
+    public int getPixelRelative(int x, int z) {
+        if (!inBoundsRel(x, z))
+            return 0;
+        return texture.getPixels().getPixel(x, z);
+    }
+
     public void checkDirty() {
         if (dirtyVisual) {
             if (Arrays.stream(texture.getPixels().getPixelsABGR()).allMatch(i -> i == 0)) {

@@ -59,6 +59,13 @@ public abstract class AbstractMapWidgetRegion {
     }
 
     public abstract boolean putPixelRelative(int x, int z, int color, boolean highlight);
+
+    public int getPixelWorld(int x, int z) {
+        return getPixelRelative(x - rx() * 512, z - rz() * 512);
+    }
+
+    public abstract int getPixelRelative(int x, int z);
+
     public Path getPath(Path regionFile) {
         if (regionFile == null)
             return null;
