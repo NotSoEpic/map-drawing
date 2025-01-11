@@ -11,7 +11,7 @@ import java.nio.FloatBuffer;
 import java.util.List;
 
 public record ColorPalette(Text displayName, List<Color> colors, @Nullable FloatBuffer buffer) {
-	public static final int SIZE = 8;
+	public static final int SIZE = 9;
 
 	public static final Codec<ColorPalette> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			TextCodecs.CODEC.fieldOf("name").forGetter(ColorPalette::displayName),
