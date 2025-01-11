@@ -1,13 +1,13 @@
 package wawa.wayfinder.mapmanager;
 
-import org.joml.Vector2d;
-import org.joml.Vector2i;
-
-import java.nio.file.Path;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
+import org.joml.Vector2d;
+import org.joml.Vector2i;
+
+import java.nio.file.Path;
 
 public abstract class AbstractMapWidgetRegion {
     private final Vector2i region;
@@ -40,16 +40,10 @@ public abstract class AbstractMapWidgetRegion {
         return inBoundsRel(x - region.x * 512, z - region.y * 512);
     }
 
-    public boolean shouldBeRendered(MapWidget parent, Vector2d ul, Vector2d lr) {
-        Vector2d ul_ = parent.worldToScreen(rx() * 512, rz() * 512, true).max(new Vector2d());
-        Vector2d lr_ = parent.worldToScreen(rx() * 512 + 512, rz() * 512 + 512, true).min(new Vector2d(parent.getWidth(), parent.getHeight()));
-        ul.set(ul_);
-        lr.set(lr_);
-        return ul.x <= parent.getWidth() && ul.y <= parent.getHeight() && lr.x >= 0 && lr.y >= 0;
-    }
-
     public boolean shouldBeRendered(MapWidget parent) {
-        return shouldBeRendered(parent, new Vector2d(), new Vector2d());
+        Vector2d ul = parent.worldToScreen(rx() * 512, rz() * 512, true).max(new Vector2d());
+        Vector2d lr = parent.worldToScreen(rx() * 512 + 512, rz() * 512 + 512, true).min(new Vector2d(parent.getWidth(), parent.getHeight()));
+        return ul.x <= parent.getWidth() && ul.y <= parent.getHeight() && lr.x >= 0 && lr.y >= 0;
     }
 
     public void render(GuiGraphics context, MapWidget parent) {

@@ -1,22 +1,28 @@
 package wawa.wayfinder.mapmanager;
 
-import wawa.wayfinder.Wayfinder;
-import wawa.wayfinder.WayfinderClient;
-import wawa.wayfinder.RenderHelper;
-import wawa.wayfinder.color.ColorPalette;
-import org.joml.Vector2d;
-import org.lwjgl.glfw.GLFW;
 import com.mojang.blaze3d.platform.InputConstants;
-import java.awt.*;
+import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
+import org.joml.RoundingMode;
+import org.joml.Vector2d;
+import org.joml.Vector2i;
+import org.lwjgl.glfw.GLFW;
+import wawa.wayfinder.RenderHelper;
+import wawa.wayfinder.Wayfinder;
+import wawa.wayfinder.WayfinderClient;
+import wawa.wayfinder.color.ColorPalette;
+import wawa.wayfinder.rendering.WayfinderRenderLayers;
+
+import java.awt.*;
 
 /**
  * The map, rendering drawn regions and player position
@@ -65,6 +71,10 @@ public class MapWidget extends AbstractWidget {
         return worldToScreen(x, z, false);
     }
 
+    public Vector2d worldToScreen(Vector2d v, boolean round) {
+        return worldToScreen(v.x, v.y, true);
+    }
+
     public void putPixelScreen(int x, int z, int r, int color) {
         Vector2d pos = screenToWorld(x - getX(), z - getY());
         putPixelWorld((int) pos.x, (int) pos.y, r, color, false);
@@ -82,8 +92,8 @@ public class MapWidget extends AbstractWidget {
     }
 
     public void drawLineScreen(double x0, double z0, double x1, double z1, int color, int size, boolean highlight) {
-        Vector2d pos0 = screenToWorld(x0 - getX(), z0 - getY());
-        Vector2d pos1 = screenToWorld(x1 - getX(), z1 - getY());
+        Vector2i pos0 = new Vector2i(screenToWorld(x0 - getX(), z0 - getY()), RoundingMode.FLOOR);
+        Vector2i pos1 = new Vector2i(screenToWorld(x1 - getX(), z1 - getY()), RoundingMode.FLOOR);
         WayfinderClient.lastDrawnPos = pos1;
         drawLineWorld(pos0.x, pos0.y, pos1.x, pos1.y, color, size, highlight);
     }
@@ -97,7 +107,7 @@ public class MapWidget extends AbstractWidget {
         double x = x1;
         double z = z1;
         for (int i = 0; i < steps + 1; i++) {
-            putPixelWorld((int) Math.floor(x), (int) Math.floor(z), size, color, highlight);
+            putPixelWorld((int) Math.floor(x + 0.5), (int) Math.floor(z + 0.5), size, color, highlight);
             x += dx;
             z += dz;
         }
@@ -143,10 +153,12 @@ public class MapWidget extends AbstractWidget {
 
         Vector2d mouse = RenderHelper.smootherMouse();
         handleMouse(context, mouse);
+        context.enableScissor(0, 0, width + 1, height + 1);
         drawRegions(context);
         drawDebugText(context, mouse);
-        drawMouse(context, mouse);
         drawPlayer(context);
+        drawMouse(context, mouse);
+        context.disableScissor();
 
         context.pose().popPose();
     }
@@ -161,7 +173,7 @@ public class MapWidget extends AbstractWidget {
         boolean shift = InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT)
                 || InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_RIGHT_SHIFT);
         if (shift && WayfinderClient.lastDrawnPos != null) {
-            Vector2d mouseWorld = screenToWorld(mouse.x - getX(), mouse.y - getY());
+            Vector2i mouseWorld = new Vector2i(screenToWorld(mouse.x - getX(), mouse.y - getY()), RoundingMode.FLOOR);
             switch (mouseButton) {
                 case LEFT -> {
                     drawLineWorld(WayfinderClient.lastDrawnPos.x, WayfinderClient.lastDrawnPos.y, mouseWorld.x, mouseWorld.y,
@@ -215,36 +227,49 @@ public class MapWidget extends AbstractWidget {
     }
 
     private void drawMouse(GuiGraphics context, Vector2d mouse) {
+        Window window = Minecraft.getInstance().getWindow();
+        if (isMouseOver(mouse.x, mouse.y) && scale >= 1) {
+            GLFW.glfwSetInputMode(window.getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
+        } else {
+            GLFW.glfwSetInputMode(window.getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
+            return;
+        }
+        int wh = WayfinderClient.penSize * 2 - 1;
+        DynamicTexture pen = new DynamicTexture(wh, wh, false);
+        int color = ColorPalette.GRAYSCALE.colors().get(WayfinderClient.penColorIndex).getRGB();
+        pen.getPixels().applyToAllPixels(i -> color);
+        pen.upload();
+        Minecraft.getInstance().getTextureManager().register(Wayfinder.id("pen"), pen);
 
-        Color color = WayfinderClient.palette.colors().get(WayfinderClient.penColorIndex);
-        int penColor = color.getRGB() | 0xFF000000;
+        mouse = screenToWorld(mouse.x - getX(), mouse.y - getY()).floor();
 
-        Vector2d ul = screenToWorld((int)mouse.x - getX(), (int)mouse.y - getY()).sub(WayfinderClient.penSize - 0.5, WayfinderClient.penSize - 0.5).round();
-        Vector2d w = screenToWorld((int)mouse.x - getX(), (int)mouse.y - getY()).add(WayfinderClient.penSize - 0.5, WayfinderClient.penSize - 0.5).round();
         boolean shift = InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT)
                 || InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_RIGHT_SHIFT);
         if (shift && WayfinderClient.lastDrawnPos != null) {
-            // todo: this is slightly off
-            Vector2d oul = new Vector2d(WayfinderClient.lastDrawnPos).sub(WayfinderClient.penSize - 0.5, WayfinderClient.penSize - 0.5).round();
-            double dx = oul.x - ul.x;
-            double dz = oul.y - ul.y;
+            double dx = WayfinderClient.lastDrawnPos.x - mouse.x;
+            double dz = WayfinderClient.lastDrawnPos.y - mouse.y;
             int steps = (int) Math.max(1, Math.ceil(Math.max(Math.abs(dx), Math.abs(dz))));
             dx /= steps;
             dz /= steps;
-            double x = ul.x;
-            double z = ul.y;
-            ul = worldToScreen(ul.x, ul.y, true);
-            w = worldToScreen(w.x, w.y, true).sub(ul);
+            double x = mouse.x;
+            double z = mouse.y;
             for (int i = 0; i < steps + 1; i++) {
-                Vector2d awawa = worldToScreen(Math.round(x), Math.round(z), true);
-                context.fill((int) awawa.x, (int) awawa.y, (int) (awawa.x + w.x), (int) (awawa.y + w.y), penColor);
+                Vector2d ul = worldToScreen(Math.round(x), Math.round(z), true)
+                        .sub(new Vector2d(WayfinderClient.penSize - 1).floor().mul(scale));
+                context.blit(WayfinderRenderLayers::getPaletteSwap, Wayfinder.id("pen"),
+                        (int) ul.x, (int) ul.y, 0, 0,
+                        (int) (wh * scale), (int) (wh * scale), (int) (wh * scale), (int) (wh * scale)
+                );
                 x += dx;
                 z += dz;
             }
         } else {
-            ul = worldToScreen(ul.x, ul.y, true);
-            w = worldToScreen(w.x, w.y, true).sub(ul);
-            context.fill((int) Math.floor(ul.x), (int) Math.floor(ul.y), (int) Math.floor(ul.x + w.x), (int) Math.floor(ul.y + w.y), penColor);
+            mouse = worldToScreen(mouse, true)
+                    .sub(new Vector2d(WayfinderClient.penSize - 1).floor().mul(scale));
+            context.blit(WayfinderRenderLayers::getPaletteSwap, Wayfinder.id("pen"),
+                    (int) mouse.x, (int) mouse.y, 0, 0,
+                    (int) (wh * scale), (int) (wh * scale), (int) (wh * scale), (int) (wh * scale)
+            );
         }
     }
 

@@ -1,15 +1,5 @@
 package wawa.wayfinder;
 
-import com.mojang.authlib.minecraft.client.MinecraftClient;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
-import wawa.wayfinder.color.ColorPalette;
-import wawa.wayfinder.color.ColorPaletteManager;
-import wawa.wayfinder.mapmanager.MapRegions;
-import wawa.wayfinder.mapmanager.PlayerMovementHistory;
-import wawa.wayfinder.mixin.client.BiomeAccessAccessor;
-import wawa.wayfinder.stampitem.StampTextureTooltipData;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -17,8 +7,16 @@ import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector2d;
+import org.joml.Vector2i;
+import wawa.wayfinder.color.ColorPalette;
+import wawa.wayfinder.color.ColorPaletteManager;
+import wawa.wayfinder.mapmanager.MapRegions;
+import wawa.wayfinder.mapmanager.PlayerMovementHistory;
+import wawa.wayfinder.mixin.client.BiomeAccessAccessor;
+import wawa.wayfinder.stampitem.StampTextureTooltipData;
 
 import java.lang.ref.WeakReference;
 import java.util.UUID;
@@ -32,7 +30,7 @@ public class WayfinderClient implements ClientModInitializer {
 	public static int penSize = 3;
 	public static boolean highlight = false;
 	@Nullable
-	public static Vector2d lastDrawnPos = null;
+	public static Vector2i lastDrawnPos = null;
 
 	private static WeakReference<ClientLevel> currentWorld = new WeakReference<>(null); //weak reference so we don't keep the last world loaded in memory if we leave the server lol
 

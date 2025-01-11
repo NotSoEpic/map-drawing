@@ -1,18 +1,19 @@
 package wawa.wayfinder.mapmanager;
 
-import wawa.wayfinder.Wayfinder;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import org.joml.RoundingMode;
+import org.joml.Vector2i;
 import wawa.wayfinder.RenderHelper;
+import wawa.wayfinder.Wayfinder;
 import wawa.wayfinder.rendering.WayfinderRenderLayers;
-import org.joml.Vector2d;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import net.minecraft.Util;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.texture.DynamicTexture;
 
 /**
  * A 512x512 section of the map that contains an image
@@ -41,9 +42,7 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
     public void render(GuiGraphics context, MapWidget parent) {
         super.render(context, parent);
 
-        Vector2d ul = new Vector2d();
-        Vector2d lr = new Vector2d();
-        if (!shouldBeRendered(parent, ul, lr))
+        if (!shouldBeRendered(parent))
             return;
         checkDirty();
         if (isRemoved()) {
@@ -51,13 +50,9 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
             regions.put(rx(), rz(), new UnloadedMapWidgetRegion(rx(), rz(), regions));
             return;
         }
-        Vector2d uv = parent.worldToScreen(rx() * 512, rz() * 512, true).sub(ul).mul(-1);
-        Vector2d wh = new Vector2d(lr).sub(ul);
-        RenderHelper.drawTexture(context, WayfinderRenderLayers::getPaletteSwap, id(),
-                ul.x, ul.y,
-                (float) uv.x, (float) uv.y,
-                wh.x, wh.y,
-                (int) (512 * parent.scale),(int) (512 * parent.scale));
+        Vector2i ul = new Vector2i(parent.worldToScreen(rx() * 512, rz() * 512, true), RoundingMode.FLOOR);
+        Vector2i wh = new Vector2i(512 * parent.scale, 512 * parent.scale, RoundingMode.FLOOR);
+        context.blit(WayfinderRenderLayers::getPaletteSwap, id(), ul.x, ul.y, 0, 0, wh.x, wh.y, wh.x, wh.y);
         if (Minecraft.getInstance().getDebugOverlay().showDebugScreen()) {
             RenderHelper.badDebugText(context, (int)ul.x + 2, (int)ul.y + 2, id().getPath());
         }
