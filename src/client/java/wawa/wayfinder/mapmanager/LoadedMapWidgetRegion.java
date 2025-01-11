@@ -2,7 +2,7 @@ package wawa.wayfinder.mapmanager;
 
 import wawa.wayfinder.Wayfinder;
 import wawa.wayfinder.RenderHelper;
-import wawa.wayfinder.rendering.WayfinderRenderLayers;
+import wawa.wayfinder.rendering.WayfinderRenderTypes;
 import org.joml.Vector2d;
 
 import java.io.IOException;
@@ -53,7 +53,7 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
         }
         Vector2d uv = parent.worldToScreen(rx() * 512, rz() * 512, true).sub(ul).mul(-1);
         Vector2d wh = new Vector2d(lr).sub(ul);
-        RenderHelper.drawTexture(context, WayfinderRenderLayers::getPaletteSwap, id(),
+        RenderHelper.drawTexture(context, WayfinderRenderTypes::getPaletteSwap, id(),
                 ul.x, ul.y,
                 (float) uv.x, (float) uv.y,
                 wh.x, wh.y,

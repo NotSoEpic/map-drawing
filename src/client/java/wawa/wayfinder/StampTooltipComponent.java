@@ -1,7 +1,7 @@
 package wawa.wayfinder;
 
 import wawa.wayfinder.color.ColorPaletteManager;
-import wawa.wayfinder.rendering.WayfinderRenderLayers;
+import wawa.wayfinder.rendering.WayfinderRenderTypes;
 import wawa.wayfinder.stampitem.StampTextureTooltipData;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.gui.Font;
@@ -24,7 +24,7 @@ public record StampTooltipComponent(ResourceLocation texture) implements ClientT
     @Override
     public void renderText(Font textRenderer, int x, int y, Matrix4f matrix, MultiBufferSource.BufferSource vertexConsumers) {
         WayfinderClient.palette = ColorPaletteManager.get(Wayfinder.id("default"));
-        VertexConsumer consumer = vertexConsumers.getBuffer(WayfinderRenderLayers.getPaletteSwap(texture));
+        VertexConsumer consumer = vertexConsumers.getBuffer(WayfinderRenderTypes.getPaletteSwap(texture));
         consumer.addVertex(matrix, x, y, 0).setUv(0, 0).setColor(-1);
         consumer.addVertex(matrix, x, y + 32, 0).setUv(0, 1).setColor(-1);
         consumer.addVertex(matrix, x + 32, y + 32, 0).setUv(1, 1).setColor(-1);
