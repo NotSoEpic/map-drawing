@@ -20,6 +20,11 @@ repositories {
 	maven {
 		url "https://cursemaven.com"
 	}
+
+	maven {
+		name = 'ParchmentMC'
+		url = 'https://maven.parchmentmc.org'
+	}
 }
 
 loom {
