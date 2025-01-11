@@ -10,7 +10,6 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
-import net.minecraft.block.MapColor;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.resource.ResourceType;
@@ -74,7 +73,7 @@ public class MapDrawingClient implements ClientModInitializer {
 
 		TooltipComponentCallback.EVENT.register((data -> {
 			if (data instanceof StampTextureTooltipData stampTextureComponent) {
-				return new StampTooltipComponent(stampTextureComponent.texture());
+				return StampTooltipComponent.fromComponent(stampTextureComponent);
 			}
 			return null;
 		}));
