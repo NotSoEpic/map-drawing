@@ -5,7 +5,6 @@ import beeisyou.mapdrawing.RenderHelper;
 import beeisyou.mapdrawing.rendering.MapDrawingRenderLayers;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.util.Util;
 import org.joml.Vector2d;
@@ -98,7 +97,7 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
     public boolean putPixelRelative(int x, int z, int color, boolean highlight) {
         if (!inBoundsRel(x, z))
             return false;
-        if (!highlight || texture.getImage().getColorArgb(x - rx() * 512, z - rz() * 512) == 0) {
+        if (!highlight || texture.getImage().getColorArgb(x, z) == 0) {
             texture.getImage().setColorArgb(x, z, color);
             dirtyVisual = true;
             dirtySave = true;
