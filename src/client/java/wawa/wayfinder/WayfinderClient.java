@@ -15,6 +15,7 @@ import wawa.wayfinder.color.ColorPalette;
 import wawa.wayfinder.color.ColorPaletteManager;
 import wawa.wayfinder.mapmanager.MapRegions;
 import wawa.wayfinder.mapmanager.PlayerMovementHistory;
+import wawa.wayfinder.mapmanager.tools.Tool;
 import wawa.wayfinder.mixin.client.BiomeAccessAccessor;
 import wawa.wayfinder.stampitem.StampTextureTooltipData;
 
@@ -26,9 +27,7 @@ public class WayfinderClient implements ClientModInitializer {
 	public static PlayerMovementHistory movementHistory = new PlayerMovementHistory();
 
 	public static ColorPalette palette;
-	public static int penColorIndex = 0;
-	public static int penSize = 3;
-	public static boolean highlight = false;
+	public static Tool tool;
 	@Nullable
 	public static Vector2i lastDrawnPos = null;
 

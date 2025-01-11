@@ -1,0 +1,116 @@
+package wawa.wayfinder.mapmanager.tools;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.resources.ResourceLocation;
+import org.joml.RoundingMode;
+import org.joml.Vector2d;
+import org.joml.Vector2i;
+import wawa.wayfinder.Wayfinder;
+import wawa.wayfinder.WayfinderClient;
+import wawa.wayfinder.color.ColorPalette;
+import wawa.wayfinder.mapmanager.MapWidget;
+import wawa.wayfinder.rendering.WayfinderRenderTypes;
+
+public class PenTool implements Tool {
+    public int size;
+    private int colorIndex;
+    public boolean highlight;
+    private static final DynamicTexture pen = new DynamicTexture(1, 1, false);
+    private static final ResourceLocation id = Wayfinder.id("pen");
+
+    @Override
+    public void onSelect() {
+        Minecraft.getInstance().getTextureManager().register(id, pen);
+    }
+
+    public PenTool(int size, int colorIndex, boolean highlight) {
+        this.size = size;
+        this.highlight = highlight;
+        this.colorIndex = colorIndex;
+    }
+
+    @Override
+    public boolean leftClick(MapWidget widget, boolean initial, boolean shift, Vector2d mouse, Vector2i world) {
+        if (shift) {
+            Vector2i lastWorld = WayfinderClient.lastDrawnPos;
+            if (lastWorld == null) {
+                widget.drawLineScreen(mouse.x, mouse.y, mouse.x, mouse.y, getDrawnColor(), size, highlight);
+            } else {
+                widget.drawLineWorld(lastWorld.x, lastWorld.y, world.x, world.y, getDrawnColor(), size, highlight);
+            }
+        } else {
+            widget.drawLineScreen(widget.prevX, widget.prevY, mouse.x, mouse.y, getDrawnColor(), size, highlight);
+        }
+        WayfinderClient.lastDrawnPos = new Vector2i(world);
+        return true;
+    }
+
+    @Override
+    public boolean rightClick(MapWidget widget, boolean initial, boolean shift, Vector2d mouse, Vector2i world) {
+        if (shift) {
+            Vector2i lastWorld = WayfinderClient.lastDrawnPos;
+            if (lastWorld == null) {
+                widget.drawLineScreen(mouse.x, mouse.y, mouse.x, mouse.y, 0, size, false);
+            } else {
+                widget.drawLineWorld(lastWorld.x, lastWorld.y, world.x, world.y, 0, size, false);
+            }
+        } else {
+            widget.drawLineScreen(widget.prevX, widget.prevY, mouse.x, mouse.y, 0, size, false);
+        }
+        WayfinderClient.lastDrawnPos = new Vector2i(world);
+        return true;
+    }
+
+    @Override
+    public void render(MapWidget widget, GuiGraphics context, boolean shift, Vector2d mouse, Vector2i world) {
+        int wh = size * 2 - 1;
+
+        int swh = (int) (wh * widget.scale);
+        if (shift && WayfinderClient.lastDrawnPos != null) {
+            double dx = WayfinderClient.lastDrawnPos.x - world.x;
+            double dz = WayfinderClient.lastDrawnPos.y - world.y;
+            int steps = (int) Math.max(1, Math.ceil(Math.max(Math.abs(dx), Math.abs(dz))));
+            dx /= steps;
+            dz /= steps;
+            double x = world.x;
+            double z = world.y;
+            for (int i = 0; i < steps + 1; i++) {
+                Vector2d ul = widget.worldToScreen(Math.round(x), Math.round(z), true)
+                        .sub(new Vector2d(size - 1).floor().mul(widget.scale));
+                context.blit(WayfinderRenderTypes::getPaletteSwap, id,
+                        (int) ul.x, (int) ul.y, 0, 0,
+                        swh, swh, swh, swh
+                );
+                x += dx;
+                z += dz;
+            }
+        } else {
+            world = new Vector2i(widget.worldToScreen(new Vector2d(world).sub(size - 1, size - 1), true), RoundingMode.FLOOR);
+            context.blit(WayfinderRenderTypes::getPaletteSwap, id,
+                    world.x, world.y, 0, 0,
+                    swh, swh, swh, swh
+            );
+        }
+    }
+
+    @Override
+    public boolean hideMouse(MapWidget widget, Vector2d mouse, Vector2i world) {
+        return widget.scale >= 1;
+    }
+
+    public void setColorIndex(int colorIndex) {
+        this.colorIndex = colorIndex;
+        pen.getPixels().applyToAllPixels(i -> getDrawnColor());
+        pen.upload();
+    }
+
+    public int getVisualColor() {
+        return WayfinderClient.palette.colors().get(colorIndex).getRGB() | 0xFF000000;
+    }
+
+    public int getDrawnColor() {
+        return ColorPalette.GRAYSCALE.colors().get(colorIndex).getRGB() | 0xFF000000;
+    }
+}

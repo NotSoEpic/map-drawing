@@ -1,22 +1,22 @@
 package wawa.wayfinder.mapmanager;
 
-import wawa.wayfinder.WayfinderClient;
-import wawa.wayfinder.color.ColorPalette;
-import org.lwjgl.glfw.GLFW;
-
-import java.awt.*;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
+import org.lwjgl.glfw.GLFW;
+import wawa.wayfinder.WayfinderClient;
+import wawa.wayfinder.color.ColorPalette;
+import wawa.wayfinder.mapmanager.tools.PenTool;
+
+import java.awt.*;
 
 public class DrawToolWidget extends AbstractWidget {
-    private final MapScreen parent;
     private final int colorIndex;
     private final int size;
+    private static final PenTool toolPencil = new PenTool(1, 0, false);
     public DrawToolWidget(MapScreen parent, int x, int y, int width, int height, int colorIndex, int size) {
         super(x, y, width, height, Component.nullToEmpty("draw tool"));
-        this.parent = parent;
         this.colorIndex = colorIndex;
         this.size = size;
     }
@@ -29,9 +29,11 @@ public class DrawToolWidget extends AbstractWidget {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (super.mouseClicked(mouseX, mouseY, button)) {
-            WayfinderClient.penColorIndex = colorIndex;
-            WayfinderClient.penSize = size;
-            WayfinderClient.highlight = button == GLFW.GLFW_MOUSE_BUTTON_RIGHT;
+            WayfinderClient.tool = toolPencil;
+            toolPencil.size = size;
+            toolPencil.highlight = button == GLFW.GLFW_MOUSE_BUTTON_RIGHT;
+            toolPencil.setColorIndex(colorIndex);
+            toolPencil.onSelect();
             return true;
         }
         return false;
