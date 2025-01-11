@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "wawa.wayfinder.mixin.client",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "BiomeAccessAccessor",
+    "DrawContextAccessor",
+    "ShaderProgramMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
+  ]
+}

@@ -1,34 +1,38 @@
 {
 	"schemaVersion": 1,
-	"id": "map_drawing",
+	"id": "wayfinder",
 	"version": "${version}",
-	"name": "Map Drawing",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"name": "Wayfinder",
+	"description": "[[Journey]] THIS [[CHUNKS]] THAT !! WHY NOT [Put your funny where your mouth is] IS 4ND MAKE YOUR OWN",
 	"authors": [
-		"Me!"
+		"Starlotte",
+		"beeisyou",
+		"Cyvack",
+		"KyanBirb",
+		"LlamaMan"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
 		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
 	"license": "CC0-1.0",
-	"icon": "assets/map_drawing/icon.png",
+	"icon": "assets/wayfinder/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"fabric-datagen": [
-			"beeisyou.mapdrawing.datagen.DataGenerator"
+          "wawa.wayfinder.datagen.DataGenerator"
 		],
 		"main": [
-			"beeisyou.mapdrawing.MapDrawing"
+			"wawa.wayfinder.Wayfinder"
 		],
 		"client": [
-			"beeisyou.mapdrawing.MapDrawingClient"
+			"wawa.wayfinder.WayfinderClient"
 		]
 	},
 	"mixins": [
-		"map_drawing.mixins.json",
+		"wayfinder.mixins.json",
 		{
-			"config": "map_drawing.client.mixins.json",
+			"config": "wayfinder.client.mixins.json",
 			"environment": "client"
 		}
 	],
