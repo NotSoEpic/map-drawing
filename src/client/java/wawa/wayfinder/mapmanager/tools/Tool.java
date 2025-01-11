@@ -1,12 +1,25 @@
 package wawa.wayfinder.mapmanager.tools;
 
 import net.minecraft.client.gui.GuiGraphics;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
 import wawa.wayfinder.mapmanager.MapWidget;
 
-public interface Tool {
-    void onSelect();
+public abstract class Tool {
+    private static Tool tool;
+
+    public static void set(@Nullable Tool tool) {
+        Tool.tool = tool;
+        if (tool != null)
+            tool.onSelect();
+    }
+
+    public static Tool get() {
+        return tool;
+    }
+
+    protected abstract void onSelect();
 
     /**
      * Called every frame left click is held on the map
@@ -17,7 +30,7 @@ public interface Tool {
      * @param world world position of the mouse
      * @return whether to capture the input
      */
-    boolean leftClick(MapWidget widget, boolean initial, boolean shift, Vector2d mouse, Vector2i world);
+    public abstract boolean leftClick(MapWidget widget, boolean initial, boolean shift, Vector2d mouse, Vector2i world);
 
     /**
      * Called every frame right click is held on the map
@@ -28,7 +41,7 @@ public interface Tool {
      * @param world world position of the mouse
      * @return whether to capture the input
      */
-    boolean rightClick(MapWidget widget, boolean initial, boolean shift, Vector2d mouse, Vector2i world);
-    void render(MapWidget widget, GuiGraphics context, boolean shift, Vector2d mouse, Vector2i world);
-    boolean hideMouse(MapWidget widget, Vector2d mouse, Vector2i world);
+    public abstract boolean rightClick(MapWidget widget, boolean initial, boolean shift, Vector2d mouse, Vector2i world);
+    public abstract void render(MapWidget widget, GuiGraphics context, boolean shift, Vector2d mouse, Vector2i world);
+    public abstract boolean hideMouse(MapWidget widget, Vector2d mouse, Vector2i world);
 }

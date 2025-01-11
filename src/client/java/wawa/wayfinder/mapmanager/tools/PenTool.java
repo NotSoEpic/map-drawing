@@ -13,7 +13,7 @@ import wawa.wayfinder.color.ColorPalette;
 import wawa.wayfinder.mapmanager.MapWidget;
 import wawa.wayfinder.rendering.WayfinderRenderTypes;
 
-public class PenTool implements Tool {
+public class PenTool extends Tool {
     public int size;
     private int colorIndex;
     public boolean highlight;

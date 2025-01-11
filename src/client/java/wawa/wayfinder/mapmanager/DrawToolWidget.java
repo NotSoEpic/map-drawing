@@ -8,6 +8,7 @@ import org.lwjgl.glfw.GLFW;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.color.ColorPalette;
 import wawa.wayfinder.mapmanager.tools.PenTool;
+import wawa.wayfinder.mapmanager.tools.Tool;
 
 import java.awt.*;
 
@@ -29,11 +30,10 @@ public class DrawToolWidget extends AbstractWidget {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (super.mouseClicked(mouseX, mouseY, button)) {
-            WayfinderClient.tool = toolPencil;
             toolPencil.size = size;
             toolPencil.highlight = button == GLFW.GLFW_MOUSE_BUTTON_RIGHT;
             toolPencil.setColorIndex(colorIndex);
-            toolPencil.onSelect();
+            Tool.set(toolPencil);
             return true;
         }
         return false;

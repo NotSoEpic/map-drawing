@@ -19,6 +19,7 @@ import org.lwjgl.glfw.GLFW;
 import wawa.wayfinder.RenderHelper;
 import wawa.wayfinder.Wayfinder;
 import wawa.wayfinder.WayfinderClient;
+import wawa.wayfinder.mapmanager.tools.Tool;
 
 /**
  * The map, rendering drawn regions and player position
@@ -185,18 +186,18 @@ public class MapWidget extends AbstractWidget {
 //        mouse = new Vector2d(mouse).floor();
         Vector2i world = new Vector2i(screenToWorld(mouse.x - getX(), mouse.y - getY()), RoundingMode.FLOOR);
 
-        if (WayfinderClient.tool != null) {
+        if (Tool.get() != null) {
             boolean shift = InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT)
                     || InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_RIGHT_SHIFT);
             switch (mouseButton) {
-                case LEFT -> WayfinderClient.tool.leftClick(this, firstClick, shift, mouse, world);
-                case RIGHT -> WayfinderClient.tool.rightClick(this, firstClick, shift, mouse, world);
+                case LEFT -> Tool.get().leftClick(this, firstClick, shift, mouse, world);
+                case RIGHT -> Tool.get().rightClick(this, firstClick, shift, mouse, world);
                 case MIDDLE -> pan(prevX - mouse.x, prevY - mouse.y);
             }
-
         } else if (mouseButton == MouseButton.MIDDLE) {
             pan(prevX - mouse.x, prevY - mouse.y);
         }
+        firstClick = false;
 
         prevX = mouse.x;
         prevY = mouse.y;
@@ -232,14 +233,14 @@ public class MapWidget extends AbstractWidget {
 
     private void drawMouse(GuiGraphics context, Vector2d mouse) {
         Window window = Minecraft.getInstance().getWindow();
-        if (WayfinderClient.tool == null) {
+        if (Tool.get() == null) {
             GLFW.glfwSetInputMode(window.getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
             return;
         }
 
         Vector2i world = new Vector2i(screenToWorld(mouse.x - getX(), mouse.y - getY()), RoundingMode.FLOOR);
 
-        if (isMouseOver(mouse.x, mouse.y) && WayfinderClient.tool.hideMouse(this, mouse, world)) {
+        if (isMouseOver(mouse.x, mouse.y) && Tool.get().hideMouse(this, mouse, world)) {
             GLFW.glfwSetInputMode(window.getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
         } else {
             GLFW.glfwSetInputMode(window.getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
@@ -247,7 +248,7 @@ public class MapWidget extends AbstractWidget {
 
         boolean shift = InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT)
                 || InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_RIGHT_SHIFT);
-        WayfinderClient.tool.render(this, context, shift, mouse, world);
+        Tool.get().render(this, context, shift, mouse, world);
     }
 
     private void drawPlayer(GuiGraphics context) {
