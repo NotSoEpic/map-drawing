@@ -6,37 +6,36 @@ import com.google.gson.JsonParser;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
-import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ColorPaletteManager implements SimpleSynchronousResourceReloadListener {
-	private static final Map<Identifier, ColorPalette> COLOR_PALETTES = new HashMap<>();
+	private static final Map<ResourceLocation, ColorPalette> COLOR_PALETTES = new HashMap<>();
 
-	public static ColorPalette get(Identifier id) {
+	public static ColorPalette get(ResourceLocation id) {
 		return COLOR_PALETTES.get(id);
 	}
 
 	@Override
-	public Identifier getFabricId() {
+	public ResourceLocation getFabricId() {
 		return Wayfinder.id("color_palettes");
 	}
 
 	@Override
-	public void reload(ResourceManager manager) {
+	public void onResourceManagerReload(ResourceManager manager) {
 		COLOR_PALETTES.clear();
 
-		Map<Identifier, Resource> resources = manager.findResources("color_palettes", path -> path.getPath().endsWith(".json"));
-		for (Map.Entry<Identifier, Resource> entry : resources.entrySet()) {
-			Identifier key = entry.getKey();
-			Identifier id = Identifier.of(key.getNamespace(), key.getPath().split("/")[1].replace(".json", ""));
+		Map<ResourceLocation, Resource> resources = manager.listResources("color_palettes", path -> path.getPath().endsWith(".json"));
+		for (Map.Entry<ResourceLocation, Resource> entry : resources.entrySet()) {
+			ResourceLocation key = entry.getKey();
+			ResourceLocation id = ResourceLocation.fromNamespaceAndPath(key.getNamespace(), key.getPath().split("/")[1].replace(".json", ""));
 
-			try(InputStream stream = entry.getValue().getInputStream()) {
+			try(InputStream stream = entry.getValue().open()) {
 				InputStreamReader reader = new InputStreamReader(stream);
 				JsonElement json = JsonParser.parseReader(reader);
 

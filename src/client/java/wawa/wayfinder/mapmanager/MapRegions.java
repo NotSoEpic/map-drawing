@@ -1,8 +1,6 @@
 package wawa.wayfinder.mapmanager;
 
 import wawa.wayfinder.Wayfinder;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 
@@ -12,6 +10,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 
 /**
  * Stores regions in memory for quick access
@@ -63,7 +63,7 @@ public class MapRegions extends HashMap<Vector2i, AbstractMapWidgetRegion> {
      * @author Cyvack
      */
     public void setRegionPathGeneral(UUID folderID, String name, boolean client) {
-        File mainDir = MinecraftClient.getInstance().runDirectory;
+        File mainDir = Minecraft.getInstance().gameDirectory;
 
         regionPath = mainDir.toPath()
                 .resolve("wayfinder_maps")
@@ -73,8 +73,8 @@ public class MapRegions extends HashMap<Vector2i, AbstractMapWidgetRegion> {
 
     @Nullable
     public Path getRegionPath() {
-        if (regionPath != null && MinecraftClient.getInstance().world != null) {
-            return regionPath.resolve(MinecraftClient.getInstance().world.getRegistryKey().getValue().toUnderscoreSeparatedString());
+        if (regionPath != null && Minecraft.getInstance().level != null) {
+            return regionPath.resolve(Minecraft.getInstance().level.dimension().location().toDebugFileName());
         }
 
         return null;
@@ -104,9 +104,9 @@ public class MapRegions extends HashMap<Vector2i, AbstractMapWidgetRegion> {
             Wayfinder.LOGGER.warn("No path for map to save");
             return;
         }
-        long rendertime = Util.getMeasuringTimeMs();
+        long rendertime = Util.getMillis();
         for (Iterator<Entry<Vector2i, AbstractMapWidgetRegion>> it = entrySet().iterator(); it.hasNext();) {
-            Map.Entry<Vector2i, AbstractMapWidgetRegion> entry = it.next();
+            Entry<Vector2i, AbstractMapWidgetRegion> entry = it.next();
             if (rendertime - entry.getValue().getLastRenderTime() > msThreshold) {
                 entry.getValue().save(getRegionPath());
                 deltaStats(entry.getValue(), -1);

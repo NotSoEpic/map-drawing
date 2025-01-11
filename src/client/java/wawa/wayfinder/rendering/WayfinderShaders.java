@@ -1,15 +1,15 @@
 package wawa.wayfinder.rendering;
 
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraft.client.renderer.ShaderDefines;
+import net.minecraft.client.renderer.ShaderProgram;
+import net.minecraft.resources.ResourceLocation;
 import wawa.wayfinder.Wayfinder;
-import net.minecraft.client.gl.Defines;
-import net.minecraft.client.gl.ShaderProgramKey;
-import net.minecraft.client.render.RenderPhase;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.util.Identifier;
 
 public class WayfinderShaders {
-	public static final Identifier PALETTE_SWAP_PATH = Wayfinder.id("core/texture_palette_swap");
+	public static final ResourceLocation PALETTE_SWAP_PATH = Wayfinder.id("core/texture_palette_swap");
 
-	public static final RenderPhase.ShaderProgram PALETTE_SWAP =
-			new RenderPhase.ShaderProgram(new ShaderProgramKey(PALETTE_SWAP_PATH, VertexFormats.POSITION_TEXTURE_COLOR, Defines.EMPTY));
+	public static final RenderStateShard.ShaderStateShard PALETTE_SWAP =
+			new RenderStateShard.ShaderStateShard(new ShaderProgram(PALETTE_SWAP_PATH, DefaultVertexFormat.POSITION_TEX_COLOR, ShaderDefines.EMPTY));
 }

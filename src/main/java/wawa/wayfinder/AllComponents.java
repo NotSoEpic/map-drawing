@@ -1,13 +1,13 @@
 package wawa.wayfinder;
 
+import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.BuiltInRegistries;
 import wawa.wayfinder.stampitem.StampComponent;
-import net.minecraft.component.ComponentType;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
 
 public class AllComponents {
-    public static final ComponentType<StampComponent> STAMP = Registry.register(Registries.DATA_COMPONENT_TYPE, Wayfinder.id("stamp"),
-            new ComponentType.Builder<StampComponent>().codec(StampComponent.CODEC).packetCodec(StampComponent.PACKET_CODEC).build()
+    public static final DataComponentType<StampComponent> STAMP = Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Wayfinder.id("stamp"),
+            new DataComponentType.Builder<StampComponent>().persistent(StampComponent.CODEC).networkSynchronized(StampComponent.PACKET_CODEC).build()
     );
 
     public static void init() {}

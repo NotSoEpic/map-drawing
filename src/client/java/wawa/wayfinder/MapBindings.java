@@ -1,22 +1,22 @@
 package wawa.wayfinder;
 
 import wawa.wayfinder.mapmanager.MapScreen;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import org.lwjgl.glfw.GLFW;
 
 public class MapBindings {
-    public static final KeyBinding openMap = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+    public static final KeyMapping openMap = KeyBindingHelper.registerKeyBinding(new KeyMapping(
             "key.way_finder.open_map",
-            InputUtil.Type.KEYSYM,
+            InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_M,
             "category.way_finder.map"
     ));
 
-    public static void inputEvents(MinecraftClient client) {
-        while (openMap.wasPressed()) {
+    public static void inputEvents(Minecraft client) {
+        while (openMap.consumeClick()) {
             client.setScreen(new MapScreen());
         }
     }

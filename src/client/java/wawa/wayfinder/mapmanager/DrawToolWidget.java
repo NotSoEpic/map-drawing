@@ -2,20 +2,20 @@ package wawa.wayfinder.mapmanager;
 
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.color.ColorPalette;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.network.chat.Component;
 
-public class DrawToolWidget extends ClickableWidget {
+public class DrawToolWidget extends AbstractWidget {
     private final MapScreen parent;
     private final int colorIndex;
     private final int size;
     public DrawToolWidget(MapScreen parent, int x, int y, int width, int height, int colorIndex, int size) {
-        super(x, y, width, height, Text.of("draw tool"));
+        super(x, y, width, height, Component.nullToEmpty("draw tool"));
         this.parent = parent;
         this.colorIndex = colorIndex;
         this.size = size;
@@ -38,12 +38,12 @@ public class DrawToolWidget extends ClickableWidget {
     }
 
     @Override
-    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
         context.fill(getX(), getY(), getRight(), getBottom(), getVisualColor());
     }
 
     @Override
-    protected void appendClickableNarrations(NarrationMessageBuilder builder) {}
+    protected void updateWidgetNarration(NarrationElementOutput builder) {}
 
     private int getVisualColor() {
         Color color = WayfinderClient.palette.colors().get(colorIndex);

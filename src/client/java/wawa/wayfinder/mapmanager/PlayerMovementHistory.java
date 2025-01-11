@@ -1,13 +1,13 @@
 package wawa.wayfinder.mapmanager;
 
 import wawa.wayfinder.RenderHelper;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.util.math.ColorHelper;
 import org.joml.Vector2d;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.util.ARGB;
 
 /**
  * Stores the previous positions of the players to be rendered in the map
@@ -17,7 +17,7 @@ public class PlayerMovementHistory {
     Vector2d newest = new Vector2d();
     int timer = 0;
 
-    public void tick(ClientPlayerEntity player) {
+    public void tick(LocalPlayer player) {
         if (player == null)
             return;
         timer++;
@@ -32,12 +32,12 @@ public class PlayerMovementHistory {
         }
     }
 
-    public void render(DrawContext context, MapWidget manager) {
+    public void render(GuiGraphics context, MapWidget manager) {
         positions.stream().forEach(v -> {
             Vector2d p = manager.worldToScreen(v.x, v.y, true);
             if (p.x > 0 && p.x < manager.getWidth() && p.y > 0 && p.y < manager.getHeight()) {
                 RenderHelper.fill(context, p.x - 1, p.y - 1, p.x + 1, p.y + 1,
-                        ColorHelper.getArgb(255, 255, 0));
+                        ARGB.color(255, 255, 0));
             }
         });
     }

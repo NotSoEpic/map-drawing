@@ -1,33 +1,32 @@
 package wawa.wayfinder.stampitem;
 
 import wawa.wayfinder.AllComponents;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipData;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
-import net.minecraft.util.Identifier;
-
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.CommonColors;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 
 public class StampItem extends Item {
-    public StampItem(Settings settings) {
-        super(settings.component(AllComponents.STAMP, new StampComponent(Identifier.of("missingno"))));
+    public StampItem(Properties settings) {
+        super(settings.component(AllComponents.STAMP, new StampComponent(ResourceLocation.parse("missingno"))));
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        super.appendTooltip(stack, context, tooltip, type);
-        tooltip.add(Text.translatable(
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
+        super.appendHoverText(stack, context, tooltip, type);
+        tooltip.add(Component.translatable(
                 Optional.ofNullable(stack.get(AllComponents.STAMP)).orElse(StampComponent.unknown)
                         .getTranslationString()
-        ).withColor(Colors.LIGHT_GRAY));
+        ).withColor(CommonColors.LIGHT_GRAY));
     }
 
     @Override
-    public Optional<TooltipData> getTooltipData(ItemStack stack) {
+    public Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
         return Optional.ofNullable(stack.get(AllComponents.STAMP)).map(StampComponent::getTooltipData);
     }
 }

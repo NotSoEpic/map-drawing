@@ -2,19 +2,19 @@ package wawa.wayfinder.color;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.nio.FloatBuffer;
 import java.util.List;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 
-public record ColorPalette(Text displayName, List<Color> colors, @Nullable FloatBuffer buffer) {
+public record ColorPalette(Component displayName, List<Color> colors, @Nullable FloatBuffer buffer) {
 	public static final int SIZE = 9;
 
 	public static final Codec<ColorPalette> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			TextCodecs.CODEC.fieldOf("name").forGetter(ColorPalette::displayName),
+			ComponentSerialization.CODEC.fieldOf("name").forGetter(ColorPalette::displayName),
 			Codec.STRING.xmap(ColorPalette::stringToColor, ColorPalette::colorToString)
 					.listOf(SIZE, SIZE).fieldOf("colors").forGetter(ColorPalette::colors)
 	).apply(instance, ColorPalette::new));
@@ -29,14 +29,14 @@ public record ColorPalette(Text displayName, List<Color> colors, @Nullable Float
 			colors[i] = new Color(color, color, color);
 		}
 
-		GRAYSCALE = new ColorPalette(Text.literal("Grayscale"), List.of(colors), true);
+		GRAYSCALE = new ColorPalette(Component.literal("Grayscale"), List.of(colors), true);
 	}
 
-	public ColorPalette(Text displayName, List<Color> colors) {
+	public ColorPalette(Component displayName, List<Color> colors) {
 		this(displayName, colors, true);
 	}
 
-	public ColorPalette(Text displayName, List<Color> colors, boolean createBuffer) {
+	public ColorPalette(Component displayName, List<Color> colors, boolean createBuffer) {
 		this(displayName, colors, createBuffer ? createBuffer(colors) : null);
 	}
 

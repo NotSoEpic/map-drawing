@@ -1,5 +1,9 @@
 package wawa.wayfinder;
 
+import com.mojang.authlib.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import wawa.wayfinder.color.ColorPalette;
 import wawa.wayfinder.color.ColorPaletteManager;
 import wawa.wayfinder.mapmanager.MapRegions;
@@ -11,10 +15,8 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.server.packs.PackType;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
 
@@ -32,7 +34,7 @@ public class WayfinderClient implements ClientModInitializer {
 	@Nullable
 	public static Vector2d lastDrawnPos = null;
 
-	private static WeakReference<ClientWorld> currentWorld = new WeakReference<>(null); //weak reference so we don't keep the last world loaded in memory if we leave the server lol
+	private static WeakReference<ClientLevel> currentWorld = new WeakReference<>(null); //weak reference so we don't keep the last world loaded in memory if we leave the server lol
 
 	@Override
 	public void onInitializeClient() {
@@ -44,26 +46,26 @@ public class WayfinderClient implements ClientModInitializer {
 		});
 
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
-			boolean connectedTolocal = client.isConnectedToLocalServer();
-			Wayfinder.LOGGER.debug("Connecting to {}", client.world);
+			boolean connectedTolocal = client.isLocalServer();
+			Wayfinder.LOGGER.debug("Connecting to {}", client.level);
 
-			long seed = ((BiomeAccessAccessor) client.world.getBiomeAccess()).getSeed();
+			long seed = ((BiomeAccessAccessor) client.level.getBiomeManager()).getBiomeZoomSeed();
 
 			String name;
 			if (connectedTolocal) {
-				name = client.getServer().getSaveProperties().getLevelName();
+				name = client.getSingleplayerServer().getWorldData().getLevelName();
 			} else {
-				name = client.getCurrentServerEntry().name;
+				name = client.getCurrentServer().name;
 			}
 
-			UUID uuid = MathHelper.randomUuid(Random.create(seed));
+			UUID uuid = Mth.createInsecureUUID(RandomSource.create(seed));
 			Wayfinder.LOGGER.debug("Generating UUID from {}; {}_{}", seed, uuid, name);
 
 			WayfinderClient.regions.setRegionPathGeneral(uuid, name, connectedTolocal);
 		});
 
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
-			Wayfinder.LOGGER.debug("Disconnecting from {}", client.world);
+			Wayfinder.LOGGER.debug("Disconnecting from {}", client.level);
 
 			WayfinderClient.regions.save();
 			WayfinderClient.regions.clear();
@@ -78,6 +80,6 @@ public class WayfinderClient implements ClientModInitializer {
 			return null;
 		}));
 
-		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new ColorPaletteManager());
+		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new ColorPaletteManager());
 	}
 }

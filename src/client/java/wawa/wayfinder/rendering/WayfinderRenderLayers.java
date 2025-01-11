@@ -1,31 +1,30 @@
 package wawa.wayfinder.rendering;
 
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderPhase;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.util.Identifier;
+import net.minecraft.Util;
+import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.TriState;
-import net.minecraft.util.Util;
-
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import java.util.function.Function;
 
 public class WayfinderRenderLayers {
 
-	private static final Function<Identifier, RenderLayer> PALETTE_SWAP = Util.memoize((id) -> RenderLayer.of(
+	private static final Function<ResourceLocation, RenderType> PALETTE_SWAP = Util.memoize((id) -> RenderType.create(
 			"texture_palette_swap",
-			VertexFormats.POSITION_TEXTURE_COLOR,
-			VertexFormat.DrawMode.QUADS,
+			DefaultVertexFormat.POSITION_TEX_COLOR,
+			VertexFormat.Mode.QUADS,
 			786432,
-			RenderLayer.MultiPhaseParameters.builder()
-					.texture(new RenderPhase.Texture(id, TriState.DEFAULT, false))
-					.program(WayfinderShaders.PALETTE_SWAP)
-					.transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
-					.depthTest(RenderPhase.LEQUAL_DEPTH_TEST)
-					.writeMaskState(RenderPhase.COLOR_MASK)
-					.build(false)));
+			RenderType.CompositeState.builder()
+					.setTextureState(new RenderStateShard.TextureStateShard(id, TriState.DEFAULT, false))
+					.setShaderState(WayfinderShaders.PALETTE_SWAP)
+					.setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
+					.setDepthTestState(RenderStateShard.LEQUAL_DEPTH_TEST)
+					.setWriteMaskState(RenderStateShard.COLOR_WRITE)
+					.createCompositeState(false)));
 
-	public static RenderLayer getPaletteSwap(Identifier texture) {
+	public static RenderType getPaletteSwap(ResourceLocation texture) {
 		return PALETTE_SWAP.apply(texture);
 	}
 }

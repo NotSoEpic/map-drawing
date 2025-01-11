@@ -3,42 +3,42 @@ package wawa.wayfinder.mapmanager;
 import wawa.wayfinder.Wayfinder;
 import wawa.wayfinder.RenderHelper;
 import wawa.wayfinder.rendering.WayfinderRenderLayers;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.util.Util;
 import org.joml.Vector2d;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 
 /**
  * A 512x512 section of the map that contains an image
  */
 public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
-    public final NativeImageBackedTexture texture;
+    public final DynamicTexture texture;
     private boolean dirtyVisual = false; // unuploaded changes
     private boolean dirtySave = false;
     private boolean removed = false;
     public LoadedMapWidgetRegion(int rx, int rz, MapRegions regions) {
         super(rx, rz, regions);
-        texture = new NativeImageBackedTexture(512, 512, false); // each chunk region is 512x512 blocks, seems fitting
+        texture = new DynamicTexture(512, 512, false); // each chunk region is 512x512 blocks, seems fitting
     }
 
     public void initToClear() {
-        texture.getImage().apply(i -> 0); // reset to clear
+        texture.getPixels().applyToAllPixels(i -> 0); // reset to clear
         texture.upload();
         registerTexture();
     }
 
     public void registerTexture() {
-        MinecraftClient.getInstance().getTextureManager().registerTexture(id(), texture);
+        Minecraft.getInstance().getTextureManager().register(id(), texture);
     }
 
     @Override
-    public void render(DrawContext context, MapWidget parent) {
+    public void render(GuiGraphics context, MapWidget parent) {
         super.render(context, parent);
 
         Vector2d ul = new Vector2d();
@@ -58,7 +58,7 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
                 (float) uv.x, (float) uv.y,
                 wh.x, wh.y,
                 (int) (512 * parent.scale),(int) (512 * parent.scale));
-        if (MinecraftClient.getInstance().getDebugHud().shouldShowDebugHud()) {
+        if (Minecraft.getInstance().getDebugOverlay().showDebugScreen()) {
             RenderHelper.badDebugText(context, (int)ul.x + 2, (int)ul.y + 2, id().getPath());
         }
     }
@@ -68,10 +68,10 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
         if (!dirtySave)
             return;
         Path file = getPath(regionPath);
-        Util.getIoWorkerExecutor().execute(() -> {
+        Util.ioPool().execute(() -> {
             try {
                 Files.createDirectories(file.getParent());
-                texture.getImage().writeTo(file);
+                texture.getPixels().writeToFile(file);
             } catch (IOException e) {
                 Wayfinder.LOGGER.warn("Failed to save region {} {} to {}\n{}", rx(), rz(), file, e);
             }
@@ -81,7 +81,7 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
     private void clearFile() {
         Path file = getPath(regions.getRegionPath());
         if (file != null) {
-            Util.getIoWorkerExecutor().execute(() -> {
+            Util.ioPool().execute(() -> {
                 try {
                     Files.deleteIfExists(file);
                     dirtySave = false;
@@ -97,8 +97,8 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
     public boolean putPixelRelative(int x, int z, int color, boolean highlight) {
         if (!inBoundsRel(x, z))
             return false;
-        if (!highlight || texture.getImage().getColorArgb(x, z) == 0) {
-            texture.getImage().setColorArgb(x, z, color);
+        if (!highlight || texture.getPixels().getPixel(x, z) == 0) {
+            texture.getPixels().setPixel(x, z, color);
             dirtyVisual = true;
             dirtySave = true;
             return true;
@@ -108,7 +108,7 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
 
     public void checkDirty() {
         if (dirtyVisual) {
-            if (Arrays.stream(texture.getImage().copyPixelsAbgr()).allMatch(i -> i == 0)) {
+            if (Arrays.stream(texture.getPixels().getPixelsABGR()).allMatch(i -> i == 0)) {
                 removed = true;
             } else {
                 texture.upload();

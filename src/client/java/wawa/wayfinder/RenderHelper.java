@@ -1,28 +1,27 @@
 package wawa.wayfinder;
 
 import wawa.wayfinder.mixin.client.DrawContextAccessor;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.Mouse;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.Window;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.ColorHelper;
 import org.joml.Matrix4f;
 import org.joml.Vector2d;
-
+import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import java.util.function.Function;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.MouseHandler;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ARGB;
 
 public class RenderHelper {
     // DrawContext.fill only accepts integer coordinates, which isn't precise enough
-    public static void fill(DrawContext context, double x1, double y1, double x2, double y2, int color) {
-        RenderLayer layer = RenderLayer.getGui();
-        MatrixStack matrices = context.getMatrices();
-        matrices.push();
+    public static void fill(GuiGraphics context, double x1, double y1, double x2, double y2, int color) {
+        RenderType layer = RenderType.gui();
+        PoseStack matrices = context.pose();
+        matrices.pushPose();
 
-        Matrix4f mat = matrices.peek().getPositionMatrix();
+        Matrix4f mat = matrices.last().pose();
         mat.rotate(0, 0, 0, 0);
 
         if (x1 < x2) {
@@ -37,17 +36,17 @@ public class RenderHelper {
             y2 = i;
         }
 
-        VertexConsumer vertexConsumer = ((DrawContextAccessor)context).getVertexConsumers().getBuffer(layer);
-        vertexConsumer.vertex(mat, (float)x1, (float)y1, 0).color(color);
-        vertexConsumer.vertex(mat, (float)x1, (float)y2, 0).color(color);
-        vertexConsumer.vertex(mat, (float)x2, (float)y2, 0).color(color);
-        vertexConsumer.vertex(mat, (float)x2, (float)y1, 0).color(color);
+        VertexConsumer vertexConsumer = ((DrawContextAccessor)context).getBufferSource().getBuffer(layer);
+        vertexConsumer.addVertex(mat, (float)x1, (float)y1, 0).setColor(color);
+        vertexConsumer.addVertex(mat, (float)x1, (float)y2, 0).setColor(color);
+        vertexConsumer.addVertex(mat, (float)x2, (float)y2, 0).setColor(color);
+        vertexConsumer.addVertex(mat, (float)x2, (float)y1, 0).setColor(color);
 
-        matrices.pop();
+        matrices.popPose();
     }
 
     public static void drawTexture(
-            DrawContext context, Function<Identifier, RenderLayer> renderLayers, Identifier sprite,
+            GuiGraphics context, Function<ResourceLocation, RenderType> renderLayers, ResourceLocation sprite,
             double x, double y, float u, float v, double width, double height, int textureWidth, int textureHeight
     ) {
         double x1 = x;
@@ -58,29 +57,29 @@ public class RenderHelper {
         float u2 = (float) ((u + width) / textureWidth);
         float v1 = v / textureHeight;
         float v2 = (float) ((v + height) / textureHeight);
-        RenderLayer renderLayer = renderLayers.apply(sprite);
-        MatrixStack matrices = context.getMatrices();
-        matrices.push();
+        RenderType renderLayer = renderLayers.apply(sprite);
+        PoseStack matrices = context.pose();
+        matrices.pushPose();
 
-        Matrix4f posMat = matrices.peek().getPositionMatrix();
-        VertexConsumer vertexConsumer = ((DrawContextAccessor)context).getVertexConsumers().getBuffer(renderLayer);
-        vertexConsumer.vertex(posMat, (float)x1, (float)y1, 0.0F).texture(u1, v1).color(-1);
-        vertexConsumer.vertex(posMat, (float)x1, (float)y2, 0.0F).texture(u1, v2).color(-1);
-        vertexConsumer.vertex(posMat, (float)x2, (float)y2, 0.0F).texture(u2, v2).color(-1);
-        vertexConsumer.vertex(posMat, (float)x2, (float)y1, 0.0F).texture(u2, v1).color(-1);
+        Matrix4f posMat = matrices.last().pose();
+        VertexConsumer vertexConsumer = ((DrawContextAccessor)context).getBufferSource().getBuffer(renderLayer);
+        vertexConsumer.addVertex(posMat, (float)x1, (float)y1, 0.0F).setUv(u1, v1).setColor(-1);
+        vertexConsumer.addVertex(posMat, (float)x1, (float)y2, 0.0F).setUv(u1, v2).setColor(-1);
+        vertexConsumer.addVertex(posMat, (float)x2, (float)y2, 0.0F).setUv(u2, v2).setColor(-1);
+        vertexConsumer.addVertex(posMat, (float)x2, (float)y1, 0.0F).setUv(u2, v1).setColor(-1);
 
-        matrices.pop();
+        matrices.popPose();
     }
 
-    public static void badDebugText(DrawContext context, int x, int y, String text) {
-        context.drawText(MinecraftClient.getInstance().textRenderer, text, x, y, ColorHelper.getArgb(0, 0, 255), false);
+    public static void badDebugText(GuiGraphics context, int x, int y, String text) {
+        context.drawString(Minecraft.getInstance().font, text, x, y, ARGB.color(0, 0, 255), false);
     }
 
     public static Vector2d smootherMouse() {
-        Mouse mouse = MinecraftClient.getInstance().mouse;
-        Window window = MinecraftClient.getInstance().getWindow();
+        MouseHandler mouse = Minecraft.getInstance().mouseHandler;
+        Window window = Minecraft.getInstance().getWindow();
         // client mouse is per gui pixel (up to 4x less accurate)
-        return new Vector2d(mouse.getX() * window.getScaledWidth() / window.getWidth(),
-            mouse.getY() * window.getScaledHeight() / window.getHeight());
+        return new Vector2d(mouse.xpos() * window.getGuiScaledWidth() / window.getScreenWidth(),
+            mouse.ypos() * window.getGuiScaledHeight() / window.getScreenHeight());
     }
 }

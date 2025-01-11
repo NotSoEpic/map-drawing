@@ -1,24 +1,24 @@
 package wawa.wayfinder.mapmanager;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
 
 import java.nio.file.Path;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
 
 public abstract class AbstractMapWidgetRegion {
     private final Vector2i region;
-    private final Identifier id;
+    private final ResourceLocation id;
     protected final MapRegions regions;
     private long lastRenderTime;
     public AbstractMapWidgetRegion(int rx, int rz, MapRegions regions) {
         region = new Vector2i(rx, rz);
-        id = Identifier.of("mapmanager", String.format("%d_%d", rx, rz));
+        id = ResourceLocation.fromNamespaceAndPath("mapmanager", String.format("%d_%d", rx, rz));
         this.regions = regions;
-        lastRenderTime = MinecraftClient.getInstance().getRenderTime();
+        lastRenderTime = Minecraft.getInstance().getFrameTimeNs();
     }
 
     public int rx() {
@@ -27,7 +27,7 @@ public abstract class AbstractMapWidgetRegion {
     public int rz() {
         return region.y;
     }
-    public Identifier id() {
+    public ResourceLocation id() {
         return id;
     }
 
@@ -52,8 +52,8 @@ public abstract class AbstractMapWidgetRegion {
         return shouldBeRendered(parent, new Vector2d(), new Vector2d());
     }
 
-    public void render(DrawContext context, MapWidget parent) {
-        lastRenderTime = Util.getMeasuringTimeMs();
+    public void render(GuiGraphics context, MapWidget parent) {
+        lastRenderTime = Util.getMillis();
     }
 
     public long getLastRenderTime() {

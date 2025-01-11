@@ -1,15 +1,14 @@
 package wawa.wayfinder.mapmanager;
 
 import wawa.wayfinder.Wayfinder;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.util.Util;
-
+import com.mojang.blaze3d.platform.NativeImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import net.minecraft.Util;
+import net.minecraft.client.gui.GuiGraphics;
 
 /**
  * A 512x512 section of the map, either still in the state of loading or having no image
@@ -25,7 +24,7 @@ public class UnloadedMapWidgetRegion extends AbstractMapWidgetRegion {
 
     public void tryLoadRegion() {
         loading = true;
-        Util.getIoWorkerExecutor().execute(this::loadRegionIO);
+        Util.ioPool().execute(this::loadRegionIO);
     }
 
     private void loadRegionIO() {
@@ -60,12 +59,12 @@ public class UnloadedMapWidgetRegion extends AbstractMapWidgetRegion {
     }
 
     @Override
-    public void render(DrawContext context, MapWidget parent) {
+    public void render(GuiGraphics context, MapWidget parent) {
         super.render(context, parent);
 
         if (loadedImage != null) {
             loaded = new LoadedMapWidgetRegion(rx(), rz(), regions);
-            loaded.texture.setImage(loadedImage);
+            loaded.texture.setPixels(loadedImage);
             loaded.texture.upload();
             loaded.registerTexture();
             regions.put(rx(), rz(), loaded);

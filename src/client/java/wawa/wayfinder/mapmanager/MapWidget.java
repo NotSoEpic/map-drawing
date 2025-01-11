@@ -4,26 +4,25 @@ import wawa.wayfinder.Wayfinder;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.RenderHelper;
 import wawa.wayfinder.color.ColorPalette;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.ColorHelper;
-import net.minecraft.util.math.MathHelper;
 import org.joml.Vector2d;
 import org.lwjgl.glfw.GLFW;
-
+import com.mojang.blaze3d.platform.InputConstants;
 import java.awt.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ARGB;
+import net.minecraft.util.Mth;
 
 /**
  * The map, rendering drawn regions and player position
  */
-public class MapWidget extends ClickableWidget {
-    public static final Identifier GRID_TEXTURE = Wayfinder.id("textures/gui/grid.png");
+public class MapWidget extends AbstractWidget {
+    public static final ResourceLocation GRID_TEXTURE = Wayfinder.id("textures/gui/grid.png");
     private final MapScreen parent;
     public final MapRegions regions = WayfinderClient.regions;
     public Vector2d panning = new Vector2d();
@@ -31,7 +30,7 @@ public class MapWidget extends ClickableWidget {
     public double scale = 1;
 
     public MapWidget(MapScreen parent, int leftPad, int topPad, int width, int height) {
-        super(leftPad, topPad, width, height, Text.of("map"));
+        super(leftPad, topPad, width, height, Component.nullToEmpty("map"));
         this.parent = parent;
     }
 
@@ -138,9 +137,9 @@ public class MapWidget extends ClickableWidget {
     }
 
     @Override
-    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-        context.getMatrices().push();
-        context.getMatrices().translate(getX(), getY(), 0);
+    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
+        context.pose().pushPose();
+        context.pose().translate(getX(), getY(), 0);
 
         Vector2d mouse = RenderHelper.smootherMouse();
         handleMouse(context, mouse);
@@ -149,18 +148,18 @@ public class MapWidget extends ClickableWidget {
         drawMouse(context, mouse);
         drawPlayer(context);
 
-        context.getMatrices().pop();
+        context.pose().popPose();
     }
 
-    private void handleMouse(DrawContext context, Vector2d mouse) {
-        if (!hovered && mouseButton != MouseButton.RIGHT)
+    private void handleMouse(GuiGraphics context, Vector2d mouse) {
+        if (!isHovered && mouseButton != MouseButton.RIGHT)
             mouseButton = MouseButton.NONE;
 
         Color color = ColorPalette.GRAYSCALE.colors().get(WayfinderClient.penColorIndex);
         int penColor = color.getRGB() | 0xFF000000;
 
-        boolean shift = InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT)
-                || InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_RIGHT_SHIFT);
+        boolean shift = InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT)
+                || InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_RIGHT_SHIFT);
         if (shift && WayfinderClient.lastDrawnPos != null) {
             Vector2d mouseWorld = screenToWorld(mouse.x - getX(), mouse.y - getY());
             switch (mouseButton) {
@@ -186,8 +185,8 @@ public class MapWidget extends ClickableWidget {
         prevX = mouse.x;
         prevY = mouse.y;
     }
-    private void drawRegions(DrawContext context) {
-        context.drawTexture(RenderLayer::getGuiTextured, GRID_TEXTURE, 0, 0,
+    private void drawRegions(GuiGraphics context) {
+        context.blit(RenderType::guiTextured, GRID_TEXTURE, 0, 0,
                 Math.floorMod((int)Math.round(panning.x), 16), Math.floorMod((int)Math.round(panning.y), 16), width, height, 16, 16, -1);
 
         Vector2d ul = screenToWorld(0, 0).div(512).floor();
@@ -200,13 +199,13 @@ public class MapWidget extends ClickableWidget {
             }
         }
 
-        context.drawVerticalLine(0, 0, height, ColorHelper.getArgb(255,0,0));
-        context.drawVerticalLine(width, 0, height, ColorHelper.getArgb(255,0,0));
-        context.drawHorizontalLine(0, width, 0, ColorHelper.getArgb(255,0,0));
-        context.drawHorizontalLine(0, width, height, ColorHelper.getArgb(255,0,0));
+        context.vLine(0, 0, height, ARGB.color(255,0,0));
+        context.vLine(width, 0, height, ARGB.color(255,0,0));
+        context.hLine(0, width, 0, ARGB.color(255,0,0));
+        context.hLine(0, width, height, ARGB.color(255,0,0));
     }
 
-    private void drawDebugText(DrawContext context, Vector2d mouse) {
+    private void drawDebugText(GuiGraphics context, Vector2d mouse) {
         Vector2d cursorWorld = screenToWorld(mouse.x - getX(), mouse.y - getY());
         RenderHelper.badDebugText(context, 0, height + 2, String.format("%d, %d", (int)cursorWorld.x, (int)cursorWorld.y));
         RenderHelper.badDebugText(context, 100, height + 2, String.format("%d, %d", (int)panning.x, (int)panning.y));
@@ -215,15 +214,15 @@ public class MapWidget extends ClickableWidget {
         RenderHelper.badDebugText(context, 0, height + 12, regions.getRegionPath().toString());
     }
 
-    private void drawMouse(DrawContext context, Vector2d mouse) {
+    private void drawMouse(GuiGraphics context, Vector2d mouse) {
 
         Color color = WayfinderClient.palette.colors().get(WayfinderClient.penColorIndex);
         int penColor = color.getRGB() | 0xFF000000;
 
         Vector2d ul = screenToWorld((int)mouse.x - getX(), (int)mouse.y - getY()).sub(WayfinderClient.penSize - 0.5, WayfinderClient.penSize - 0.5).round();
         Vector2d w = screenToWorld((int)mouse.x - getX(), (int)mouse.y - getY()).add(WayfinderClient.penSize - 0.5, WayfinderClient.penSize - 0.5).round();
-        boolean shift = InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT)
-                || InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_RIGHT_SHIFT);
+        boolean shift = InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT)
+                || InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_RIGHT_SHIFT);
         if (shift && WayfinderClient.lastDrawnPos != null) {
             // todo: this is slightly off
             Vector2d oul = new Vector2d(WayfinderClient.lastDrawnPos).sub(WayfinderClient.penSize - 0.5, WayfinderClient.penSize - 0.5).round();
@@ -249,13 +248,13 @@ public class MapWidget extends ClickableWidget {
         }
     }
 
-    private void drawPlayer(DrawContext context) {
-        Vector2d player = worldToScreen(MinecraftClient.getInstance().player.getX(), MinecraftClient.getInstance().player.getZ(), true)
+    private void drawPlayer(GuiGraphics context) {
+        Vector2d player = worldToScreen(Minecraft.getInstance().player.getX(), Minecraft.getInstance().player.getZ(), true)
                 .min(new Vector2d(width, height)).max(new Vector2d());
         RenderHelper.fill(context, player.x - 5, player.y - 5, player.x + 5, player.y + 5,
-                ColorHelper.getArgb(255, 255, 0));
+                ARGB.color(255, 255, 0));
 
-        if (InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_ALT)) WayfinderClient.movementHistory.render(context, this);
+        if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_ALT)) WayfinderClient.movementHistory.render(context, this);
     }
 
     public void applyLoadedRegion(UnloadedMapWidgetRegion unloaded, LoadedMapWidgetRegion loaded) {
@@ -265,7 +264,7 @@ public class MapWidget extends ClickableWidget {
     public void reset() {
         regions.clear();
         setScale(0);
-        centerWorld(MinecraftClient.getInstance().player.getX(), MinecraftClient.getInstance().player.getZ());
+        centerWorld(Minecraft.getInstance().player.getX(), Minecraft.getInstance().player.getZ());
     }
 
     public void pan(double dx, double dz) {
@@ -289,9 +288,9 @@ public class MapWidget extends ClickableWidget {
     }
 
     public void deltaScale(int num, double mouseX, double mouseY) {
-        setScale(MathHelper.clamp(scaleNum + num, -3, 2), mouseX, mouseY);
+        setScale(Mth.clamp(scaleNum + num, -3, 2), mouseX, mouseY);
     }
 
     @Override
-    protected void appendClickableNarrations(NarrationMessageBuilder builder) {}
+    protected void updateWidgetNarration(NarrationElementOutput builder) {}
 }
