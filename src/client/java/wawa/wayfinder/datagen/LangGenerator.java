@@ -19,6 +19,7 @@ public class LangGenerator extends FabricLanguageProvider {
 
         stamp(translationBuilder, ResourceLocation.withDefaultNamespace("missingno"), "Unusual Pattern");
         stamp(translationBuilder, Wayfinder.id("x_marks_the_spot"), "X Marks the Spot");
+        stamp(translationBuilder, Wayfinder.id("the_stamptong"), "The Legally Distinct Stamptong");
     }
 
     private void stamp(TranslationBuilder translationBuilder, ResourceLocation stamp, String value) {
