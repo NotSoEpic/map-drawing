@@ -9,7 +9,7 @@ import org.joml.Vector2i;
 
 import java.nio.file.Path;
 
-public abstract class AbstractMapWidgetRegion {
+public abstract class AbstractMapWidgetRegion implements AutoCloseable {
     private final Vector2i region;
     private final ResourceLocation id;
     protected final MapRegions regions;
@@ -71,6 +71,7 @@ public abstract class AbstractMapWidgetRegion {
             return null;
         return regionFile.resolve(String.format("%s.png", id().getPath()));
     }
+
     public void save(Path regionPath) {};
 
     public void reloadFromHistory() {};

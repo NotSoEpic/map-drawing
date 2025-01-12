@@ -30,6 +30,13 @@ public class MapRegions extends HashMap<Vector2i, AbstractMapWidgetRegion> {
         deltaStats(region, 1);
         AbstractMapWidgetRegion prev = put(new Vector2i(rx, rz), region);
         deltaStats(prev, -1);
+        if (prev != null) {
+            try {
+                prev.close();
+            } catch (Exception e) {
+                Wayfinder.LOGGER.warn("error closing resources for region {} {}\n{}", rx, rz, e);
+            }
+        }
         return prev;
     }
 
@@ -98,6 +105,18 @@ public class MapRegions extends HashMap<Vector2i, AbstractMapWidgetRegion> {
         }
     }
 
+    @Override
+    public void clear() {
+        forEach((v, r) -> {
+            try {
+                r.close();
+            } catch (Exception e) {
+                Wayfinder.LOGGER.warn("error closing resources for region {} {}\n{}", r.rx(), r.rz(), e);
+            }
+        });
+        super.clear();
+    }
+
     public void cleanup(long msThreshold) {
         if (regionPath == null) {
             Wayfinder.LOGGER.warn("No path for map to save");
@@ -110,6 +129,11 @@ public class MapRegions extends HashMap<Vector2i, AbstractMapWidgetRegion> {
                 entry.save(getRegionPath());
                 if (!entry.hasHistory()) {
                     deltaStats(entry, -1);
+                    try {
+                        entry.close();
+                    } catch (Exception e) {
+                        Wayfinder.LOGGER.warn("error closing resources for region {} {}\n{}", entry.rx(), entry.rz(), e);
+                    }
                     it.remove();
                 }
             }

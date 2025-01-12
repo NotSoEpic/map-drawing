@@ -112,6 +112,14 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
         return texture.getPixels().getPixel(x, z);
     }
 
+    @Override
+    public void close() {
+        texture.close();
+        if (history != null) {
+            history.close();
+        }
+    }
+
     public boolean isEmpty() {
         return Arrays.stream(texture.getPixels().getPixelsABGR()).allMatch(i -> i == 0);
     }
@@ -137,6 +145,7 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
             texture.setPixels(history.getPixels());
             dirtySave = true;
             dirtyVisual = true;
+            history.close();
             history = null;
             if (isEmpty())
                 removed = true;
@@ -145,9 +154,11 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
 
     @Override
     public void clearHistory() {
-        if (history != null && isEmpty())
+        if (history != null && isEmpty()) {
             removed = true;
-        history = null;
+            history.close();
+            history = null;
+        }
     }
 
     @Override

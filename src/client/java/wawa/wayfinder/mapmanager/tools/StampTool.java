@@ -33,6 +33,9 @@ public class StampTool extends Tool {
     }
     @Override
     public void onSelect() {
+        if (texture != null) {
+            texture.close();
+        }
         texture = new DynamicTexture(w, h, false);
         Minecraft.getInstance().getTextureManager().getTexture(stamp).bind();
         texture.getPixels().downloadTexture(0, false);

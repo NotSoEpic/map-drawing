@@ -65,6 +65,9 @@ public class UnloadedMapWidgetRegion extends AbstractMapWidgetRegion {
     }
 
     @Override
+    public void close() {}
+
+    @Override
     public void render(GuiGraphics context, MapWidget parent) {
         super.render(context, parent);
 
