@@ -1,17 +1,16 @@
 package wawa.wayfinder.mapmanager;
 
-import wawa.wayfinder.Wayfinder;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
+import wawa.wayfinder.Wayfinder;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.UUID;
-import net.minecraft.Util;
-import net.minecraft.client.Minecraft;
 
 /**
  * Stores regions in memory for quick access
@@ -106,12 +105,22 @@ public class MapRegions extends HashMap<Vector2i, AbstractMapWidgetRegion> {
         }
         long rendertime = Util.getMillis();
         for (Iterator<Entry<Vector2i, AbstractMapWidgetRegion>> it = entrySet().iterator(); it.hasNext();) {
-            Entry<Vector2i, AbstractMapWidgetRegion> entry = it.next();
-            if (rendertime - entry.getValue().getLastRenderTime() > msThreshold) {
-                entry.getValue().save(getRegionPath());
-                deltaStats(entry.getValue(), -1);
-                it.remove();
+            AbstractMapWidgetRegion entry = it.next().getValue();
+            if (rendertime - entry.getLastRenderTime() > msThreshold) {
+                entry.save(getRegionPath());
+                if (entry.hasHistory()) {
+                    deltaStats(entry, -1);
+                    it.remove();
+                }
             }
         }
+    }
+
+    public void reloadFromHistory() {
+        forEach((k, r) -> r.reloadFromHistory());
+    }
+
+    public void clearHistory() {
+        forEach((k, r) -> r.clearHistory());
     }
 }

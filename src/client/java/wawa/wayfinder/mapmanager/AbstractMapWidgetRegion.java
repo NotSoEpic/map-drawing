@@ -71,5 +71,9 @@ public abstract class AbstractMapWidgetRegion {
             return null;
         return regionFile.resolve(String.format("%s.png", id().getPath()));
     }
-    public abstract void save(Path regionPath);
+    public void save(Path regionPath) {};
+
+    public void reloadFromHistory() {};
+    public void clearHistory() {};
+    public abstract boolean hasHistory();
 }

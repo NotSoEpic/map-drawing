@@ -78,5 +78,7 @@ public class UnloadedMapWidgetRegion extends AbstractMapWidgetRegion {
     }
 
     @Override
-    public void save(Path path) {}
+    public boolean hasHistory() {
+        return false;
+    }
 }

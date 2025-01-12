@@ -13,6 +13,7 @@ import org.joml.Vector2d;
 import org.joml.Vector2i;
 import org.lwjgl.opengl.GL11;
 import wawa.wayfinder.AllComponents;
+import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.mapmanager.MapWidget;
 import wawa.wayfinder.rendering.WayfinderRenderTypes;
 
@@ -39,11 +40,13 @@ public class StampTool extends Tool {
 
     @Override
     public void leftDown(MapWidget widget, boolean shift, Vector2d mouse, Vector2i world) {
+        WayfinderClient.regions.clearHistory();
         widget.putTextureWorld(world.x, world.y, texture.getPixels());
     }
 
     @Override
     public void rightDown(MapWidget widget, boolean shift, Vector2d mouse, Vector2i world) {
+        WayfinderClient.regions.clearHistory();
         widget.putTextureWorld(world.x, world.y, texture.getPixels(), (pixel, current) -> 0);
     }
 

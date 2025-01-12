@@ -4,6 +4,7 @@ import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import org.jetbrains.annotations.Nullable;
 import org.joml.RoundingMode;
 import org.joml.Vector2i;
 import wawa.wayfinder.RenderHelper;
@@ -20,6 +21,8 @@ import java.util.Arrays;
  */
 public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
     public final DynamicTexture texture;
+    @Nullable
+    private DynamicTexture history;
     private boolean dirtyVisual = false; // unuploaded changes
     private boolean dirtySave = false;
     private boolean removed = false;
@@ -92,6 +95,10 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
     public boolean putPixelRelative(int x, int z, int color) {
         if (!inBoundsRel(x, z))
             return false;
+        if (history == null) {
+            history = new DynamicTexture(512, 512, false);
+            history.getPixels().copyFrom(texture.getPixels());
+        }
         texture.getPixels().setPixel(x, z, color);
         dirtyVisual = true;
         dirtySave = true;
@@ -105,9 +112,13 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
         return texture.getPixels().getPixel(x, z);
     }
 
+    public boolean isEmpty() {
+        return Arrays.stream(texture.getPixels().getPixelsABGR()).allMatch(i -> i == 0);
+    }
+
     public void checkDirty() {
         if (dirtyVisual) {
-            if (Arrays.stream(texture.getPixels().getPixelsABGR()).allMatch(i -> i == 0)) {
+            if (history == null && isEmpty()) {
                 removed = true;
             } else {
                 texture.upload();
@@ -118,5 +129,29 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
 
     public boolean isRemoved() {
         return removed;
+    }
+
+    @Override
+    public void reloadFromHistory() {
+        if (history != null) {
+            texture.setPixels(history.getPixels());
+            dirtySave = true;
+            dirtyVisual = true;
+            history = null;
+            if (isEmpty())
+                removed = true;
+        }
+    }
+
+    @Override
+    public void clearHistory() {
+        if (history != null && isEmpty())
+            removed = true;
+        history = null;
+    }
+
+    @Override
+    public boolean hasHistory() {
+        return history != null;
     }
 }

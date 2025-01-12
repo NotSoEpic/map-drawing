@@ -86,6 +86,8 @@ public class MapScreen extends Screen {
         } else if (MapBindings.openMap.matches(keyCode, scanCode)) {
             onClose();
             return true;
+        } else if (Screen.hasControlDown() && MapBindings.undo.matches(keyCode, scanCode)) {
+            WayfinderClient.regions.reloadFromHistory();
         }
         return true;
     }

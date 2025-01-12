@@ -62,7 +62,14 @@ public class PenTool extends Tool {
                     setColorIndex(i);
                 }
             }
+        } else {
+            WayfinderClient.regions.clearHistory();
         }
+    }
+
+    @Override
+    public void rightDown(MapWidget widget, boolean shift, Vector2d mouse, Vector2i world) {
+        WayfinderClient.regions.clearHistory();
     }
 
     @Override
