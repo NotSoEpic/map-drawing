@@ -89,16 +89,13 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
         }
     }
 
-    public boolean putPixelRelative(int x, int z, int color, boolean highlight) {
+    public boolean putPixelRelative(int x, int z, int color) {
         if (!inBoundsRel(x, z))
             return false;
-        if (!highlight || texture.getPixels().getPixel(x, z) == 0) {
-            texture.getPixels().setPixel(x, z, color);
-            dirtyVisual = true;
-            dirtySave = true;
-            return true;
-        }
-        return false;
+        texture.getPixels().setPixel(x, z, color);
+        dirtyVisual = true;
+        dirtySave = true;
+        return true;
     }
 
     @Override

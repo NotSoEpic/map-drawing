@@ -43,6 +43,11 @@ public class StampTool extends Tool {
     }
 
     @Override
+    public void rightDown(MapWidget widget, boolean shift, Vector2d mouse, Vector2i world) {
+        widget.putTextureWorld(world.x, world.y, texture.getPixels(), (pixel, current) -> 0);
+    }
+
+    @Override
     public void render(MapWidget widget, GuiGraphics context, boolean shift, Vector2d mouse, Vector2i world) {
         int sw = (int) (w * widget.scale);
         int sh = (int) (h * widget.scale);

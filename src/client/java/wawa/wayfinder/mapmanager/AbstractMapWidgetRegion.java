@@ -54,11 +54,11 @@ public abstract class AbstractMapWidgetRegion {
         return lastRenderTime;
     }
 
-    public boolean putPixelWorld(int x, int z, int color, boolean highlight) {
-        return putPixelRelative(x - rx() * 512, z - rz() * 512, color, highlight);
+    public boolean putPixelWorld(int x, int z, int color) {
+        return putPixelRelative(x - rx() * 512, z - rz() * 512, color);
     }
 
-    public abstract boolean putPixelRelative(int x, int z, int color, boolean highlight);
+    public abstract boolean putPixelRelative(int x, int z, int color);
 
     public int getPixelWorld(int x, int z) {
         return getPixelRelative(x - rx() * 512, z - rz() * 512);

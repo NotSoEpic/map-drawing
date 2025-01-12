@@ -21,6 +21,8 @@ import wawa.wayfinder.Wayfinder;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.mapmanager.tools.Tool;
 
+import java.util.function.BiFunction;
+
 /**
  * The map, rendering drawn regions and player position
  */
@@ -72,18 +74,18 @@ public class MapWidget extends AbstractWidget {
         return worldToScreen(v.x, v.y, true);
     }
 
-    public void putPixelScreen(int x, int z, int r, int color) {
-        Vector2d pos = screenToWorld(x - getX(), z - getY());
-        putPixelWorld((int) pos.x, (int) pos.y, r, color, false);
+    public void putPixelWorld(int x, int z, int r, int color) {
+        putPixelWorld(x, z, r, color, (pixel, current) -> pixel);
     }
 
-    public void putPixelWorld(int x, int z, int r, int color, boolean highlight) {
+    public void putPixelWorld(int x, int z, int r, int color, BiFunction<Integer, Integer, Integer> map) {
         for (int i = 1-r; i < r; i++) {
             for (int j = 1-r; j < r; j++) {
                 int rx = Math.floorDiv(x + i, 512);
                 int rz = Math.floorDiv(z + j, 512);
                 AbstractMapWidgetRegion region = getOrLoad(rx, rz);
-                region.putPixelWorld(x + i, z + j, color, highlight);
+                int current = region.getPixelWorld(x + i, z + j);
+                region.putPixelWorld(x + i, z + j, map.apply(color, current));
             }
         }
     }
@@ -96,6 +98,11 @@ public class MapWidget extends AbstractWidget {
     }
 
     public void putTextureWorld(int x, int z, NativeImage pixels) {
+        putTextureWorld(x, z, pixels, (pixel, current) -> pixel);
+    }
+
+    // map: (texture, current) -> result
+    public void putTextureWorld(int x, int z, NativeImage pixels, BiFunction<Integer, Integer, Integer> map) {
         int w = pixels.getWidth();
         int h = pixels.getHeight();
         x -= w/2;
@@ -103,20 +110,21 @@ public class MapWidget extends AbstractWidget {
         for (int i = 0; i < w; i++) {
             for (int j = 0; j < h; j++) {
                 int pixel = pixels.getPixel(i, j);
-                if (pixel != 0)
-                    putPixelWorld(x + i, z + j, 1, pixels.getPixel(i, j), false);
+                if (pixel != 0) {
+                    putPixelWorld(x + i, z + j, 1, pixel, map);
+                }
             }
         }
     }
 
-    public void drawLineScreen(double x0, double z0, double x1, double z1, int color, int size, boolean highlight) {
+    public void drawLineScreen(double x0, double z0, double x1, double z1, int color, int size, BiFunction<Integer, Integer, Integer> map) {
         Vector2i pos0 = new Vector2i(screenToWorld(x0 - getX(), z0 - getY()), RoundingMode.FLOOR);
         Vector2i pos1 = new Vector2i(screenToWorld(x1 - getX(), z1 - getY()), RoundingMode.FLOOR);
         WayfinderClient.lastDrawnPos = pos1;
-        drawLineWorld(pos0.x, pos0.y, pos1.x, pos1.y, color, size, highlight);
+        drawLineWorld(pos0.x, pos0.y, pos1.x, pos1.y, color, size, map);
     }
 
-    public void drawLineWorld(double x0, double z0, double x1, double z1, int color, int size, boolean highlight) {
+    public void drawLineWorld(double x0, double z0, double x1, double z1, int color, int size, BiFunction<Integer, Integer, Integer> map) {
         double dx = x0 - x1;
         double dz = z0 - z1;
         int steps = (int) Math.max(1, Math.ceil(Math.max(Math.abs(dx), Math.abs(dz))));
@@ -125,7 +133,7 @@ public class MapWidget extends AbstractWidget {
         double x = x1;
         double z = z1;
         for (int i = 0; i < steps + 1; i++) {
-            putPixelWorld((int) Math.floor(x + 0.5), (int) Math.floor(z + 0.5), size, color, highlight);
+            putPixelWorld((int) Math.floor(x + 0.5), (int) Math.floor(z + 0.5), size, color, map);
             x += dx;
             z += dz;
         }

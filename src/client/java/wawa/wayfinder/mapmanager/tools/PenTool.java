@@ -16,6 +16,8 @@ import wawa.wayfinder.mapmanager.MapWidget;
 import wawa.wayfinder.rendering.WayfinderRenderTypes;
 
 import java.awt.*;
+import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 
 public class PenTool extends Tool {
     public int size;
@@ -40,12 +42,12 @@ public class PenTool extends Tool {
         if (shift) {
             Vector2i lastWorld = WayfinderClient.lastDrawnPos;
             if (lastWorld == null) {
-                widget.drawLineScreen(mouse.x, mouse.y, mouse.x, mouse.y, getDrawnColor(), size, highlight);
+                widget.drawLineScreen(mouse.x, mouse.y, mouse.x, mouse.y, getDrawnColor(), size, getPixelMap());
             } else {
-                widget.drawLineWorld(lastWorld.x, lastWorld.y, world.x, world.y, getDrawnColor(), size, highlight);
+                widget.drawLineWorld(lastWorld.x, lastWorld.y, world.x, world.y, getDrawnColor(), size, getPixelMap());
             }
         } else {
-            widget.drawLineScreen(widget.prevX, widget.prevY, mouse.x, mouse.y, getDrawnColor(), size, highlight);
+            widget.drawLineScreen(widget.prevX, widget.prevY, mouse.x, mouse.y, getDrawnColor(), size, getPixelMap());
         }
         WayfinderClient.lastDrawnPos = new Vector2i(world);
     }
@@ -70,14 +72,30 @@ public class PenTool extends Tool {
         if (shift) {
             Vector2i lastWorld = WayfinderClient.lastDrawnPos;
             if (lastWorld == null) {
-                widget.drawLineScreen(mouse.x, mouse.y, mouse.x, mouse.y, 0, size, false);
+                widget.drawLineScreen(mouse.x, mouse.y, mouse.x, mouse.y, 0, size, getPixelMap());
             } else {
-                widget.drawLineWorld(lastWorld.x, lastWorld.y, world.x, world.y, 0, size, false);
+                widget.drawLineWorld(lastWorld.x, lastWorld.y, world.x, world.y, 0, size, getPixelMap());
             }
         } else {
-            widget.drawLineScreen(widget.prevX, widget.prevY, mouse.x, mouse.y, 0, size, false);
+            widget.drawLineScreen(widget.prevX, widget.prevY, mouse.x, mouse.y, 0, size, getPixelMap());
         }
         WayfinderClient.lastDrawnPos = new Vector2i(world);
+    }
+
+    private BiFunction<Integer, Integer, Integer> getPixelMap() {
+        if (highlight) {
+            return (pixel, current) -> highlightPredicate().test(pixel, current) ? pixel : current;
+        }
+        return (pixel, current) -> pixel;
+    }
+
+    private BiPredicate<Integer, Integer> highlightPredicate() {
+        return (pixel, current) -> {
+            // todo: make this not hardcoded
+            if (current == ColorPalette.GRAYSCALE.colors().get(0).getRGB())
+                return false;
+            return true;
+        };
     }
 
     @Override

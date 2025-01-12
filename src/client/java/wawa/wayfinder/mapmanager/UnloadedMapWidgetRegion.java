@@ -49,12 +49,12 @@ public class UnloadedMapWidgetRegion extends AbstractMapWidgetRegion {
     }
 
     @Override
-    public boolean putPixelRelative(int x, int z, int color, boolean highlight) {
+    public boolean putPixelRelative(int x, int z, int color) {
         if (!loading) {
             loaded = new LoadedMapWidgetRegion(rx(), rz(), regions);
             loaded.initToClear();
             regions.put(rx(), rz(), loaded);
-            return loaded.putPixelRelative(x, z, color, highlight);
+            return loaded.putPixelRelative(x, z, color);
         }
         return false;
     }
