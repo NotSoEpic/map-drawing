@@ -235,11 +235,13 @@ public class MapWidget extends AbstractWidget {
     }
 
     private void drawRegions(GuiGraphics context) {
-        context.blit(RenderType::guiTextured, GRID_TEXTURE, 0, 0,
-                Math.floorMod((int)Math.round(panning.x), 16), Math.floorMod((int)Math.round(panning.y), 16), width, height, 16, 16, -1);
-
         Vector2d ul = screenToWorld(0, 0).div(512).floor();
         Vector2d lr = screenToWorld(width, height).div(512).ceil();
+
+        Vector2d uv = worldToScreen(ul.x + 1, ul.y + 1, true);
+
+        context.blit(RenderType::guiTextured, GRID_TEXTURE, 0, 0,
+                (float) -uv.x, (float) -uv.y, width, height, 16, 16, -1);
 
         for (int i = (int) ul.x; i < (int) lr.x; i++) {
             for (int j = (int) ul.y; j < (int) lr.y; j++) {
