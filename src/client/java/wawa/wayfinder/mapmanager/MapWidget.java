@@ -1,21 +1,21 @@
 package wawa.wayfinder.mapmanager;
 
-import wawa.wayfinder.Wayfinder;
-import wawa.wayfinder.WayfinderClient;
-import wawa.wayfinder.RenderHelper;
-import wawa.wayfinder.color.ColorPalette;
-import org.joml.Vector2d;
-import org.lwjgl.glfw.GLFW;
 import com.mojang.blaze3d.platform.InputConstants;
-import java.awt.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import org.joml.Vector2d;
+import org.lwjgl.glfw.GLFW;
+import wawa.wayfinder.RenderHelper;
+import wawa.wayfinder.Wayfinder;
+import wawa.wayfinder.WayfinderClient;
+import wawa.wayfinder.color.ColorPalette;
+
+import java.awt.*;
 
 /**
  * The map, rendering drawn regions and player position
@@ -186,7 +186,10 @@ public class MapWidget extends AbstractWidget {
     }
     private void drawRegions(GuiGraphics context) {
         context.blit(GRID_TEXTURE, 0, 0,
-                Math.floorMod((int)Math.round(panning.x), 16), Math.floorMod((int)Math.round(panning.y), 16), width, height, 16, 16, -1);
+                Math.floorMod((int)Math.round(panning.x), 16),
+                Math.floorMod((int)Math.round(panning.y), 16),
+                width, height,
+                16, 16);
 
         Vector2d ul = screenToWorld(0, 0).div(512).floor();
         Vector2d lr = screenToWorld(width, height).div(512).ceil();

@@ -1,29 +1,24 @@
 package wawa.wayfinder.rendering;
 
-import net.minecraft.Util;
-import net.minecraft.client.renderer.RenderStateShard;
+import foundry.veil.api.client.render.rendertype.VeilRenderType;
+import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import java.util.function.Function;
+import wawa.wayfinder.Wayfinder;
+import wawa.wayfinder.WayfinderClient;
+import wawa.wayfinder.color.ColorPalette;
 
 public class WayfinderRenderTypes {
-
-	private static final Function<ResourceLocation, RenderType> PALETTE_SWAP = Util.memoize((id) -> RenderType.create(
-			"texture_palette_swap",
-			DefaultVertexFormat.POSITION_TEX_COLOR,
-			VertexFormat.Mode.QUADS,
-			786432,
-			RenderType.CompositeState.builder()
-					.setTextureState(new RenderStateShard.TextureStateShard(id, false, false))
-					.setShaderState(RenderStateShard.POSITION_TEX_SHADER)
-					.setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
-					.setDepthTestState(RenderStateShard.LEQUAL_DEPTH_TEST)
-					.setWriteMaskState(RenderStateShard.COLOR_WRITE)
-					.createCompositeState(false)));
-
 	public static RenderType getPaletteSwap(ResourceLocation texture) {
-		return PALETTE_SWAP.apply(texture);
+		return VeilRenderType.get(Wayfinder.id("palette_swap"), texture.toString());
+	}
+
+	public static void beforeRenderTypeDraw(ShaderProgram shader) {
+		if(shader.getName().equals(WayfinderShaders.PALETTE_SWAP)) {
+			for (int i = 0; i < ColorPalette.SIZE; i++) {
+				String name = "ColorPalette[%s]".formatted(i);
+				shader.setVector(name, WayfinderClient.palette.vecList()[i]);
+			}
+		}
 	}
 }

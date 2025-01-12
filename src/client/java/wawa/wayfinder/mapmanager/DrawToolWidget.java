@@ -1,14 +1,14 @@
 package wawa.wayfinder.mapmanager;
 
-import wawa.wayfinder.WayfinderClient;
-import wawa.wayfinder.color.ColorPalette;
-import org.lwjgl.glfw.GLFW;
-
-import java.awt.*;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
+import org.lwjgl.glfw.GLFW;
+import wawa.wayfinder.WayfinderClient;
+import wawa.wayfinder.color.ColorPalette;
+
+import java.awt.*;
 
 public class DrawToolWidget extends AbstractWidget {
     private final MapScreen parent;

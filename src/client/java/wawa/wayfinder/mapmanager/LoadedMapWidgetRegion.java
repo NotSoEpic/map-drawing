@@ -1,18 +1,18 @@
 package wawa.wayfinder.mapmanager;
 
-import wawa.wayfinder.Wayfinder;
-import wawa.wayfinder.RenderHelper;
-import wawa.wayfinder.rendering.WayfinderRenderTypes;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import org.joml.Vector2d;
+import wawa.wayfinder.RenderHelper;
+import wawa.wayfinder.Wayfinder;
+import wawa.wayfinder.rendering.WayfinderRenderTypes;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import net.minecraft.Util;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.texture.DynamicTexture;
 
 /**
  * A 512x512 section of the map that contains an image
@@ -53,11 +53,12 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
         }
         Vector2d uv = parent.worldToScreen(rx() * 512, rz() * 512, true).sub(ul).mul(-1);
         Vector2d wh = new Vector2d(lr).sub(ul);
-        RenderHelper.drawTexture(context, WayfinderRenderTypes::getPaletteSwap, id(),
+        RenderHelper.drawTexture(context, WayfinderRenderTypes.getPaletteSwap(id()),
                 ul.x, ul.y,
                 (float) uv.x, (float) uv.y,
                 wh.x, wh.y,
                 (int) (512 * parent.scale),(int) (512 * parent.scale));
+
         if (Minecraft.getInstance().getDebugOverlay().showDebugScreen()) {
             RenderHelper.badDebugText(context, (int)ul.x + 2, (int)ul.y + 2, id().getPath());
         }

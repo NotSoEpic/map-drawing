@@ -5,7 +5,7 @@
   "client": [
     "BiomeAccessAccessor",
     "DrawContextAccessor",
-    "ShaderProgramMixin"
+    "RenderTypeMixin"
   ],
   "injectors": {
     "defaultRequire": 1

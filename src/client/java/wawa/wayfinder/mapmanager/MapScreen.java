@@ -1,10 +1,5 @@
 package wawa.wayfinder.mapmanager;
 
-import wawa.wayfinder.MapBindings;
-import wawa.wayfinder.Wayfinder;
-import wawa.wayfinder.WayfinderClient;
-import wawa.wayfinder.color.ColorPalette;
-import wawa.wayfinder.color.ColorPaletteManager;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -16,6 +11,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.lwjgl.glfw.GLFW;
+import wawa.wayfinder.MapBindings;
+import wawa.wayfinder.Wayfinder;
+import wawa.wayfinder.WayfinderClient;
+import wawa.wayfinder.color.ColorPalette;
+import wawa.wayfinder.color.ColorPaletteManager;
 
 /**
  * The entire screen that gets rendered, including map and drawing tools
@@ -42,7 +42,6 @@ public class MapScreen extends Screen {
         GLFW.glfwSetInputMode(window.getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
 
         addRenderableWidget(map);
-
         WayfinderClient.palette = ColorPaletteManager.get(Wayfinder.id("default"));
 
         for (int i = 0; i < ColorPalette.SIZE; i++) {

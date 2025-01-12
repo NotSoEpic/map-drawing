@@ -1,6 +1,5 @@
 package wawa.wayfinder.color;
 
-import wawa.wayfinder.Wayfinder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.DataResult;
@@ -9,6 +8,8 @@ import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
+import wawa.wayfinder.Wayfinder;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;

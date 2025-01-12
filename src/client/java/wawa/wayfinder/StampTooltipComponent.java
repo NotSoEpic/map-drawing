@@ -1,14 +1,14 @@
 package wawa.wayfinder;
 
-import wawa.wayfinder.color.ColorPaletteManager;
-import wawa.wayfinder.rendering.WayfinderRenderTypes;
-import wawa.wayfinder.stampitem.StampTextureTooltipData;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix4f;
+import wawa.wayfinder.color.ColorPaletteManager;
+import wawa.wayfinder.rendering.WayfinderRenderTypes;
+import wawa.wayfinder.stampitem.StampTextureTooltipData;
 
 public record StampTooltipComponent(ResourceLocation texture) implements ClientTooltipComponent {
     @Override

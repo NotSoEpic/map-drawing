@@ -1,17 +1,16 @@
 package wawa.wayfinder.mapmanager;
 
-import wawa.wayfinder.Wayfinder;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
+import wawa.wayfinder.Wayfinder;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.UUID;
-import net.minecraft.Util;
-import net.minecraft.client.Minecraft;
 
 /**
  * Stores regions in memory for quick access

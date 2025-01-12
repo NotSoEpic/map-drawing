@@ -1,13 +1,13 @@
 package wawa.wayfinder.mapmanager;
 
-import org.joml.Vector2d;
-import org.joml.Vector2i;
-
-import java.nio.file.Path;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
+import org.joml.Vector2d;
+import org.joml.Vector2i;
+
+import java.nio.file.Path;
 
 public abstract class AbstractMapWidgetRegion {
     private final Vector2i region;
