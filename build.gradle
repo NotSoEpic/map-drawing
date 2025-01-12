@@ -54,8 +54,8 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	modImplementation "curse.maven:cloth-config-348521:5987042"
-	modImplementation "curse.maven:auth-me-356643:5990588"
+	modImplementation "curse.maven:cloth-config-348521:5729125"
+	modImplementation "curse.maven:auth-me-356643:5425698"
 }
 
 processResources {
