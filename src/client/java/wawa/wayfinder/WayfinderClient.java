@@ -63,8 +63,8 @@ public class WayfinderClient implements ClientModInitializer {
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
 			Wayfinder.LOGGER.debug("Disconnecting from {}", client.level);
 
-			WayfinderClient.regions.save();
-			WayfinderClient.regions.clear();
+			WayfinderClient.regions.save(true);
+			WayfinderClient.regions.unsafeClear();
 			WayfinderClient.regions.clearRegionPath();
 			WayfinderClient.movementHistory.clear();
 		});

@@ -72,7 +72,7 @@ public abstract class AbstractMapWidgetRegion implements AutoCloseable {
         return regionFile.resolve(String.format("%s.png", id().getPath()));
     }
 
-    public void save(Path regionPath) {};
+    public void save(Path regionPath, boolean close) {};
 
     public void reloadFromHistory() {};
     public void clearHistory() {};
