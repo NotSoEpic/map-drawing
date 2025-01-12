@@ -17,7 +17,7 @@ public class WayfinderRenderTypes {
 			786432,
 			RenderType.CompositeState.builder()
 					.setTextureState(new RenderStateShard.TextureStateShard(id, false, false))
-					.setShaderState(WayfinderShaders.PALETTE_SWAP)
+					.setShaderState(RenderStateShard.POSITION_TEX_SHADER)
 					.setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
 					.setDepthTestState(RenderStateShard.LEQUAL_DEPTH_TEST)
 					.setWriteMaskState(RenderStateShard.COLOR_WRITE)

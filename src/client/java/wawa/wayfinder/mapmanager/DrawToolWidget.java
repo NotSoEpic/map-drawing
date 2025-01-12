@@ -47,11 +47,11 @@ public class DrawToolWidget extends AbstractWidget {
 
     private int getVisualColor() {
         Color color = WayfinderClient.palette.colors().get(colorIndex);
-        return color.getRGB() | 0xFF000000;
+        return color.getRGB();
     }
 
     private int getDrawnColor() {
         Color color = ColorPalette.GRAYSCALE.colors().get(colorIndex);
-        return color.getRGB() | 0xFF000000;
+        return color.getRGB();
     }
 }

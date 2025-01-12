@@ -8,12 +8,12 @@ uniform vec4 ColorModulator;
 uniform float[PALETTE_SIZE * 3] ColorPalette;
 
 in vec2 texCoord0;
-in vec4 vertexColor;
+//in vec4 vertexColor;
 
 out vec4 fragColor;
 
 void main() {
-    vec4 color = texture(Sampler0, texCoord0) * vertexColor;
+    vec4 color = texture(Sampler0, texCoord0);
 
     if(color.a == 0) {
         discard;

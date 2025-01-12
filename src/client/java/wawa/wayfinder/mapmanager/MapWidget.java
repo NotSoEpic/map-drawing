@@ -15,7 +15,6 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 
 /**
@@ -156,7 +155,7 @@ public class MapWidget extends AbstractWidget {
             mouseButton = MouseButton.NONE;
 
         Color color = ColorPalette.GRAYSCALE.colors().get(WayfinderClient.penColorIndex);
-        int penColor = color.getRGB() | 0xFF000000;
+        int penColor = color.getRGB();
 
         boolean shift = InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT)
                 || InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_RIGHT_SHIFT);
@@ -186,7 +185,7 @@ public class MapWidget extends AbstractWidget {
         prevY = mouse.y;
     }
     private void drawRegions(GuiGraphics context) {
-        context.blit(RenderType::guiTextured, GRID_TEXTURE, 0, 0,
+        context.blit(GRID_TEXTURE, 0, 0,
                 Math.floorMod((int)Math.round(panning.x), 16), Math.floorMod((int)Math.round(panning.y), 16), width, height, 16, 16, -1);
 
         Vector2d ul = screenToWorld(0, 0).div(512).floor();
@@ -199,10 +198,11 @@ public class MapWidget extends AbstractWidget {
             }
         }
 
-        context.vLine(0, 0, height, ARGB.color(255,0,0));
-        context.vLine(width, 0, height, ARGB.color(255,0,0));
-        context.hLine(0, width, 0, ARGB.color(255,0,0));
-        context.hLine(0, width, height, ARGB.color(255,0,0));
+
+        context.vLine(0, 0, height, Color.RED.getRGB());
+        context.vLine(width, 0, height, Color.RED.getRGB());
+        context.hLine(0, width, 0, Color.RED.getRGB());
+        context.hLine(0, width, height, Color.RED.getRGB());
     }
 
     private void drawDebugText(GuiGraphics context, Vector2d mouse) {
@@ -217,7 +217,7 @@ public class MapWidget extends AbstractWidget {
     private void drawMouse(GuiGraphics context, Vector2d mouse) {
 
         Color color = WayfinderClient.palette.colors().get(WayfinderClient.penColorIndex);
-        int penColor = color.getRGB() | 0xFF000000;
+        int penColor = color.getRGB();
 
         Vector2d ul = screenToWorld((int)mouse.x - getX(), (int)mouse.y - getY()).sub(WayfinderClient.penSize - 0.5, WayfinderClient.penSize - 0.5).round();
         Vector2d w = screenToWorld((int)mouse.x - getX(), (int)mouse.y - getY()).add(WayfinderClient.penSize - 0.5, WayfinderClient.penSize - 0.5).round();
@@ -252,7 +252,7 @@ public class MapWidget extends AbstractWidget {
         Vector2d player = worldToScreen(Minecraft.getInstance().player.getX(), Minecraft.getInstance().player.getZ(), true)
                 .min(new Vector2d(width, height)).max(new Vector2d());
         RenderHelper.fill(context, player.x - 5, player.y - 5, player.x + 5, player.y + 5,
-                ARGB.color(255, 255, 0));
+                Color.YELLOW.getRGB());
 
         if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_ALT)) WayfinderClient.movementHistory.render(context, this);
     }

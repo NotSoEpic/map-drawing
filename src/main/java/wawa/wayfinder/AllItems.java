@@ -10,11 +10,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 
 public class AllItems {
-    public static Item STAMP = register(Wayfinder.id("stamp"), StampItem::new, new Item.Properties());
+    public static Item STAMP = register(Wayfinder.id("stamp"), new StampItem(new Item.Properties()));
 
-    private static  <T extends Item> T register(ResourceLocation id, Function<Item.Properties, T> factory, Item.Properties settings) {
+    private static  <T extends Item> T register(ResourceLocation id, T item) {
         ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, id);
-        return Registry.register(BuiltInRegistries.ITEM, key, factory.apply(settings.setId(key)));
+        return Registry.register(BuiltInRegistries.ITEM, key, item);
     }
 
     public static void init() {}
