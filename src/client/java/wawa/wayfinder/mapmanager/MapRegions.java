@@ -108,7 +108,7 @@ public class MapRegions extends HashMap<Vector2i, AbstractMapWidgetRegion> {
             AbstractMapWidgetRegion entry = it.next().getValue();
             if (rendertime - entry.getLastRenderTime() > msThreshold) {
                 entry.save(getRegionPath());
-                if (entry.hasHistory()) {
+                if (!entry.hasHistory()) {
                     deltaStats(entry, -1);
                     it.remove();
                 }
