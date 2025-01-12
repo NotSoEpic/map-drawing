@@ -4,7 +4,6 @@ import net.minecraft.Util;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.TriState;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import java.util.function.Function;
@@ -17,7 +16,7 @@ public class WayfinderRenderTypes {
 			VertexFormat.Mode.QUADS,
 			786432,
 			RenderType.CompositeState.builder()
-					.setTextureState(new RenderStateShard.TextureStateShard(id, TriState.DEFAULT, false))
+					.setTextureState(new RenderStateShard.TextureStateShard(id, false, false))
 					.setShaderState(WayfinderShaders.PALETTE_SWAP)
 					.setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
 					.setDepthTestState(RenderStateShard.LEQUAL_DEPTH_TEST)

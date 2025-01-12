@@ -12,7 +12,7 @@ import org.joml.Matrix4f;
 
 public record StampTooltipComponent(ResourceLocation texture) implements ClientTooltipComponent {
     @Override
-    public int getHeight(Font textRenderer) {
+    public int getHeight() {
         return 32 + 2;
     }
 

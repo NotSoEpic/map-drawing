@@ -1,5 +1,6 @@
 package wawa.wayfinder;
 
+import net.minecraft.util.FastColor;
 import wawa.wayfinder.mixin.client.DrawContextAccessor;
 import org.joml.Matrix4f;
 import org.joml.Vector2d;
@@ -12,7 +13,6 @@ import net.minecraft.client.MouseHandler;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.ARGB;
 
 public class RenderHelper {
     // DrawContext.fill only accepts integer coordinates, which isn't precise enough
@@ -72,7 +72,7 @@ public class RenderHelper {
     }
 
     public static void badDebugText(GuiGraphics context, int x, int y, String text) {
-        context.drawString(Minecraft.getInstance().font, text, x, y, ARGB.color(0, 0, 255), false);
+        context.drawString(Minecraft.getInstance().font, text, x, y, FastColor.ARGB32.color(0, 0, 255), false);
     }
 
     public static Vector2d smootherMouse() {

@@ -1,21 +1,20 @@
 package wawa.wayfinder.mixin.client;
 
-import wawa.wayfinder.WayfinderClient;
-import wawa.wayfinder.color.ColorPalette;
+import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.shaders.Uniform;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.client.renderer.ShaderInstance;
+import net.minecraft.server.packs.resources.ResourceProvider;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.shaders.Uniform;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import java.util.List;
-import net.minecraft.client.renderer.CompiledShaderProgram;
-import net.minecraft.client.renderer.ShaderProgramConfig;
+import wawa.wayfinder.WayfinderClient;
+import wawa.wayfinder.color.ColorPalette;
 
-@Mixin(CompiledShaderProgram.class)
+@Mixin(ShaderInstance.class)
 public class ShaderProgramMixin {
 
 	@Unique
@@ -31,9 +30,9 @@ public class ShaderProgramMixin {
 		}
 	}
 
-	@Inject(method = "setupUniforms", at = @At("TAIL"))
-	private void wayfinder$set(List<ShaderProgramConfig.Uniform> uniforms, List<ShaderProgramConfig.Sampler> samplers, CallbackInfo ci) {
-		CompiledShaderProgram self = (CompiledShaderProgram) (Object) this;
+	@Inject(method = "<init>", at = @At("TAIL"))
+	private void wayfinder$set(ResourceProvider resourceProvider, String name, VertexFormat vertexFormat, CallbackInfo ci) {
+		ShaderInstance self = (ShaderInstance) (Object) this;
 		this.wayfinder$colorPalette = self.getUniform("ColorPalette");
 	}
 

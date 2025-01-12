@@ -97,8 +97,8 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
     public boolean putPixelRelative(int x, int z, int color, boolean highlight) {
         if (!inBoundsRel(x, z))
             return false;
-        if (!highlight || texture.getPixels().getPixel(x, z) == 0) {
-            texture.getPixels().setPixel(x, z, color);
+        if (!highlight || texture.getPixels().getPixelRGBA(x, z) == 0) {
+            texture.getPixels().setPixelRGBA(x, z, color);
             dirtyVisual = true;
             dirtySave = true;
             return true;
@@ -108,7 +108,7 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
 
     public void checkDirty() {
         if (dirtyVisual) {
-            if (Arrays.stream(texture.getPixels().getPixelsABGR()).allMatch(i -> i == 0)) {
+            if (Arrays.stream(texture.getPixels().getPixelsRGBA()).allMatch(i -> i == 0)) {
                 removed = true;
             } else {
                 texture.upload();
