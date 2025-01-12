@@ -33,6 +33,7 @@ public class WayfinderClient implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
+		Wayfinder.LOGGER.info("wawa");
 		MapBindings.init();
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			MapBindings.inputEvents(client);
