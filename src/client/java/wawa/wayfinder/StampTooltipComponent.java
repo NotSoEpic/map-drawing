@@ -18,6 +18,10 @@ public class StampTooltipComponent implements ClientTooltipComponent {
     private final int h;
     private static final int padding = 4 + 2;
     private static final ResourceLocation background = Wayfinder.id("page");
+import org.joml.Matrix4f;
+import wawa.wayfinder.color.ColorPaletteManager;
+import wawa.wayfinder.rendering.WayfinderRenderTypes;
+import wawa.wayfinder.stampitem.StampTextureTooltipData;
 
     public StampTooltipComponent(ResourceLocation texture) {
         this.texture = texture;
@@ -27,7 +31,7 @@ public class StampTooltipComponent implements ClientTooltipComponent {
     }
 
     @Override
-    public int getHeight(Font textRenderer) {
+    public int getHeight() {
         return w + padding * 2 + 2;
     }
 

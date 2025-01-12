@@ -1,11 +1,12 @@
 package wawa.wayfinder.datagen;
 
-import wawa.wayfinder.AllItems;
-import wawa.wayfinder.Wayfinder;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceLocation;
+import wawa.wayfinder.AllItems;
+import wawa.wayfinder.Wayfinder;
+
 import java.util.concurrent.CompletableFuture;
 
 public class LangGenerator extends FabricLanguageProvider {

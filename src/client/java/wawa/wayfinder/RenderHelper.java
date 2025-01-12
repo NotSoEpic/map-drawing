@@ -7,7 +7,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.util.ARGB;
 import org.joml.Matrix4f;
 import org.joml.Vector2d;
 import wawa.wayfinder.mixin.client.DrawContextAccessor;
@@ -44,7 +43,7 @@ public class RenderHelper {
     }
 
     public static void badDebugText(GuiGraphics context, int x, int y, String text) {
-        context.drawString(Minecraft.getInstance().font, text, x, y, ARGB.color(0, 0, 255), false);
+        context.drawString(Minecraft.getInstance().font, text, x, y, Color.BLUE.getRGB(), false);
     }
 
     public static Vector2d smootherMouse() {

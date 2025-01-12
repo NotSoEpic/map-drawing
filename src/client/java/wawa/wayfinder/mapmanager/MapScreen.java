@@ -1,5 +1,6 @@
 package wawa.wayfinder.mapmanager;
 
+import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
@@ -20,6 +21,12 @@ import wawa.wayfinder.mapmanager.tools.StampTool;
 import wawa.wayfinder.mapmanager.tools.Tool;
 
 import java.util.Iterator;
+import org.lwjgl.glfw.GLFW;
+import wawa.wayfinder.MapBindings;
+import wawa.wayfinder.Wayfinder;
+import wawa.wayfinder.WayfinderClient;
+import wawa.wayfinder.color.ColorPalette;
+import wawa.wayfinder.color.ColorPaletteManager;
 
 /**
  * The entire screen that gets rendered, including map and drawing tools

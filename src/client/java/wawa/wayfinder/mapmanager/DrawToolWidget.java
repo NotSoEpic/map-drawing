@@ -7,8 +7,6 @@ import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.color.ColorPalette;
-import wawa.wayfinder.mapmanager.tools.PenTool;
-import wawa.wayfinder.mapmanager.tools.Tool;
 
 import java.awt.*;
 
@@ -49,11 +47,11 @@ public class DrawToolWidget extends AbstractWidget {
 
     private int getVisualColor() {
         Color color = WayfinderClient.palette.colors().get(colorIndex);
-        return color.getRGB() | 0xFF000000;
+        return color.getRGB();
     }
 
     private int getDrawnColor() {
         Color color = ColorPalette.GRAYSCALE.colors().get(colorIndex);
-        return color.getRGB() | 0xFF000000;
+        return color.getRGB();
     }
 }

@@ -1,13 +1,13 @@
 package wawa.wayfinder.mapmanager;
 
-import wawa.wayfinder.RenderHelper;
-import org.joml.Vector2d;
-
-import java.util.ArrayDeque;
-import java.util.Queue;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.util.ARGB;
+import org.joml.Vector2d;
+import wawa.wayfinder.RenderHelper;
+
+import java.awt.*;
+import java.util.ArrayDeque;
+import java.util.Queue;
 
 /**
  * Stores the previous positions of the players to be rendered in the map
@@ -37,7 +37,7 @@ public class PlayerMovementHistory {
             Vector2d p = manager.worldToScreen(v.x, v.y, true);
             if (p.x > 0 && p.x < manager.getWidth() && p.y > 0 && p.y < manager.getHeight()) {
                 RenderHelper.fill(context, p.x - 1, p.y - 1, p.x + 1, p.y + 1,
-                        ARGB.color(255, 255, 0));
+                        Color.YELLOW.getRGB());
             }
         });
     }

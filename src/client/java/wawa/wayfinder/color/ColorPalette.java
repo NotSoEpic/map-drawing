@@ -2,15 +2,14 @@ package wawa.wayfinder.color;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import org.jetbrains.annotations.Nullable;
-
-import java.awt.*;
-import java.nio.FloatBuffer;
-import java.util.List;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
+import org.joml.Vector3f;
 
-public record ColorPalette(Component displayName, List<Color> colors, @Nullable FloatBuffer buffer) {
+import java.awt.*;
+import java.util.List;
+
+public record ColorPalette(Component displayName, List<Color> colors, Vector3f[] vecList) {
 	public static final int SIZE = 9;
 
 	public static final Codec<ColorPalette> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -29,26 +28,20 @@ public record ColorPalette(Component displayName, List<Color> colors, @Nullable 
 			colors[i] = new Color(color, color, color);
 		}
 
-		GRAYSCALE = new ColorPalette(Component.literal("Grayscale"), List.of(colors), true);
+		GRAYSCALE = new ColorPalette(Component.literal("Grayscale"), List.of(colors));
 	}
 
 	public ColorPalette(Component displayName, List<Color> colors) {
-		this(displayName, colors, true);
+		this(displayName, colors, createVectors(colors));
 	}
 
-	public ColorPalette(Component displayName, List<Color> colors, boolean createBuffer) {
-		this(displayName, colors, createBuffer ? createBuffer(colors) : null);
-	}
-
-	private static FloatBuffer createBuffer(List<Color> colorList) {
-		FloatBuffer buffer = FloatBuffer.allocate(colorList.size() * 3);
-		for (Color color : colorList) {
-			float[] components = color.getColorComponents(null);
-			buffer.put(components[0]);
-			buffer.put(components[1]);
-			buffer.put(components[2]);
+	private static Vector3f[] createVectors(List<Color> colorList) {
+		Vector3f[] list = new Vector3f[colorList.size()];
+		for (int i = 0; i < colorList.size(); i++) {
+			Color color = colorList.get(i);
+			list[i] = new Vector3f(color.getColorComponents(null));
 		}
-		return buffer;
+		return list;
 	}
 
 	private static Color stringToColor(String string) {

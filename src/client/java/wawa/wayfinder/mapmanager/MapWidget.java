@@ -10,7 +10,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import org.joml.RoundingMode;
 import org.joml.Vector2d;
@@ -19,8 +18,10 @@ import org.lwjgl.glfw.GLFW;
 import wawa.wayfinder.RenderHelper;
 import wawa.wayfinder.Wayfinder;
 import wawa.wayfinder.WayfinderClient;
+import wawa.wayfinder.color.ColorPalette;
 import wawa.wayfinder.mapmanager.tools.Tool;
 
+import java.awt.*;
 import java.util.function.BiFunction;
 
 /**
@@ -218,6 +219,8 @@ public class MapWidget extends AbstractWidget {
             mouseButton = MouseButton.NONE;
 
         Vector2i world = new Vector2i(screenToWorld(mouse.x - getX(), mouse.y - getY()), RoundingMode.FLOOR);
+        Color color = ColorPalette.GRAYSCALE.colors().get(WayfinderClient.penColorIndex);
+        int penColor = color.getRGB();
 
         if (Tool.get() != null) {
             boolean shift = Screen.hasShiftDown();
@@ -235,6 +238,12 @@ public class MapWidget extends AbstractWidget {
     }
 
     private void drawRegions(GuiGraphics context) {
+//        context.blit(GRID_TEXTURE, 0, 0,
+//                Math.floorMod((int)Math.round(panning.x), 16),
+//                Math.floorMod((int)Math.round(panning.y), 16),
+//                width, height,
+//                16, 16);
+
         Vector2d ul = screenToWorld(0, 0).div(512).floor();
         Vector2d lr = screenToWorld(width, height).div(512).ceil();
 
@@ -250,10 +259,11 @@ public class MapWidget extends AbstractWidget {
             }
         }
 
-        context.vLine(0, 0, height, ARGB.color(255,0,0));
-        context.vLine(width, 0, height, ARGB.color(255,0,0));
-        context.hLine(0, width, 0, ARGB.color(255,0,0));
-        context.hLine(0, width, height, ARGB.color(255,0,0));
+
+        context.vLine(0, 0, height, Color.RED.getRGB());
+        context.vLine(width, 0, height, Color.RED.getRGB());
+        context.hLine(0, width, 0, Color.RED.getRGB());
+        context.hLine(0, width, height, Color.RED.getRGB());
     }
 
     private void drawDebugText(GuiGraphics context, Vector2d mouse) {
@@ -272,6 +282,8 @@ public class MapWidget extends AbstractWidget {
             return;
         }
 
+        Color color = WayfinderClient.palette.colors().get(WayfinderClient.penColorIndex);
+        int penColor = color.getRGB();
         Vector2i world = new Vector2i(screenToWorld(mouse.x - getX(), mouse.y - getY()), RoundingMode.FLOOR);
 
         if (isMouseOver(mouse.x, mouse.y) && Tool.get().hideMouse(this, mouse, world)) {
@@ -288,7 +300,7 @@ public class MapWidget extends AbstractWidget {
         Vector2d player = worldToScreen(Minecraft.getInstance().player.getX(), Minecraft.getInstance().player.getZ(), true)
                 .min(new Vector2d(width, height)).max(new Vector2d());
         RenderHelper.fill(context, player.x - 5, player.y - 5, player.x + 5, player.y + 5,
-                ARGB.color(255, 255, 0));
+                Color.YELLOW.getRGB());
 
         if (Screen.hasAltDown()) WayfinderClient.movementHistory.render(context, this);
     }
