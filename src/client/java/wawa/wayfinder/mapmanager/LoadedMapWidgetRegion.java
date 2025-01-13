@@ -161,8 +161,7 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
 
     @Override
     public void clearHistory() {
-        if (history != null && isEmpty()) {
-            removed = true;
+        if (history != null) {
             history.close();
             history = null;
         }
