@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTabs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import wawa.wayfinder.stampitem.BuiltInStamps;
 import wawa.wayfinder.stampitem.StampRegistry;
 
 public class Wayfinder implements ModInitializer {
@@ -21,6 +22,7 @@ public class Wayfinder implements ModInitializer {
 		AllItems.init();
 		AllComponents.init();
 		StampRegistry.init();
+		BuiltInStamps.init();
 
 		ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(StampRegistry::generatePresetPaintings);
 	}
