@@ -1,4 +1,4 @@
-package wawa.wayfinder.mapmanager;
+package wawa.wayfinder.mapmanager.widgets;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;

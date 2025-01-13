@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import wawa.wayfinder.Wayfinder;
+import wawa.wayfinder.mapmanager.widgets.MapWidget;
 
 import java.io.File;
 import java.io.IOException;

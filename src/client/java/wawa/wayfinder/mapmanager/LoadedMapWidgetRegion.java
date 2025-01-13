@@ -9,6 +9,7 @@ import org.joml.RoundingMode;
 import org.joml.Vector2i;
 import wawa.wayfinder.RenderHelper;
 import wawa.wayfinder.Wayfinder;
+import wawa.wayfinder.mapmanager.widgets.MapWidget;
 import wawa.wayfinder.rendering.WayfinderRenderTypes;
 
 import java.io.IOException;

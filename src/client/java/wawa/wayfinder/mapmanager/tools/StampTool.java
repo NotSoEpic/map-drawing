@@ -15,7 +15,7 @@ import org.lwjgl.opengl.GL11;
 import wawa.wayfinder.AllComponents;
 import wawa.wayfinder.RenderHelper;
 import wawa.wayfinder.WayfinderClient;
-import wawa.wayfinder.mapmanager.MapWidget;
+import wawa.wayfinder.mapmanager.widgets.MapWidget;
 import wawa.wayfinder.rendering.WayfinderRenderTypes;
 
 import java.util.HashSet;

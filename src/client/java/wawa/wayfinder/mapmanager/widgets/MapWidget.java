@@ -1,4 +1,4 @@
-package wawa.wayfinder.mapmanager;
+package wawa.wayfinder.mapmanager.widgets;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.Window;
@@ -20,6 +20,7 @@ import wawa.wayfinder.RenderHelper;
 import wawa.wayfinder.Wayfinder;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.color.ColorPalette;
+import wawa.wayfinder.mapmanager.*;
 import wawa.wayfinder.mapmanager.tools.Tool;
 
 import java.awt.*;

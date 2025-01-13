@@ -1,4 +1,4 @@
-package wawa.wayfinder.mapmanager;
+package wawa.wayfinder.mapmanager.widgets;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -7,6 +7,7 @@ import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.color.ColorPalette;
+import wawa.wayfinder.mapmanager.MapScreen;
 import wawa.wayfinder.mapmanager.tools.PenTool;
 import wawa.wayfinder.mapmanager.tools.Tool;
 

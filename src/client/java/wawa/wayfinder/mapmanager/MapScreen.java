@@ -18,6 +18,9 @@ import wawa.wayfinder.color.ColorPalette;
 import wawa.wayfinder.color.ColorPaletteManager;
 import wawa.wayfinder.mapmanager.tools.StampTool;
 import wawa.wayfinder.mapmanager.tools.Tool;
+import wawa.wayfinder.mapmanager.widgets.DrawToolWidget;
+import wawa.wayfinder.mapmanager.widgets.MapWidget;
+import wawa.wayfinder.mapmanager.widgets.StampToolWidget;
 
 import java.util.Iterator;
 

@@ -4,7 +4,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
-import wawa.wayfinder.mapmanager.MapWidget;
+import wawa.wayfinder.mapmanager.widgets.MapWidget;
 
 public abstract class Tool {
     private static Tool tool;

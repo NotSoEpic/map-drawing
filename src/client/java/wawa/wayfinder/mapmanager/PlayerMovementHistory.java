@@ -4,6 +4,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import org.joml.Vector2d;
 import wawa.wayfinder.RenderHelper;
+import wawa.wayfinder.mapmanager.widgets.MapWidget;
 
 import java.awt.*;
 import java.util.ArrayDeque;

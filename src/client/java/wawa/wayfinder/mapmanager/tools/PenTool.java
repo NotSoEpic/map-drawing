@@ -3,7 +3,6 @@ package wawa.wayfinder.mapmanager.tools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -14,7 +13,7 @@ import wawa.wayfinder.RenderHelper;
 import wawa.wayfinder.Wayfinder;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.color.ColorPalette;
-import wawa.wayfinder.mapmanager.MapWidget;
+import wawa.wayfinder.mapmanager.widgets.MapWidget;
 import wawa.wayfinder.rendering.WayfinderRenderTypes;
 
 import java.awt.*;
