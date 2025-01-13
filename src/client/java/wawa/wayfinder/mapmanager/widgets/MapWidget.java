@@ -8,7 +8,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -19,7 +18,6 @@ import org.lwjgl.glfw.GLFW;
 import wawa.wayfinder.RenderHelper;
 import wawa.wayfinder.Wayfinder;
 import wawa.wayfinder.WayfinderClient;
-import wawa.wayfinder.color.ColorPalette;
 import wawa.wayfinder.mapmanager.*;
 import wawa.wayfinder.mapmanager.tools.Tool;
 
@@ -284,6 +282,11 @@ public class MapWidget extends AbstractWidget {
     private void drawMouse(GuiGraphics context, Vector2d mouse) {
         Window window = Minecraft.getInstance().getWindow();
         if (Tool.get() == null) {
+            GLFW.glfwSetInputMode(window.getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
+            return;
+        }
+
+        if (!active && Tool.get().hideWhenInactive()) {
             GLFW.glfwSetInputMode(window.getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
             return;
         }

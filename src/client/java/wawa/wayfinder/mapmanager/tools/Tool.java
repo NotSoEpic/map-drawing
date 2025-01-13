@@ -10,6 +10,8 @@ public abstract class Tool {
     private static Tool tool;
 
     public static void set(@Nullable Tool tool) {
+        if (Tool.tool != null)
+            Tool.tool.onDeselect();
         Tool.tool = tool;
         if (tool != null)
             tool.onSelect();
@@ -20,6 +22,7 @@ public abstract class Tool {
     }
 
     protected abstract void onSelect();
+    protected void onDeselect() {}
 
     public void leftDown(MapWidget widget, boolean shift, Vector2d mouse, Vector2i world) {}
 
@@ -48,5 +51,8 @@ public abstract class Tool {
     public void ctrlScroll(MapWidget widget, Vector2d mouse, Vector2i world, double verticalAmount) {}
 
     public abstract void render(MapWidget widget, GuiGraphics context, boolean shift, Vector2d mouse, Vector2i world);
+    public boolean hideWhenInactive() {
+        return true;
+    }
     public abstract boolean hideMouse(MapWidget widget, Vector2d mouse, Vector2i world);
 }

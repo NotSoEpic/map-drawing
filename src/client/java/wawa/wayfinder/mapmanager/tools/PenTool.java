@@ -29,13 +29,14 @@ public class PenTool extends Tool {
 
     @Override
     public void onSelect() {
+        setColorIndex(colorIndex);
         Minecraft.getInstance().getTextureManager().register(id, pen);
     }
 
     public PenTool(int size, int colorIndex, boolean highlight) {
         this.size = size;
-        this.highlight = highlight;
         this.colorIndex = colorIndex;
+        this.highlight = highlight;
     }
 
     @Override
@@ -128,15 +129,13 @@ public class PenTool extends Tool {
                 Vector2d ul = widget.worldToScreen(Math.round(x), Math.round(z), true)
                         .sub(new Vector2d(size - 1).floor().mul(widget.scale));
 
-                RenderHelper.renderTypeBlit(context, WayfinderRenderTypes.getPaletteSwap(id),
-                        (int) ul.x, (int) ul.y, 0, 0.0f, 0.0f,
-                        swh, swh, swh, swh
-                );
-
-//                context.blit(WayfinderRenderTypes::getPaletteSwap, id,
-//                        (int) ul.x, (int) ul.y, 0, 0,
-//                        swh, swh, swh, swh
-//                );
+                if (ul.x > -size * widget.scale * 2 && ul.x < context.guiWidth() &&
+                        ul.y > -size * widget.scale * 2 && ul.y < context.guiHeight()) {
+                    RenderHelper.renderTypeBlit(context, WayfinderRenderTypes.getPaletteSwap(id),
+                            (int) ul.x, (int) ul.y, 0, 0.0f, 0.0f,
+                            swh, swh, swh, swh
+                    );
+                }
                 x += dx;
                 z += dz;
             }
@@ -157,7 +156,7 @@ public class PenTool extends Tool {
 
     @Override
     public boolean hideMouse(MapWidget widget, Vector2d mouse, Vector2i world) {
-        return widget.scale >= 1;
+        return widget.scale >= 1 && colorIndex != -1;
     }
 
     public void setColorIndex(int colorIndex) {
@@ -166,11 +165,19 @@ public class PenTool extends Tool {
         pen.upload();
     }
 
+    public int getColorIndex() {
+        return colorIndex;
+    }
+
     public int getVisualColor() {
+        if (colorIndex == -1)
+            return 0;
         return WayfinderClient.palette.colors().get(colorIndex).getRGB();
     }
 
     public int getDrawnColor() {
+        if (colorIndex == -1)
+            return 0;
         return ColorPalette.GRAYSCALE.colors().get(colorIndex).getRGB();
     }
 }
