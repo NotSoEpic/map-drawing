@@ -5,6 +5,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import wawa.wayfinder.RenderHelper;
 import wawa.wayfinder.mapmanager.tools.StampTool;
 import wawa.wayfinder.mapmanager.tools.Tool;
 import wawa.wayfinder.rendering.WayfinderRenderTypes;
@@ -23,8 +24,11 @@ public class StampToolWidget extends AbstractWidget {
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        guiGraphics.blit(WayfinderRenderTypes::getPaletteSwap, stampTool.stamp,
-                getX(), getY(), 0, 0, width, height, width, height);
+        RenderHelper.renderTypeBlit(guiGraphics, WayfinderRenderTypes.getPaletteSwap(stampTool.stamp),
+                getX(),getY(), 0,
+                0.0f, 0.0f,
+                width, height, width, height
+        );
     }
 
     @Override

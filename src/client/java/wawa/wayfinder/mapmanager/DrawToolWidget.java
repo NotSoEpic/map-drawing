@@ -7,6 +7,8 @@ import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.color.ColorPalette;
+import wawa.wayfinder.mapmanager.tools.PenTool;
+import wawa.wayfinder.mapmanager.tools.Tool;
 
 import java.awt.*;
 

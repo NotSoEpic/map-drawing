@@ -18,10 +18,6 @@ public class StampTooltipComponent implements ClientTooltipComponent {
     private final int h;
     private static final int padding = 4 + 2;
     private static final ResourceLocation background = Wayfinder.id("page");
-import org.joml.Matrix4f;
-import wawa.wayfinder.color.ColorPaletteManager;
-import wawa.wayfinder.rendering.WayfinderRenderTypes;
-import wawa.wayfinder.stampitem.StampTextureTooltipData;
 
     public StampTooltipComponent(ResourceLocation texture) {
         this.texture = texture;
@@ -41,10 +37,16 @@ import wawa.wayfinder.stampitem.StampTextureTooltipData;
     }
 
     @Override
-    public void renderImage(Font font, int x, int y, int width, int height, GuiGraphics guiGraphics) {
+    public void renderImage(Font font, int x, int y, GuiGraphics guiGraphics) {
         WayfinderClient.palette = ColorPaletteManager.get(Wayfinder.id("default"));
-        guiGraphics.blitSprite(RenderType::guiTextured, background, x, y - 1, w + padding * 2, h + padding * 2);
-        guiGraphics.blit(WayfinderRenderTypes::getPaletteSwap, texture, x + padding, y + padding - 1, 0, 0, w, h, w, h);
+
+        guiGraphics.blitSprite(background, x + padding, y + padding - 1, w, h);
+
+        RenderHelper.renderTypeBlit(guiGraphics, WayfinderRenderTypes.getPaletteSwap(texture),
+                x + padding, y + padding - 1, 0,
+                0.0f, 0.0f,
+                w, h, w, h
+        );
     }
 
     public static String fromPathShorthand(String path) {

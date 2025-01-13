@@ -1,5 +1,5 @@
 {
-  "format": "POSITION_TEX_COLOR",
+  "format": "POSITION_TEX",
   "mode": "QUADS",
   "bufferSize": "SMALL",
   "layers": [

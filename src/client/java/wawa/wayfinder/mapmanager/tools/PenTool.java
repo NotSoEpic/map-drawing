@@ -3,12 +3,14 @@ package wawa.wayfinder.mapmanager.tools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.joml.RoundingMode;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
+import wawa.wayfinder.RenderHelper;
 import wawa.wayfinder.Wayfinder;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.color.ColorPalette;
@@ -126,19 +128,31 @@ public class PenTool extends Tool {
             for (int i = 0; i < steps + 1; i++) {
                 Vector2d ul = widget.worldToScreen(Math.round(x), Math.round(z), true)
                         .sub(new Vector2d(size - 1).floor().mul(widget.scale));
-                context.blit(WayfinderRenderTypes::getPaletteSwap, id,
-                        (int) ul.x, (int) ul.y, 0, 0,
+
+                RenderHelper.renderTypeBlit(context, WayfinderRenderTypes.getPaletteSwap(id),
+                        (int) ul.x, (int) ul.y, 0, 0.0f, 0.0f,
                         swh, swh, swh, swh
                 );
+
+//                context.blit(WayfinderRenderTypes::getPaletteSwap, id,
+//                        (int) ul.x, (int) ul.y, 0, 0,
+//                        swh, swh, swh, swh
+//                );
                 x += dx;
                 z += dz;
             }
         } else {
             world = new Vector2i(widget.worldToScreen(new Vector2d(world).sub(size - 1, size - 1), true), RoundingMode.FLOOR);
-            context.blit(WayfinderRenderTypes::getPaletteSwap, id,
-                    world.x, world.y, 0, 0,
+
+            RenderHelper.renderTypeBlit(context, WayfinderRenderTypes.getPaletteSwap(id),
+                    world.x, world.y, 0, 0.0f, 0.0f,
                     swh, swh, swh, swh
             );
+
+//            context.blit(WayfinderRenderTypes::getPaletteSwap, id,
+//                    world.x, world.y, 0, 0,
+//                    swh, swh, swh, swh
+//            );
         }
     }
 
@@ -154,10 +168,10 @@ public class PenTool extends Tool {
     }
 
     public int getVisualColor() {
-        return WayfinderClient.palette.colors().get(colorIndex).getRGB() | 0xFF000000;
+        return WayfinderClient.palette.colors().get(colorIndex).getRGB();
     }
 
     public int getDrawnColor() {
-        return ColorPalette.GRAYSCALE.colors().get(colorIndex).getRGB() | 0xFF000000;
+        return ColorPalette.GRAYSCALE.colors().get(colorIndex).getRGB();
     }
 }

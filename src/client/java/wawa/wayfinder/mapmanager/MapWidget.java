@@ -110,7 +110,7 @@ public class MapWidget extends AbstractWidget {
         z -= h/2;
         for (int i = 0; i < w; i++) {
             for (int j = 0; j < h; j++) {
-                int pixel = pixels.getPixel(i, j);
+                int pixel = pixels.getPixelRGBA(i, j);
                 if (pixel != 0) {
                     putPixelWorld(x + i, z + j, 1, pixel, map);
                 }
@@ -204,7 +204,9 @@ public class MapWidget extends AbstractWidget {
 
         Vector2d mouse = RenderHelper.smootherMouse();
         handleMouse(mouse);
-        context.enableScissor(0, 0, width + 1, height + 1);
+        context.enableScissor(getX(), getY(),
+                width + getX() + 1, height + getY() + 1
+        );
         drawRegions(context);
         drawPlayer(context);
         drawMouse(context, mouse);
@@ -219,8 +221,6 @@ public class MapWidget extends AbstractWidget {
             mouseButton = MouseButton.NONE;
 
         Vector2i world = new Vector2i(screenToWorld(mouse.x - getX(), mouse.y - getY()), RoundingMode.FLOOR);
-        Color color = ColorPalette.GRAYSCALE.colors().get(WayfinderClient.penColorIndex);
-        int penColor = color.getRGB();
 
         if (Tool.get() != null) {
             boolean shift = Screen.hasShiftDown();
@@ -238,19 +238,19 @@ public class MapWidget extends AbstractWidget {
     }
 
     private void drawRegions(GuiGraphics context) {
-//        context.blit(GRID_TEXTURE, 0, 0,
-//                Math.floorMod((int)Math.round(panning.x), 16),
-//                Math.floorMod((int)Math.round(panning.y), 16),
-//                width, height,
-//                16, 16);
-
         Vector2d ul = screenToWorld(0, 0).div(512).floor();
         Vector2d lr = screenToWorld(width, height).div(512).ceil();
 
         Vector2d uv = worldToScreen(ul.x + 1, ul.y + 1, true);
 
-        context.blit(RenderType::guiTextured, GRID_TEXTURE, 0, 0,
-                (float) -uv.x, (float) -uv.y, width, height, 16, 16, -1);
+//        context.blit(RenderType::guiTextured, GRID_TEXTURE, 0, 0,
+//                (float) -uv.x, (float) -uv.y, width, height, 16, 16, -1);
+
+        context.blit(GRID_TEXTURE, 0, 0,
+                (float) -uv.x,
+                (float) -uv.y,
+                width, height,
+                16, 16);
 
         for (int i = (int) ul.x; i < (int) lr.x; i++) {
             for (int j = (int) ul.y; j < (int) lr.y; j++) {
@@ -282,8 +282,6 @@ public class MapWidget extends AbstractWidget {
             return;
         }
 
-        Color color = WayfinderClient.palette.colors().get(WayfinderClient.penColorIndex);
-        int penColor = color.getRGB();
         Vector2i world = new Vector2i(screenToWorld(mouse.x - getX(), mouse.y - getY()), RoundingMode.FLOOR);
 
         if (isMouseOver(mouse.x, mouse.y) && Tool.get().hideMouse(this, mouse, world)) {

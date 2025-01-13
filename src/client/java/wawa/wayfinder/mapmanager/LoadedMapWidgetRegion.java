@@ -55,7 +55,12 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
         }
         Vector2i ul = new Vector2i(parent.worldToScreen(rx() * 512, rz() * 512, true), RoundingMode.FLOOR);
         Vector2i wh = new Vector2i(512 * parent.scale, 512 * parent.scale, RoundingMode.FLOOR);
-        context.blit(WayfinderRenderTypes::getPaletteSwap, id(), ul.x, ul.y, 0, 0, wh.x, wh.y, wh.x, wh.y);
+
+        RenderHelper.renderTypeBlit(context, WayfinderRenderTypes.getPaletteSwap(id()),
+            ul.x, ul.y, 0, 0.0f, 0.0f, wh.x, wh.y, wh.x, wh.y
+        );
+
+//        context.blit(WayfinderRenderTypes::getPaletteSwap, id(), ul.x, ul.y, 0, 0, wh.x, wh.y, wh.x, wh.y);
         if (Minecraft.getInstance().getDebugOverlay().showDebugScreen()) {
             RenderHelper.badDebugText(context, ul.x + 2, ul.y + 2, id().getPath());
         }
@@ -102,7 +107,7 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
             history = new DynamicTexture(512, 512, false);
             history.getPixels().copyFrom(texture.getPixels());
         }
-        texture.getPixels().setPixel(x, z, color);
+        texture.getPixels().setPixelRGBA(x, z, color);
         dirtyVisual = true;
         dirtySave = true;
         return true;
@@ -112,7 +117,7 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
     public int getPixelRelative(int x, int z) {
         if (!inBoundsRel(x, z))
             return 0;
-        return texture.getPixels().getPixel(x, z);
+        return texture.getPixels().getPixelRGBA(x, z);
     }
 
     @Override
@@ -124,7 +129,7 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
     }
 
     public boolean isEmpty() {
-        return Arrays.stream(texture.getPixels().getPixelsABGR()).allMatch(i -> i == 0);
+        return Arrays.stream(texture.getPixels().getPixelsRGBA()).allMatch(i -> i == 0);
     }
 
     public void checkDirty() {

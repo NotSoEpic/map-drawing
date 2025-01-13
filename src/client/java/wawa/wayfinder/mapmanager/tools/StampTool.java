@@ -13,6 +13,7 @@ import org.joml.Vector2d;
 import org.joml.Vector2i;
 import org.lwjgl.opengl.GL11;
 import wawa.wayfinder.AllComponents;
+import wawa.wayfinder.RenderHelper;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.mapmanager.MapWidget;
 import wawa.wayfinder.rendering.WayfinderRenderTypes;
@@ -58,8 +59,10 @@ public class StampTool extends Tool {
         int sw = (int) (w * widget.scale);
         int sh = (int) (h * widget.scale);
         world = new Vector2i(widget.worldToScreen(world.x - w/2, world.y - h/2, true), RoundingMode.FLOOR);
-        context.blit(WayfinderRenderTypes::getPaletteSwap, stamp,
-                world.x, world.y, 0, 0, sw, sh, sw, sh);
+
+        RenderHelper.renderTypeBlit(context, WayfinderRenderTypes.getPaletteSwap(stamp),
+            world.x, world.y, 0, 0.0f, 0.0f, sw, sh, sw, sh
+        );
     }
 
     @Override

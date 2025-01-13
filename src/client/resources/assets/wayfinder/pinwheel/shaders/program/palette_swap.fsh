@@ -8,7 +8,6 @@ uniform vec4 ColorModulator;
 uniform vec3[PALETTE_SIZE] ColorPalette;
 
 in vec2 texCoord0;
-in vec4 vertexColor;
 
 out vec4 fragColor;
 
