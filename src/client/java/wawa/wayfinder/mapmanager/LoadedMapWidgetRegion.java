@@ -76,7 +76,7 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
                 Files.createDirectories(file.getParent());
                 texture.getPixels().writeToFile(file);
                 if (close) {
-                    texture.close();
+                    close();
                 }
             } catch (IOException e) {
                 Wayfinder.LOGGER.warn("Failed to save region {} {} to {}\n{}", rx(), rz(), file, e);
@@ -153,7 +153,6 @@ public class LoadedMapWidgetRegion extends AbstractMapWidgetRegion {
             texture.setPixels(history.getPixels());
             dirtySave = true;
             dirtyVisual = true;
-            history.close();
             history = null;
             if (isEmpty())
                 removed = true;
