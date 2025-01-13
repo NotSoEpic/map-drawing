@@ -2,6 +2,7 @@ package wawa.wayfinder.mapmanager;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -246,11 +247,15 @@ public class MapWidget extends AbstractWidget {
 //        context.blit(RenderType::guiTextured, GRID_TEXTURE, 0, 0,
 //                (float) -uv.x, (float) -uv.y, width, height, 16, 16, -1);
 
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
         context.blit(GRID_TEXTURE, 0, 0,
                 (float) -uv.x,
                 (float) -uv.y,
                 width, height,
                 16, 16);
+        RenderSystem.disableBlend();
+
 
         for (int i = (int) ul.x; i < (int) lr.x; i++) {
             for (int j = (int) ul.y; j < (int) lr.y; j++) {
