@@ -71,7 +71,7 @@ public class WayfinderClient implements ClientModInitializer {
 
 		TooltipComponentCallback.EVENT.register((data -> {
 			if (data instanceof StampTextureTooltipData stampTextureComponent) {
-				return StampTooltipComponent.fromComponent(stampTextureComponent);
+				return ClientStampTooltipComponent.fromComponent(stampTextureComponent);
 			}
 			return null;
 		}));

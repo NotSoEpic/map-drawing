@@ -1,6 +1,5 @@
 package wawa.wayfinder.mapmanager;
 
-import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
@@ -11,8 +10,8 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import wawa.wayfinder.ClientStampTooltipComponent;
 import wawa.wayfinder.MapBindings;
-import wawa.wayfinder.StampTooltipComponent;
 import wawa.wayfinder.Wayfinder;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.color.ColorPalette;
@@ -21,12 +20,6 @@ import wawa.wayfinder.mapmanager.tools.StampTool;
 import wawa.wayfinder.mapmanager.tools.Tool;
 
 import java.util.Iterator;
-import org.lwjgl.glfw.GLFW;
-import wawa.wayfinder.MapBindings;
-import wawa.wayfinder.Wayfinder;
-import wawa.wayfinder.WayfinderClient;
-import wawa.wayfinder.color.ColorPalette;
-import wawa.wayfinder.color.ColorPaletteManager;
 
 /**
  * The entire screen that gets rendered, including map and drawing tools
@@ -60,7 +53,7 @@ public class MapScreen extends Screen {
         boolean stampAllowed = false;
         Iterator<ResourceLocation> stamps = StampTool.collectAvailableStamps(Minecraft.getInstance().player).iterator();
         for (int i = 0; stamps.hasNext(); i++) {
-            ResourceLocation stamp = stamps.next().withPath(StampTooltipComponent::fromPathShorthand);
+            ResourceLocation stamp = stamps.next().withPath(ClientStampTooltipComponent::fromPathShorthand);
             if (Tool.get() instanceof StampTool stampTool && stampTool.stamp.equals(stamp))
                 stampAllowed = true;
             addRenderableWidget(new StampToolWidget(width - 50 + 2, 2 + i * 18, stamp));
