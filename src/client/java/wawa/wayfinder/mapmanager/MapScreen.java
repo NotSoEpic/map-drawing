@@ -32,6 +32,7 @@ import java.util.Iterator;
  */
 public class MapScreen extends Screen {
     MapWidget map;
+    ToolSelectionWidget toolSelection;
 
     public MapScreen() {
         super(Component.translatable("map"));
@@ -68,7 +69,8 @@ public class MapScreen extends Screen {
             Tool.set(null);
         }
 
-        addRenderableWidget(new ToolSelectionWidget(this));
+        toolSelection = new ToolSelectionWidget(this);
+        addRenderableWidget(toolSelection);
     }
 
     public void setDrawingEnabled(boolean enabled) {
@@ -105,6 +107,16 @@ public class MapScreen extends Screen {
             return true;
         } else if (Screen.hasControlDown() && MapBindings.undo.matches(keyCode, scanCode)) {
             WayfinderClient.regions.reloadFromHistory();
+        } else if (MapBindings.swap_tool.matches(keyCode, scanCode)) {
+            Tool.swap();
+        } else if (MapBindings.pencil.matches(keyCode, scanCode)) {
+            toolSelection.selectPencil();
+        } else if (MapBindings.brush.matches(keyCode, scanCode)) {
+            toolSelection.selectBrush();
+        } else if (MapBindings.eraser.matches(keyCode, scanCode)) {
+            toolSelection.selectEraser();
+        } else if (MapBindings.ruler.matches(keyCode, scanCode)) {
+            toolSelection.selectRuler();
         }
         return true;
     }

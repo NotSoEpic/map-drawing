@@ -8,19 +8,23 @@ import org.lwjgl.glfw.GLFW;
 import wawa.wayfinder.mapmanager.MapScreen;
 
 public class MapBindings {
-    public static final KeyMapping openMap = KeyBindingHelper.registerKeyBinding(new KeyMapping(
-            "key.wayfinder.open_map",
-            InputConstants.Type.KEYSYM,
-            GLFW.GLFW_KEY_M,
-            "category.wayfinder.map"
-    ));
+    public static final KeyMapping
+            openMap = register("open_map", GLFW.GLFW_KEY_M),
+    undo = register("undo", GLFW.GLFW_KEY_Z),
+    swap_tool = register("swap_tool", GLFW.GLFW_KEY_X),
+    pencil = register("pencil", GLFW.GLFW_KEY_N),
+    brush = register("brush", GLFW.GLFW_KEY_B),
+    eraser = register("eraser", GLFW.GLFW_KEY_E),
+    ruler = register("ruler", GLFW.GLFW_KEY_R);
 
-    public static final KeyMapping undo = KeyBindingHelper.registerKeyBinding(new KeyMapping(
-            "key.wayfinder.undo",
-            InputConstants.Type.KEYSYM,
-            GLFW.GLFW_KEY_Z,
-            "category.wayfinder.map"
-    ));
+    private static KeyMapping register(String name, int key) {
+        return KeyBindingHelper.registerKeyBinding(new KeyMapping(
+                "key.wayfinder." + name,
+                InputConstants.Type.KEYSYM,
+                key,
+                "category.wayfinder.map"
+        ));
+    }
 
     public static void inputEvents(Minecraft client) {
         while (openMap.consumeClick()) {

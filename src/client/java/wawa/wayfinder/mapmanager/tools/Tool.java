@@ -8,17 +8,27 @@ import wawa.wayfinder.mapmanager.widgets.MapWidget;
 
 public abstract class Tool {
     private static Tool tool;
+    private static Tool prevTool;
 
     public static void set(@Nullable Tool tool) {
         if (Tool.tool != null)
             Tool.tool.onDeselect();
-        Tool.tool = tool;
+        if (Tool.tool != tool) {
+            Tool.prevTool = Tool.tool;
+            Tool.tool = tool;
+        }
         if (tool != null)
             tool.onSelect();
     }
 
     public static Tool get() {
         return tool;
+    }
+
+    public static void swap() {
+        if (prevTool != null) {
+            set(prevTool);
+        }
     }
 
     protected abstract void onSelect();

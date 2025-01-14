@@ -12,14 +12,6 @@ public class RulerTool extends Tool {
     private @Nullable Vector2i endPos;
     @Override
     protected void onSelect() {
-        startPos = null;
-        endPos = null;
-    }
-
-    @Override
-    protected void onDeselect() {
-        startPos = null;
-        endPos = null;
     }
 
     @Override
@@ -75,6 +67,9 @@ public class RulerTool extends Tool {
             x += dx;
             z += dz;
         }
+
+        context.drawString(Minecraft.getInstance().font, String.format("(%d, %d)", startPos.x, startPos.y), (int)screenStart.x, (int)screenStart.y, -1, true);
+        context.drawString(Minecraft.getInstance().font, String.format("(%d, %d)", target.x, target.y), (int)screenEnd.x, (int)screenEnd.y, -1, true);
 
         double dist = target.distance(startPos);
         Vector2d halfway = new Vector2d(screenEnd).add(screenStart).div(2);
