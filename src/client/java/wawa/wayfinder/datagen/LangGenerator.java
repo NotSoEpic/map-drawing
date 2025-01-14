@@ -6,6 +6,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceLocation;
 import wawa.wayfinder.AllItems;
 import wawa.wayfinder.MapBindings;
+import wawa.wayfinder.Wayfinder;
 import wawa.wayfinder.stampitem.BuiltInStamps;
 
 import java.util.concurrent.CompletableFuture;
@@ -19,7 +20,7 @@ public class LangGenerator extends FabricLanguageProvider {
     public void generateTranslations(HolderLookup.Provider registryLookup, TranslationBuilder translationBuilder) {
         translationBuilder.add(AllItems.STAMP, "Stamp");
 
-        stamp(translationBuilder, ResourceLocation.withDefaultNamespace("missingno"), "Unusual Pattern");
+        stamp(translationBuilder, Wayfinder.id("missingstamp"), "Unusual Pattern");
         stamp(translationBuilder, BuiltInStamps.X, "X Marks the Spot");
         stamp(translationBuilder, BuiltInStamps.STAMPTONG, "The Legally Distinct Stamptong");
 

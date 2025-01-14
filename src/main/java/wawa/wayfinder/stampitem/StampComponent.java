@@ -5,9 +5,10 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
+import wawa.wayfinder.Wayfinder;
 
 public record StampComponent(ResourceLocation texture) {
-    public static final StampComponent unknown = new StampComponent(ResourceLocation.withDefaultNamespace("missingno"));
+    public static final StampComponent unknown = new StampComponent(Wayfinder.id("missingstamp"));
     public static final Codec<StampComponent> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
                     ResourceLocation.CODEC.fieldOf("texture").forGetter(StampComponent::texture)
