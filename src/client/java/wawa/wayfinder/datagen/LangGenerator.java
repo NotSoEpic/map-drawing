@@ -24,14 +24,14 @@ public class LangGenerator extends FabricLanguageProvider {
         stamp(translationBuilder, BuiltInStamps.X, "X Marks the Spot");
         stamp(translationBuilder, BuiltInStamps.STAMPTONG, "The Legally Distinct Stamptong");
 
-        translationBuilder.add(MapBindings.openMap.getCategory(), "Wayfinder Map Controls");
-        translationBuilder.add(MapBindings.openMap.getName(), "Open Map");
-        translationBuilder.add(MapBindings.undo.getName(), "Undo (w/ ctrl)");
-        translationBuilder.add(MapBindings.swap_tool.getName(), "Swap to Previous Tool");
-        translationBuilder.add(MapBindings.pencil.getName(), "Pencil Tool");
-        translationBuilder.add(MapBindings.brush.getName(), "Brush Tool");
-        translationBuilder.add(MapBindings.eraser.getName(), "Eraser Tool");
-        translationBuilder.add(MapBindings.ruler.getName(), "Ruler Tool");
+        translationBuilder.add(MapBindings.OPEN_MAP.getCategory(), "Wayfinder Map Controls");
+        translationBuilder.add(MapBindings.OPEN_MAP.getName(), "Open Map");
+        translationBuilder.add(MapBindings.UNDO.getName(), "Undo (w/ ctrl)");
+        translationBuilder.add(MapBindings.SWAP_TOOL.getName(), "Swap to Previous Tool");
+        translationBuilder.add(MapBindings.PENCIL.getName(), "Pencil Tool");
+        translationBuilder.add(MapBindings.BRUSH.getName(), "Brush Tool");
+        translationBuilder.add(MapBindings.ERASER.getName(), "Eraser Tool");
+        translationBuilder.add(MapBindings.RULER.getName(), "Ruler Tool");
     }
 
     private void stamp(TranslationBuilder translationBuilder, ResourceLocation stamp, String value) {

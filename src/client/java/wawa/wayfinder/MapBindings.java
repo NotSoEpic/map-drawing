@@ -9,13 +9,13 @@ import wawa.wayfinder.mapmanager.MapScreen;
 
 public class MapBindings {
     public static final KeyMapping
-            openMap = register("open_map", GLFW.GLFW_KEY_M),
-    undo = register("undo", GLFW.GLFW_KEY_Z),
-    swap_tool = register("swap_tool", GLFW.GLFW_KEY_X),
-    pencil = register("pencil", GLFW.GLFW_KEY_N),
-    brush = register("brush", GLFW.GLFW_KEY_B),
-    eraser = register("eraser", GLFW.GLFW_KEY_E),
-    ruler = register("ruler", GLFW.GLFW_KEY_R);
+            OPEN_MAP = register("open_map", GLFW.GLFW_KEY_M),
+    UNDO = registerNonBlocking("undo", GLFW.GLFW_KEY_Z),
+    SWAP_TOOL = registerNonBlocking("swap_tool", GLFW.GLFW_KEY_X),
+    PENCIL = registerNonBlocking("pencil", GLFW.GLFW_KEY_N),
+    BRUSH = registerNonBlocking("brush", GLFW.GLFW_KEY_B),
+    ERASER = registerNonBlocking("eraser", GLFW.GLFW_KEY_E),
+    RULER = registerNonBlocking("ruler", GLFW.GLFW_KEY_R);
 
     private static KeyMapping register(String name, int key) {
         return KeyBindingHelper.registerKeyBinding(new KeyMapping(
@@ -26,8 +26,17 @@ public class MapBindings {
         ));
     }
 
+    private static KeyMapping registerNonBlocking(String name, int key) {
+        return KeyBindingHelper.registerKeyBinding(new NonBlockingKeyMapping(
+                "key.wayfinder." + name,
+                InputConstants.Type.KEYSYM,
+                key,
+                "category.wayfinder.map"
+        ));
+    }
+
     public static void inputEvents(Minecraft client) {
-        while (openMap.consumeClick()) {
+        while (OPEN_MAP.consumeClick()) {
             client.setScreen(new MapScreen());
         }
     }

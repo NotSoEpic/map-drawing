@@ -102,20 +102,20 @@ public class MapScreen extends Screen {
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (super.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
-        } else if (MapBindings.openMap.matches(keyCode, scanCode)) {
+        } else if (MapBindings.OPEN_MAP.matches(keyCode, scanCode)) {
             onClose();
             return true;
-        } else if (Screen.hasControlDown() && MapBindings.undo.matches(keyCode, scanCode)) {
+        } else if (Screen.hasControlDown() && MapBindings.UNDO.matches(keyCode, scanCode)) {
             WayfinderClient.regions.reloadFromHistory();
-        } else if (MapBindings.swap_tool.matches(keyCode, scanCode)) {
+        } else if (MapBindings.SWAP_TOOL.matches(keyCode, scanCode)) {
             Tool.swap();
-        } else if (MapBindings.pencil.matches(keyCode, scanCode)) {
+        } else if (MapBindings.PENCIL.matches(keyCode, scanCode)) {
             toolSelection.selectPencil();
-        } else if (MapBindings.brush.matches(keyCode, scanCode)) {
+        } else if (MapBindings.BRUSH.matches(keyCode, scanCode)) {
             toolSelection.selectBrush();
-        } else if (MapBindings.eraser.matches(keyCode, scanCode)) {
+        } else if (MapBindings.ERASER.matches(keyCode, scanCode)) {
             toolSelection.selectEraser();
-        } else if (MapBindings.ruler.matches(keyCode, scanCode)) {
+        } else if (MapBindings.RULER.matches(keyCode, scanCode)) {
             toolSelection.selectRuler();
         }
         return true;
