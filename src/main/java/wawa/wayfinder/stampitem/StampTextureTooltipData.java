@@ -6,9 +6,10 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import wawa.wayfinder.Wayfinder;
 
 public record StampTextureTooltipData(ResourceLocation texture) implements TooltipComponent {
-    public static final StampTextureTooltipData DEFAULT = new StampTextureTooltipData(ResourceLocation.withDefaultNamespace("missingno"));
+    public static final StampTextureTooltipData DEFAULT = new StampTextureTooltipData(Wayfinder.id("missingstamp"));
     public static final Codec<StampTextureTooltipData> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
                     ResourceLocation.CODEC.fieldOf("texture").forGetter(StampTextureTooltipData::texture)

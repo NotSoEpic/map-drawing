@@ -10,10 +10,11 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import wawa.wayfinder.Wayfinder;
 
 public class StampItem extends Item {
     public StampItem(Properties settings) {
-        super(settings.component(AllComponents.STAMP, new StampComponent(ResourceLocation.parse("missingno"))));
+        super(settings.component(AllComponents.STAMP, new StampComponent(Wayfinder.id("missingstamp"))));
     }
 
     @Override
