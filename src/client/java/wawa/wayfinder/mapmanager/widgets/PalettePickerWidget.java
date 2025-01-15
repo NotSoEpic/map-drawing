@@ -21,7 +21,7 @@ public class PalettePickerWidget extends AbstractWidget {
     private static final int padding = 2;
     private static final int outerPadding = 4;
     private final int[] paletteIndices;
-    private final PaletteBrush[] brushes;
+    public final PaletteBrush[] brushes;
     private PaletteBrush lastSelected;
     public PalettePickerWidget(ToolSelectionWidget parent, ColorPalette palette, BiPredicate<Integer, Color> shownColors) {
         super(0, 0, 0, 0, Component.literal("palette picker"));
@@ -78,6 +78,17 @@ public class PalettePickerWidget extends AbstractWidget {
                 this.playDownSound(Minecraft.getInstance().getSoundManager());
             }
             return true;
+        }
+        return false;
+    }
+
+    public boolean tryPickColor(int drawnColor) {
+        int index = ColorPalette.GRAYSCALE.colors().indexOf(new Color(drawnColor));
+        for (int i = 0; i < paletteIndices.length; i++) {
+            if (paletteIndices[i] == index) {
+                Tool.set(brushes[i]);
+                return true;
+            }
         }
         return false;
     }

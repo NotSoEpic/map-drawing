@@ -164,7 +164,13 @@ public class MapWidget extends AbstractWidget {
                 Vector2i world = new Vector2i(screenToWorld(mouse.x - getX(), mouse.y - getY()), RoundingMode.FLOOR);
                 boolean shift = Screen.hasShiftDown();
                 switch (mouseButton) {
-                    case LEFT -> Tool.get().leftDown(this, shift, mouse, world);
+                    case LEFT -> {
+                        if (Screen.hasAltDown()) {
+                            parent.toolSelection.pickColor(this, world);
+                        } else {
+                            Tool.get().leftDown(this, shift, mouse, world);
+                        }
+                    }
                     case RIGHT -> Tool.get().rightDown(this, shift, mouse, world);
                 }
             }
@@ -227,7 +233,13 @@ public class MapWidget extends AbstractWidget {
         if (Tool.get() != null) {
             boolean shift = Screen.hasShiftDown();
             switch (mouseButton) {
-                case LEFT -> Tool.get().leftHold(this, shift, mouse, world);
+                case LEFT -> {
+                    if (Screen.hasAltDown()) {
+                        parent.toolSelection.pickColor(this, world);
+                    } else {
+                        Tool.get().leftHold(this, shift, mouse, world);
+                    }
+                }
                 case RIGHT -> Tool.get().rightHold(this, shift, mouse, world);
                 case MIDDLE -> pan(prevX - mouse.x, prevY - mouse.y);
             }

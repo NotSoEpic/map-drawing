@@ -31,8 +31,8 @@ import java.util.Iterator;
  * The entire screen that gets rendered, including map and drawing tools
  */
 public class MapScreen extends Screen {
-    MapWidget map;
-    ToolSelectionWidget toolSelection;
+    public MapWidget map;
+    public ToolSelectionWidget toolSelection;
 
     public MapScreen() {
         super(Component.translatable("map"));

@@ -6,6 +6,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
+import org.joml.Vector2i;
 import wawa.wayfinder.Wayfinder;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.color.ColorPalette;
@@ -59,6 +60,8 @@ public class ToolSelectionWidget extends AbstractWidget {
         Tool.set(eraser);
     }
     public void selectRuler() {
+        if (Tool.get() == ruler)
+            ruler.resetPos();
         Tool.set(ruler);
     }
 
@@ -74,17 +77,30 @@ public class ToolSelectionWidget extends AbstractWidget {
         }
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(getX(), getY(), 0);
-        guiGraphics.blit(0, 0, 0, 50, 30, pencilSprite, 1, 1, 1, 1);
-        guiGraphics.blit(0, 30, 0, 50, 30, brushSprite, 1, 1, 1, 1);
+        guiGraphics.blit(0, 0, 0, 50, 30, pencilSprite);
+        guiGraphics.blit(0, 30, 0, 50, 30, brushSprite);
 
         float[] rgb = WayfinderClient.palette.colors().get(palettePicker.getLastSelected().getColorIndex()).getColorComponents(null);
         guiGraphics.blit(0, 30, 1, 50, 30, brushMaskSprite, rgb[0], rgb[1], rgb[2], 1);
 
-        guiGraphics.blit(0, 60, 0, 50, 30, eraserSprite, 1, 1, 1, 1);
-        guiGraphics.blit(0, 90, 0, 50, 30, rulerSprite, 1, 1, 1, 1);
+        guiGraphics.blit(0, 60, 0, 50, 30, eraserSprite);
+        guiGraphics.blit(0, 90, 0, 50, 30, rulerSprite);
 
-//        palettePicker.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
         guiGraphics.pose().popPose();
+
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(screen.map.getX(), screen.map.getY(), 0);
+        if (Tool.get() != ruler && ruler.startPos != null && ruler.endPos != null) {
+            ruler.renderMeasure(screen.map, guiGraphics, ruler.startPos, ruler.endPos, false);
+        }
+        guiGraphics.pose().popPose();
+    }
+
+    public void pickColor(MapWidget widget, Vector2i world) {
+        int pixelColor = widget.getPixelWorld(world.x, world.y);
+        if (!palettePicker.tryPickColor(pixelColor) && pixelColor == ColorPalette.GRAYSCALE.colors().get(0).getRGB()) {
+            Tool.set(pencil);
+        }
     }
 
     @Override

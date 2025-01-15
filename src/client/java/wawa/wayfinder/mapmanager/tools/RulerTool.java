@@ -10,8 +10,8 @@ import wawa.wayfinder.Wayfinder;
 import wawa.wayfinder.mapmanager.widgets.MapWidget;
 
 public class RulerTool extends Tool {
-    private @Nullable Vector2i startPos;
-    private @Nullable Vector2i endPos;
+    public @Nullable Vector2i startPos;
+    public @Nullable Vector2i endPos;
     private static final TextureAtlasSprite rulerSprite = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("cursor/ruler"));
     @Override
     protected void onSelect() {
@@ -32,9 +32,13 @@ public class RulerTool extends Tool {
     public void leftUp(MapWidget widget, boolean shift, Vector2d mouse, Vector2i world) {
         endPos = world;
         if (endPos.equals(startPos)) {
-            endPos = null;
-            startPos = null;
+            resetPos();
         }
+    }
+
+    public void resetPos() {
+        endPos = null;
+        startPos = null;
     }
 
     @Override
@@ -55,8 +59,12 @@ public class RulerTool extends Tool {
             target = world;
         if (startPos.equals(target))
             return;
-        Vector2d screenStart = widget.worldToScreen(startPos.x, startPos.y, true);
-        Vector2d screenEnd = widget.worldToScreen(target.x, target.y, true);
+        renderMeasure(widget, context, startPos, target, true);
+    }
+
+    public void renderMeasure(MapWidget widget, GuiGraphics context, Vector2i start, Vector2i end, boolean text) {
+        Vector2d screenStart = widget.worldToScreen(start.x, start.y, true);
+        Vector2d screenEnd = widget.worldToScreen(end.x, end.y, true);
         double dx = screenEnd.x - screenStart.x;
         double dz = screenEnd.y - screenStart.y;
         int steps = (int) Math.max(1, Math.ceil(Math.max(Math.abs(dx), Math.abs(dz))));
@@ -71,12 +79,14 @@ public class RulerTool extends Tool {
             z += dz;
         }
 
-        context.drawString(Minecraft.getInstance().font, String.format("(%d, %d)", startPos.x, startPos.y), (int)screenStart.x, (int)screenStart.y, -1, true);
-        context.drawString(Minecraft.getInstance().font, String.format("(%d, %d)", target.x, target.y), (int)screenEnd.x, (int)screenEnd.y, -1, true);
+        if (text) {
+            context.drawString(Minecraft.getInstance().font, String.format("(%d, %d)", start.x, start.y), (int) screenStart.x, (int) screenStart.y, -1, true);
+            context.drawString(Minecraft.getInstance().font, String.format("(%d, %d)", end.x, end.y), (int) screenEnd.x, (int) screenEnd.y, -1, true);
 
-        double dist = target.distance(startPos);
-        Vector2d halfway = new Vector2d(screenEnd).add(screenStart).div(2);
-        context.drawString(Minecraft.getInstance().font, String.format("%.0f blocks", dist), (int)halfway.x, (int)halfway.y, -1, true);
+            double dist = end.distance(start);
+            Vector2d halfway = new Vector2d(screenEnd).add(screenStart).div(2);
+            context.drawString(Minecraft.getInstance().font, String.format("%.0f blocks", dist), (int) halfway.x, (int) halfway.y, -1, true);
+        }
     }
 
     @Override
