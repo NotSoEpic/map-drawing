@@ -34,6 +34,7 @@ public class MapWidget extends AbstractWidget {
     public Vector2d panning = new Vector2d();
     private int scaleNum = 0;
     public double scale = 1;
+    public boolean showMouse;
 
     public MapWidget(MapScreen parent, int leftPad, int topPad, int width, int height) {
         super(leftPad, topPad, width, height, Component.nullToEmpty("map"));
@@ -56,15 +57,15 @@ public class MapWidget extends AbstractWidget {
     }
 
     public Vector2d worldToScreen(double x, double z, boolean round) {
-       Vector2d vec = new Vector2d(x, z).mul(scale);
-       if (round) {
-           vec.round();
-       }
-       vec.add(width / 2, height / 2).sub(panning);
-       if (round) {
-           vec.round();
-       }
-       return vec;
+        Vector2d vec = new Vector2d(x, z).mul(scale);
+        if (round) {
+            vec.round();
+        }
+        vec.add(width / 2, height / 2).sub(panning);
+        if (round) {
+            vec.round();
+        }
+        return vec;
     }
 
     public Vector2d worldToScreen(double x, double z) {
@@ -80,8 +81,8 @@ public class MapWidget extends AbstractWidget {
     }
 
     public void putPixelWorld(int x, int z, int r, int color, BiFunction<Integer, Integer, Integer> map) {
-        for (int i = 1-r; i < r; i++) {
-            for (int j = 1-r; j < r; j++) {
+        for (int i = 1 - r; i < r; i++) {
+            for (int j = 1 - r; j < r; j++) {
                 int rx = Math.floorDiv(x + i, 512);
                 int rz = Math.floorDiv(z + j, 512);
                 AbstractMapWidgetRegion region = getOrLoad(rx, rz);
@@ -106,8 +107,8 @@ public class MapWidget extends AbstractWidget {
     public void putTextureWorld(int x, int z, NativeImage pixels, BiFunction<Integer, Integer, Integer> map) {
         int w = pixels.getWidth();
         int h = pixels.getHeight();
-        x -= w/2;
-        z -= h/2;
+        x -= w / 2;
+        z -= h / 2;
         for (int i = 0; i < w; i++) {
             for (int j = 0; j < h; j++) {
                 int pixel = pixels.getPixelRGBA(i, j);
@@ -143,6 +144,7 @@ public class MapWidget extends AbstractWidget {
     enum MouseButton {
         NONE, LEFT, RIGHT, MIDDLE
     }
+
     MouseButton mouseButton = MouseButton.NONE;
     public double prevX;
     public double prevY;
@@ -272,8 +274,8 @@ public class MapWidget extends AbstractWidget {
 
     private void drawDebugText(GuiGraphics context, Vector2d mouse) {
         Vector2d cursorWorld = screenToWorld(mouse.x - getX(), mouse.y - getY());
-        RenderHelper.badDebugText(context, 0, height + 2, String.format("%d, %d", (int)cursorWorld.x, (int)cursorWorld.y));
-        RenderHelper.badDebugText(context, 100, height + 2, String.format("%d, %d", (int)panning.x, (int)panning.y));
+        RenderHelper.badDebugText(context, 0, height + 2, String.format("%d, %d", (int) cursorWorld.x, (int) cursorWorld.y));
+        RenderHelper.badDebugText(context, 100, height + 2, String.format("%d, %d", (int) panning.x, (int) panning.y));
         RenderHelper.badDebugText(context, 200, height + 2, String.format("%d (%d / %d)",
                 regions.getLoaded() + regions.getUnloaded(), regions.getLoaded(), regions.getUnloaded()));
         RenderHelper.badDebugText(context, 0, height + 12, regions.getRegionPath().toString());
@@ -283,20 +285,26 @@ public class MapWidget extends AbstractWidget {
         Window window = Minecraft.getInstance().getWindow();
         if (Tool.get() == null) {
             GLFW.glfwSetInputMode(window.getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
+            showMouse = true;
             return;
         }
 
-        if (!active && Tool.get().hideWhenInactive()) {
+        if (!active && Tool.get().hideWhenInactive() && !showMouse) {
             GLFW.glfwSetInputMode(window.getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
+            showMouse = true;
             return;
         }
 
         Vector2i world = new Vector2i(screenToWorld(mouse.x - getX(), mouse.y - getY()), RoundingMode.FLOOR);
 
         if (isMouseOver(mouse.x, mouse.y) && Tool.get().hideMouse(this, mouse, world)) {
-            GLFW.glfwSetInputMode(window.getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
-        } else {
+            if (showMouse) {
+                GLFW.glfwSetInputMode(window.getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
+                showMouse = false;
+            }
+        } else if (!showMouse) {
             GLFW.glfwSetInputMode(window.getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
+            showMouse = true;
         }
 
         boolean shift = Screen.hasShiftDown();
@@ -347,5 +355,6 @@ public class MapWidget extends AbstractWidget {
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput builder) {}
+    protected void updateWidgetNarration(NarrationElementOutput builder) {
+    }
 }
