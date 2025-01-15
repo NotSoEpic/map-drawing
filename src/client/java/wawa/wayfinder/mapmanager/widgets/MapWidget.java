@@ -300,7 +300,7 @@ public class MapWidget extends AbstractWidget {
         }
 
         boolean shift = Screen.hasShiftDown();
-        Tool.get().render(this, context, shift, mouse, world);
+        Tool.render(this, context, shift, mouse, world);
     }
 
     private void drawPlayer(GuiGraphics context) {

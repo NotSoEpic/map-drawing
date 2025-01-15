@@ -2,14 +2,17 @@ package wawa.wayfinder.mapmanager.tools;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
+import wawa.wayfinder.Wayfinder;
 import wawa.wayfinder.mapmanager.widgets.MapWidget;
 
 public class RulerTool extends Tool {
     private @Nullable Vector2i startPos;
     private @Nullable Vector2i endPos;
+    private static final TextureAtlasSprite rulerSprite = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("cursor/ruler"));
     @Override
     protected void onSelect() {
     }
@@ -44,7 +47,7 @@ public class RulerTool extends Tool {
     }
 
     @Override
-    public void render(MapWidget widget, GuiGraphics context, boolean shift, Vector2d mouse, Vector2i world) {
+    public void renderTool(MapWidget widget, GuiGraphics context, boolean shift, Vector2d mouse, Vector2i world) {
         if (startPos == null)
             return;
         Vector2i target = endPos;
@@ -83,6 +86,16 @@ public class RulerTool extends Tool {
 
     @Override
     public boolean hideMouse(MapWidget widget, Vector2d mouse, Vector2i world) {
-        return false;
+        return true;
+    }
+
+    @Override
+    public @Nullable TextureAtlasSprite getCursorIcon() {
+        return rulerSprite;
+    }
+
+    @Override
+    public Vector2i getCursorIconOffset() {
+        return new Vector2i(-4, -15);
     }
 }

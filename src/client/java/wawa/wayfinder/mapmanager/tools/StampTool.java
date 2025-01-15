@@ -55,7 +55,7 @@ public class StampTool extends Tool {
     }
 
     @Override
-    public void render(MapWidget widget, GuiGraphics context, boolean shift, Vector2d mouse, Vector2i world) {
+    public void renderTool(MapWidget widget, GuiGraphics context, boolean shift, Vector2d mouse, Vector2i world) {
         int sw = (int) (w * widget.scale);
         int sh = (int) (h * widget.scale);
         world = new Vector2i(widget.worldToScreen(world.x - w/2, world.y - h/2, true), RoundingMode.FLOOR);

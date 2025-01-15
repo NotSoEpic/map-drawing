@@ -15,16 +15,16 @@ import wawa.wayfinder.mapmanager.tools.RulerTool;
 import wawa.wayfinder.mapmanager.tools.Tool;
 
 public class ToolSelectionWidget extends AbstractWidget {
-    private static final TextureAtlasSprite pencil_sprite = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool_pencil"));
-    private static final TextureAtlasSprite brush_sprite = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool_brush"));
-    private static final TextureAtlasSprite brush_mask_sprite = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool_brush_mask"));
-    private static final TextureAtlasSprite eraser_sprite = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool_eraser"));
-    private static final TextureAtlasSprite ruler_sprite = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool_ruler"));
+    private static final TextureAtlasSprite pencilSprite = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool/pencil"));
+    private static final TextureAtlasSprite brushSprite = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool/brush"));
+    private static final TextureAtlasSprite brushMaskSprite = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool/brush_mask"));
+    private static final TextureAtlasSprite eraserSprite = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool/eraser"));
+    private static final TextureAtlasSprite rulerSprite = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool/ruler"));
     public static final PenTool pencil = new PenTool(1, 0, false);
-    public static final PenTool eraser = new PenTool(1, -1, false);
+    public final PalettePickerWidget palettePicker;
+    public static final PenTool eraser = new PenTool(1, -1, false).sizeSettings(2, 7);
     public static final RulerTool ruler = new RulerTool();
     private final MapScreen screen;
-    public final PalettePickerWidget palettePicker;
 
     public ToolSelectionWidget(MapScreen screen) {
         super(screen.width - 50, 30, 50, 30 * 4, Component.literal("tool selection"));
@@ -74,14 +74,14 @@ public class ToolSelectionWidget extends AbstractWidget {
         }
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(getX(), getY(), 0);
-        guiGraphics.blit(0, 0, 0, 50, 30, pencil_sprite, 1, 1, 1, 1);
-        guiGraphics.blit(0, 30, 0, 50, 30, brush_sprite, 1, 1, 1, 1);
+        guiGraphics.blit(0, 0, 0, 50, 30, pencilSprite, 1, 1, 1, 1);
+        guiGraphics.blit(0, 30, 0, 50, 30, brushSprite, 1, 1, 1, 1);
 
         float[] rgb = WayfinderClient.palette.colors().get(palettePicker.getLastSelected().getColorIndex()).getColorComponents(null);
-        guiGraphics.blit(0, 30, 1, 50, 30, brush_mask_sprite, rgb[0], rgb[1], rgb[2], 1);
+        guiGraphics.blit(0, 30, 1, 50, 30, brushMaskSprite, rgb[0], rgb[1], rgb[2], 1);
 
-        guiGraphics.blit(0, 60, 0, 50, 30, eraser_sprite, 1, 1, 1, 1);
-        guiGraphics.blit(0, 90, 0, 50, 30, ruler_sprite, 1, 1, 1, 1);
+        guiGraphics.blit(0, 60, 0, 50, 30, eraserSprite, 1, 1, 1, 1);
+        guiGraphics.blit(0, 90, 0, 50, 30, rulerSprite, 1, 1, 1, 1);
 
 //        palettePicker.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
         guiGraphics.pose().popPose();
