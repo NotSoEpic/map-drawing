@@ -1,5 +1,6 @@
 package wawa.wayfinder.mapmanager.tools;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -28,8 +29,11 @@ public class PenTool extends Tool {
     public boolean highlight;
     private int minSize = 1;
     private int maxSize = 5;
-    private static final DynamicTexture pen = new DynamicTexture(1, 1, false);
+    private static DynamicTexture pen = new DynamicTexture(1, 1, false);
     private static final ResourceLocation textureId = Wayfinder.id("pen");
+    static {
+        Minecraft.getInstance().getTextureManager().register(textureId, pen);
+    }
     private static final TextureAtlasSprite pencilSprite = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("cursor/pencil"));
     private static final TextureAtlasSprite brushSprite = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("cursor/brush"));
     private static final TextureAtlasSprite eraserSprite = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("cursor/eraser"));
@@ -37,6 +41,28 @@ public class PenTool extends Tool {
     @Override
     public void onSelect() {
         setColorIndex(colorIndex);
+    }
+
+    public void setColorIndex(int colorIndex) {
+        this.colorIndex = colorIndex;
+        updateInternalTexture();
+    }
+
+    private void updateInternalTexture() {
+        pen.close();
+        if (colorIndex == -1) {
+            int wh = size * 2 - 1;
+            NativeImage im = new NativeImage(wh, wh, false);
+            im.fillRect(0, 0, wh, wh, -1);
+            if (wh > 2)
+                im.fillRect(1, 1, wh - 2, wh - 2, 0);
+            pen = new DynamicTexture(im);
+        } else {
+            NativeImage im = new NativeImage(1, 1, false);
+            im.setPixelRGBA(0, 0, getDrawnColor());
+            pen = new DynamicTexture(im);
+        }
+        pen.upload();
         Minecraft.getInstance().getTextureManager().register(textureId, pen);
     }
 
@@ -128,6 +154,7 @@ public class PenTool extends Tool {
 
     private void changeSize(int delta) {
         size = Mth.clamp(size + delta, minSize, maxSize);
+        updateInternalTexture();
     }
 
     @Override
@@ -170,12 +197,6 @@ public class PenTool extends Tool {
     @Override
     public boolean hideMouse(MapWidget widget, Vector2d mouse, Vector2i world) {
         return true;
-    }
-
-    public void setColorIndex(int colorIndex) {
-        this.colorIndex = colorIndex;
-        pen.getPixels().applyToAllPixels(i -> getDrawnColor());
-        pen.upload();
     }
 
     public int getColorIndex() {
