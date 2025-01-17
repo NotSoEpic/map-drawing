@@ -11,6 +11,7 @@ import net.minecraft.world.item.CreativeModeTabs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wawa.wayfinder.stampitem.BuiltInStamps;
+import wawa.wayfinder.stampitem.StampCombineRecipe;
 import wawa.wayfinder.stampitem.StampGroups;
 
 public class Wayfinder implements ModInitializer {
@@ -26,6 +27,7 @@ public class Wayfinder implements ModInitializer {
 		AllItems.init();
 		AllComponents.init();
 		BuiltInStamps.init();
+		StampCombineRecipe.init();
 
 		ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(StampGroups::generatePresetStamps);
 		ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new StampGroups());

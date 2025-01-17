@@ -46,8 +46,9 @@ public class StampItem extends Item {
 
     @Override
     public boolean overrideOtherStackedOnMe(ItemStack stack, ItemStack other, Slot slot, ClickAction action, Player player, SlotAccess access) {
-        if (player.isLocalPlayer() && other.isEmpty() && action == ClickAction.SECONDARY && stack.has(AllComponents.STAMP)) {
-            stack.get(AllComponents.STAMP).incrementSelected();
+        if (slot.mayPlace(stack) && other.isEmpty() && action == ClickAction.SECONDARY && stack.has(AllComponents.STAMP)) {
+            if (player.isLocalPlayer())
+                stack.get(AllComponents.STAMP).incrementSelected();
             return true;
         }
         return false;

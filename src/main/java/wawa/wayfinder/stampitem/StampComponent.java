@@ -78,6 +78,12 @@ public class StampComponent implements TooltipComponent {
     }
 
     @Environment(EnvType.CLIENT)
+    @Nullable
+    public ResourceLocation getGroup() {
+        return StampGroups.getGroup(textures.get(selectedIndex));
+    }
+
+    @Environment(EnvType.CLIENT)
     public int getFullGroupSize() {
         return StampGroups.groupSizeOfTexture(textures.get(selectedIndex));
     }
