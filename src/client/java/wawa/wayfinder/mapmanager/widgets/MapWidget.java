@@ -103,7 +103,7 @@ public class MapWidget extends AbstractWidget {
         putTextureWorld(x, z, pixels, (pixel, current) -> pixel);
     }
 
-    // map: (texture, current) -> result
+    // map: (textures, current) -> result
     public void putTextureWorld(int x, int z, NativeImage pixels, BiFunction<Integer, Integer, Integer> map) {
         int w = pixels.getWidth();
         int h = pixels.getHeight();

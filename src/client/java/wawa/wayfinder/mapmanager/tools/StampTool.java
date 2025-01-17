@@ -79,7 +79,7 @@ public class StampTool extends Tool {
     private static void collectAvailableStamps(Set<ResourceLocation> stamps, Iterable<ItemStack> items) {
         items.forEach(i -> {
             if (i.has(AllComponents.STAMP)) {
-                stamps.add(i.get(AllComponents.STAMP).texture());
+                stamps.addAll(i.get(AllComponents.STAMP).textures());
             }
             if (i.has(DataComponents.BUNDLE_CONTENTS)) {
                 collectAvailableStamps(stamps, i.get(DataComponents.BUNDLE_CONTENTS).items());

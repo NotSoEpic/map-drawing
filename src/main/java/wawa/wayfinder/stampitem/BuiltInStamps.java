@@ -36,7 +36,7 @@ public class BuiltInStamps {
                 tableBuilder.modifyPools(builder -> {
                     for (StampData data : stamps) {
                         builder.add(LootItem.lootTableItem(AllItems.STAMP).apply(
-                                SetComponentsFunction.setComponent(AllComponents.STAMP, new StampComponent(data.texture))
+                                SetComponentsFunction.setComponent(AllComponents.STAMP, StampComponent.single(data.texture))
                         ).setWeight(data.weight));
                     }
                 });

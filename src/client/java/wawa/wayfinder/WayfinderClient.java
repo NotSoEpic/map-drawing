@@ -3,6 +3,7 @@ package wawa.wayfinder;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -16,7 +17,8 @@ import wawa.wayfinder.color.ColorPaletteManager;
 import wawa.wayfinder.mapmanager.MapRegions;
 import wawa.wayfinder.mapmanager.PlayerMovementHistory;
 import wawa.wayfinder.mixin.client.BiomeAccessAccessor;
-import wawa.wayfinder.stampitem.StampTextureTooltipData;
+import wawa.wayfinder.stampitem.StampComponent;
+import wawa.wayfinder.stampitem.StampGroups;
 
 import java.lang.ref.WeakReference;
 import java.util.UUID;
@@ -70,12 +72,17 @@ public class WayfinderClient implements ClientModInitializer {
 		});
 
 		TooltipComponentCallback.EVENT.register((data -> {
-			if (data instanceof StampTextureTooltipData stampTextureComponent) {
-				return ClientStampTooltipComponent.fromComponent(stampTextureComponent);
+			if (data instanceof StampComponent component) {
+				return new ClientStampTooltipComponent(component);
 			}
 			return null;
 		}));
 
 		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new ColorPaletteManager());
+		ClientPlayNetworking.registerGlobalReceiver(StampGroups.Payload.TYPE, (payload, context) -> {
+			context.client().execute(() -> {
+				StampGroups.handlePayload(payload);
+			});
+		});
 	}
 }
