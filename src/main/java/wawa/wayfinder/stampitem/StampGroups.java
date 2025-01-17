@@ -29,7 +29,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class StampGroups extends SimpleJsonResourceReloadListener implements IdentifiableResourceReloadListener {
-    private static final Codec<List<ResourceLocation>> CODEC = RecordCodecBuilder.create(
+    public static final Codec<List<ResourceLocation>> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
                     ResourceLocation.CODEC.listOf().fieldOf("textures").forGetter(list -> list)
             ).apply(instance, list -> list)

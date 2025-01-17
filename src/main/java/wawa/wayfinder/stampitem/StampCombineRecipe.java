@@ -60,8 +60,9 @@ public class StampCombineRecipe extends CustomRecipe {
         return width * height >= 2;
     }
 
+    public static final ResourceLocation ID = Wayfinder.id("crafting_special_stamp_combine");
     private static final RecipeSerializer<StampCombineRecipe> COMBINE_STAMP = Registry.register(BuiltInRegistries.RECIPE_SERIALIZER,
-            Wayfinder.id("crafting_special_stamp_combine"), new SimpleCraftingRecipeSerializer<>(StampCombineRecipe::new));
+            ID, new SimpleCraftingRecipeSerializer<>(StampCombineRecipe::new));
     @Override
     public RecipeSerializer<?> getSerializer() {
         return COMBINE_STAMP;

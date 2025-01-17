@@ -20,6 +20,9 @@ public class LangGenerator extends FabricLanguageProvider {
     public void generateTranslations(HolderLookup.Provider registryLookup, TranslationBuilder translationBuilder) {
         translationBuilder.add(AllItems.STAMP, "Stamp");
 
+        stampGroup(translationBuilder, Wayfinder.id("silly"), "Silly");
+        stampGroup(translationBuilder, Wayfinder.id("silly2"), "Silly2");
+
         stamp(translationBuilder, Wayfinder.id("missingstamp"), "Unusual Pattern");
         stamp(translationBuilder, BuiltInStamps.X, "X Marks the Spot");
         stamp(translationBuilder, BuiltInStamps.STAMPTONG, "The Legally Distinct Stamptong");
@@ -36,5 +39,9 @@ public class LangGenerator extends FabricLanguageProvider {
 
     private void stamp(TranslationBuilder translationBuilder, ResourceLocation stamp, String value) {
         translationBuilder.add(stamp.toLanguageKey("stamp"), value);
+    }
+
+    private void stampGroup(TranslationBuilder translationBuilder, ResourceLocation group, String value) {
+        translationBuilder.add(group.toLanguageKey("stamp_group"), value);
     }
 }
