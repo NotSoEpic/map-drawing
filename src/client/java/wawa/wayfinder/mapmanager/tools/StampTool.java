@@ -11,6 +11,7 @@ import org.joml.Vector2i;
 import org.lwjgl.opengl.GL11;
 import wawa.wayfinder.RenderHelper;
 import wawa.wayfinder.WayfinderClient;
+import wawa.wayfinder.mapmanager.AvailableStamps;
 import wawa.wayfinder.mapmanager.widgets.MapWidget;
 import wawa.wayfinder.rendering.WayfinderRenderTypes;
 
@@ -45,6 +46,11 @@ public class StampTool extends Tool {
     public void rightDown(MapWidget widget, boolean shift, Vector2d mouse, Vector2i world) {
         WayfinderClient.regions.clearHistory();
         widget.putTextureWorld(world.x, world.y, texture.getPixels(), (pixel, current) -> 0);
+    }
+
+    @Override
+    public void ctrlScroll(MapWidget widget, Vector2d mouse, Vector2i world, double verticalAmount) {
+        AvailableStamps.deltaSelect((int) verticalAmount);
     }
 
     @Override

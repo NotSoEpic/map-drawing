@@ -6,38 +6,33 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector4i;
-import wawa.wayfinder.AllComponents;
 import wawa.wayfinder.AllItems;
 import wawa.wayfinder.ClientStampTooltipComponent;
 import wawa.wayfinder.RenderHelper;
+import wawa.wayfinder.mapmanager.AvailableStamps;
 import wawa.wayfinder.mapmanager.tools.StampTool;
 import wawa.wayfinder.mapmanager.tools.Tool;
 import wawa.wayfinder.rendering.WayfinderRenderTypes;
-import wawa.wayfinder.stampitem.StampGroups;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class StampListWidget extends AbstractWidget {
-    private final Map<ResourceLocation, List<ResourceLocation>> availableStampGroups;
     private final Map<ResourceLocation, Vector4i> stampBounds = new HashMap<>();
     private double scrollAmount = 0;
     private int fullWidth;
     private int fullHeight;
     private boolean menuEnabled = false;
-    private ResourceLocation selectedGroup;
-    private int selectedIndex;
     public StampListWidget() {
         super(25, 25, 0, 0, Component.literal("stamp list"));
-        availableStampGroups = collectAvailableStampGroups(Minecraft.getInstance().player);
+        AvailableStamps.recalculate(Minecraft.getInstance().player);
     }
 
     @Override
@@ -49,13 +44,13 @@ public class StampListWidget extends AbstractWidget {
             guiGraphics.enableScissor(getX(), getY(), getRight(), getBottom());
             fullWidth = 0;
             fullHeight = 0;
-            availableStampGroups.keySet().stream().sorted().forEach(key -> {
+            AvailableStamps.map.keySet().stream().sorted().forEach(key -> {
                 int x = getX();
                 Component groupTitle = Component.translatable(key.toLanguageKey("stamp_group"));
                 fullWidth = Math.max(fullWidth, Minecraft.getInstance().font.width(groupTitle));
                 guiGraphics.drawString(Minecraft.getInstance().font, groupTitle,
                         x, y.get(), -1, true);
-                for (ResourceLocation texture : availableStampGroups.get(key)) {
+                for (ResourceLocation texture : AvailableStamps.map.get(key)) {
                     RenderHelper.renderTypeBlit(guiGraphics, WayfinderRenderTypes.getPaletteSwap(texture.withPath(ClientStampTooltipComponent::fromPathShorthand)),
                             x, y.get() + 10, 0,
                             0.0f, 0.0f,
@@ -128,48 +123,9 @@ public class StampListWidget extends AbstractWidget {
         ResourceLocation texture = getClickedStamp(mouseX, mouseY);
         if (texture != null) {
             Tool.set(new StampTool(texture.withPath(ClientStampTooltipComponent::fromPathShorthand)));
-            selectedGroup = StampGroups.getGroup(texture);
-            if (selectedGroup != null)
-                selectedIndex = availableStampGroups.get(selectedGroup).indexOf(texture);
+            AvailableStamps.select(texture);
             menuEnabled = false;
         }
-    }
-
-    public static Map<ResourceLocation, List<ResourceLocation>> collectAvailableStampGroups(Player player) {
-        boolean stampAllowed = !(Tool.get() instanceof StampTool);
-        Map<ResourceLocation, List<ResourceLocation>> groups = new HashMap<>();
-        for (ResourceLocation texture : collectAvailableStamps(player)) {
-            ResourceLocation group = StampGroups.getGroup(texture);
-            if (group == null)
-                group = StampGroups.UNGROUPED;
-            groups.computeIfAbsent(group, g -> new ArrayList<>()).add(texture);
-            if (!stampAllowed && Tool.get() instanceof StampTool stampTool && stampTool.stamp.equals(texture.withPath(ClientStampTooltipComponent::fromPathShorthand)))
-                stampAllowed = true;
-        }
-        if (!stampAllowed)
-            Tool.set(null);
-        groups.forEach((k, v) -> v.sort(ResourceLocation::compareTo));
-        return groups;
-    }
-
-    private static Set<ResourceLocation> collectAvailableStamps(Player player) {
-        Set<ResourceLocation> stamps = new HashSet<>();
-        collectAvailableStamps(stamps, player.getInventory().items);
-        return stamps;
-    }
-
-    private static void collectAvailableStamps(Set<ResourceLocation> stamps, Iterable<ItemStack> items) {
-        items.forEach(i -> {
-            if (i.has(AllComponents.STAMP)) {
-                stamps.addAll(i.get(AllComponents.STAMP).textures());
-            }
-            if (i.has(DataComponents.BUNDLE_CONTENTS)) {
-                collectAvailableStamps(stamps, i.get(DataComponents.BUNDLE_CONTENTS).items());
-            }
-            if (i.has(DataComponents.CONTAINER)) {
-                collectAvailableStamps(stamps, i.get(DataComponents.CONTAINER).nonEmptyItems());
-            }
-        });
     }
 
     @Override
