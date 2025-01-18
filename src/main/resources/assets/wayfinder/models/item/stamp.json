@@ -1,0 +1,14 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "wayfinder:item/stamp"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "wayfinder:complete_group": 1
+      },
+      "model": "wayfinder:item/stamp_complete"
+    }
+  ]
+}

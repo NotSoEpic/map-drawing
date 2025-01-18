@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -84,5 +85,7 @@ public class WayfinderClient implements ClientModInitializer {
 				StampGroups.handlePayload(payload);
 			});
 		});
+
+		ItemProperties.register(AllItems.STAMP, Wayfinder.id("complete_group"), (stack, level, entity, i) -> stack.get(AllComponents.STAMP).isComplete() ? 1 : 0);
 	}
 }

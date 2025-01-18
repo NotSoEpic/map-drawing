@@ -92,4 +92,13 @@ public class StampComponent implements TooltipComponent {
     public void incrementSelected() {
         selectedIndex = (selectedIndex + 1) % textures.size();
     }
+
+    public boolean inGroup() {
+        return StampGroups.inGroup(textures.get(selectedIndex));
+    }
+
+    @Environment(EnvType.CLIENT)
+    public boolean isComplete() {
+        return inGroup() && getSize() >= getFullGroupSize();
+    }
 }
