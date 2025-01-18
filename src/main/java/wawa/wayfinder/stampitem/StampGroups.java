@@ -19,6 +19,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import wawa.wayfinder.AllComponents;
@@ -94,7 +95,7 @@ public class StampGroups extends SimpleJsonResourceReloadListener implements Ide
             StampComponent component = StampComponent.single(texture);
             ItemStack itemStack = new ItemStack(AllItems.STAMP);
             itemStack.set(AllComponents.STAMP, component);
-            content.accept(itemStack);
+            content.accept(itemStack, CreativeModeTab.TabVisibility.SEARCH_TAB_ONLY);
         }
     }
 

@@ -7,25 +7,22 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import wawa.wayfinder.ClientStampTooltipComponent;
 import wawa.wayfinder.MapBindings;
 import wawa.wayfinder.Wayfinder;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.color.ColorPaletteManager;
-import wawa.wayfinder.mapmanager.tools.StampTool;
 import wawa.wayfinder.mapmanager.tools.Tool;
 import wawa.wayfinder.mapmanager.widgets.MapWidget;
-import wawa.wayfinder.mapmanager.widgets.StampToolWidget;
+import wawa.wayfinder.mapmanager.widgets.StampListWidget;
 import wawa.wayfinder.mapmanager.widgets.ToolSelectionWidget;
 
-import java.util.Iterator;
+import java.util.List;
 
 /**
  * The entire screen that gets rendered, including map and drawing tools
@@ -53,28 +50,16 @@ public class MapScreen extends Screen {
 
         WayfinderClient.palette = ColorPaletteManager.get(Wayfinder.id("default"));
 
-//        for (int i = 0; i < ColorPalette.SIZE; i++) {
-//            addRenderableWidget(new DrawToolWidget(this, 2 + i * 10, 2, 8, 8, i, 1));
-//            addRenderableWidget(new DrawToolWidget(this, 2 + i * 10, 12, 8, 8, i, 3));
-//        }
-        boolean stampAllowed = false;
-        Iterator<ResourceLocation> stamps = StampTool.collectAvailableStamps(Minecraft.getInstance().player).iterator();
-        for (int i = 0; stamps.hasNext(); i++) {
-            ResourceLocation stamp = stamps.next().withPath(ClientStampTooltipComponent::fromPathShorthand);
-            if (Tool.get() instanceof StampTool stampTool && stampTool.stamp.equals(stamp))
-                stampAllowed = true;
-            addRenderableWidget(new StampToolWidget(2, 2 + i * 18, stamp));
-        }
-        if (Tool.get() instanceof StampTool && !stampAllowed) {
-            Tool.set(null);
-        }
+        addRenderableWidget(new StampListWidget());
 
         toolSelection = new ToolSelectionWidget(this);
         addRenderableWidget(toolSelection);
     }
 
-    public void setDrawingEnabled(boolean enabled) {
-        map.active = enabled;
+    // reverses order so the last added children (those rendering on top) are prioritized with mouse events
+    @Override
+    public List<? extends GuiEventListener> children() {
+        return super.children().reversed();
     }
 
     @Override

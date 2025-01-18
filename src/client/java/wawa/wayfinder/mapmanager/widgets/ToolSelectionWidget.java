@@ -66,15 +66,14 @@ public class ToolSelectionWidget extends AbstractWidget {
     }
 
     @Override
+    public boolean isMouseOver(double mouseX, double mouseY) {
+        return super.isMouseOver(mouseX, mouseY) || (palettePicker.isActive() && palettePicker.isMouseOver(mouseX, mouseY));
+    }
+
+    @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        if (isMouseOver(mouseX, mouseY) && Math.floorDiv(mouseY - getY(), 30) == 1) {
-            palettePicker.visible = true;
-            screen.setDrawingEnabled(false);
-        }
-        else if (!palettePicker.isMouseOver(mouseX, mouseY)) {
-            palettePicker.visible = false;
-            screen.setDrawingEnabled(true);
-        }
+        palettePicker.visible = isMouseOver(mouseX, mouseY) && Math.floorDiv(mouseY - getY(), 30) == 1;
+
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(getX(), getY(), 0);
         guiGraphics.blit(0, 0, 0, 50, 30, pencilSprite);
