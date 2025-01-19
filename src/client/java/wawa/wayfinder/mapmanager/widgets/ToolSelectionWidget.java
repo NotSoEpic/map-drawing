@@ -6,7 +6,9 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
+import org.joml.Vector2d;
 import org.joml.Vector2i;
+import wawa.wayfinder.RenderHelper;
 import wawa.wayfinder.Wayfinder;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.color.ColorPalette;
@@ -17,10 +19,14 @@ import wawa.wayfinder.mapmanager.tools.Tool;
 
 public class ToolSelectionWidget extends AbstractWidget {
     private static final TextureAtlasSprite pencilSprite = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool/pencil"));
+    private static final TextureAtlasSprite pencilHighlight = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool/pencil_highlight"));
     private static final TextureAtlasSprite brushSprite = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool/brush"));
-    private static final TextureAtlasSprite brushMaskSprite = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool/brush_mask"));
+    private static final TextureAtlasSprite brushHighlight = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool/brush_highlight"));
+    private static final TextureAtlasSprite brushMask = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool/brush_mask"));
     private static final TextureAtlasSprite eraserSprite = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool/eraser"));
+    private static final TextureAtlasSprite eraserHighlight = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool/eraser_highlight"));
     private static final TextureAtlasSprite rulerSprite = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool/ruler"));
+    private static final TextureAtlasSprite rulerHighlight = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool/ruler_highlight"));
     public static final PenTool pencil = new PenTool(1, 0, false);
     public final PalettePickerWidget palettePicker;
     public static final PenTool eraser = new PenTool(1, -1, false).sizeSettings(2, 7);
@@ -28,11 +34,27 @@ public class ToolSelectionWidget extends AbstractWidget {
     private final MapScreen screen;
 
     public ToolSelectionWidget(MapScreen screen) {
-        super(screen.width - 50, 30, 50, 30 * 4, Component.literal("tool selection"));
+        super(screen.width - (50 + highlightSize) / 2, 30, highlightSize, spacing * 4, Component.literal("tool selection"));
         this.screen = screen;
         palettePicker = new PalettePickerWidget(this, ColorPalette.GRAYSCALE, (i, c) -> i != 0);
         palettePicker.visible = false;
         screen.addRenderableWidget(palettePicker);
+    }
+
+    private static final int iconSize = 16;
+    private static final int highlightPadding = 1;
+    private static final int highlightSize = iconSize + highlightPadding * 2;
+    private static final int padding = 1;
+    private static final int spacing = highlightSize + padding * 2;
+    public int getTool(double mouseX, double mouseY) {
+        int rowIndex = (int)Math.floor((mouseY - getY()) / spacing);
+        if (rowIndex >= 0 && rowIndex < 4) {
+            mouseY = mouseY - rowIndex * spacing + highlightPadding;
+            mouseX = mouseX + highlightPadding;
+            if (mouseY >= getY() && mouseY <= getY() + iconSize && mouseX >= getX() && mouseX <= getX() + iconSize)
+                return rowIndex;
+        }
+        return -1;
     }
 
     @Override
@@ -42,7 +64,7 @@ public class ToolSelectionWidget extends AbstractWidget {
 
     @Override
     public void onClick(double mouseX, double mouseY) {
-        switch (Math.floorDiv((int)mouseY - getY(), 30)) {
+        switch (getTool(mouseX, mouseY)) {
             case 0 -> selectPencil();
             case 1 -> selectBrush();
             case 2 -> selectEraser();
@@ -54,6 +76,11 @@ public class ToolSelectionWidget extends AbstractWidget {
         Tool.set(pencil);
     }
     public void selectBrush() {
+        if (Tool.get() == palettePicker.getLastSelected()) {
+            Vector2d mouse = RenderHelper.smootherMouse();
+            palettePicker.moveTo(mouse.x, mouse.y);
+        }
+
         Tool.set(palettePicker.getLastSelected());
     }
     public void selectEraser() {
@@ -67,32 +94,44 @@ public class ToolSelectionWidget extends AbstractWidget {
 
     @Override
     public boolean isMouseOver(double mouseX, double mouseY) {
-        return super.isMouseOver(mouseX, mouseY) || (palettePicker.isActive() && palettePicker.isMouseOver(mouseX, mouseY));
+        return super.isMouseOver(mouseX, mouseY) || (palettePicker.isMouseOver(mouseX, mouseY));
     }
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        palettePicker.visible = isMouseOver(mouseX, mouseY) && Math.floorDiv(mouseY - getY(), 30) == 1;
+        palettePicker.visible = getTool(mouseX, mouseY) == 1 || palettePicker.isMouseOver(mouseX, mouseY);
+        if (!palettePicker.visible) {
+            palettePicker.resetPos();
+        }
 
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(getX(), getY(), 0);
-        guiGraphics.blit(0, 0, 0, 50, 30, pencilSprite);
-        guiGraphics.blit(0, 30, 0, 50, 30, brushSprite);
+        int hover = getTool(mouseX, mouseY);
 
+        renderToolIcon(guiGraphics, 0, pencilSprite, pencilHighlight, hover == 0, Tool.get() == pencil);
+
+        renderToolIcon(guiGraphics, 1, brushSprite, brushHighlight, hover == 1, Tool.get() == palettePicker.getLastSelected());
         float[] rgb = WayfinderClient.palette.colors().get(palettePicker.getLastSelected().getColorIndex()).getColorComponents(null);
-        guiGraphics.blit(0, 30, 1, 50, 30, brushMaskSprite, rgb[0], rgb[1], rgb[2], 1);
+        float val = Tool.get() == palettePicker.getLastSelected() ? 0.5f : 1f;
+        guiGraphics.blit(highlightPadding, highlightPadding +spacing, 0, iconSize, iconSize, brushMask, rgb[0] * val, rgb[1] * val, rgb[2] * val, 1);
 
-        guiGraphics.blit(0, 60, 0, 50, 30, eraserSprite);
-        guiGraphics.blit(0, 90, 0, 50, 30, rulerSprite);
-
+        renderToolIcon(guiGraphics, 2, eraserSprite, eraserHighlight, hover == 2, Tool.get() == eraser);
+        renderToolIcon(guiGraphics, 3, rulerSprite, rulerHighlight, hover == 3, Tool.get() == ruler);
         guiGraphics.pose().popPose();
 
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(screen.map.getX(), screen.map.getY(), 0);
         if (Tool.get() != ruler && ruler.startPos != null && ruler.endPos != null) {
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(screen.map.getX(), screen.map.getY(), 0);
             ruler.renderMeasure(screen.map, guiGraphics, ruler.startPos, ruler.endPos, false);
+            guiGraphics.pose().popPose();
         }
-        guiGraphics.pose().popPose();
+    }
+
+    private void renderToolIcon(GuiGraphics guiGraphics, int index, TextureAtlasSprite texture, TextureAtlasSprite highlight, boolean hovered, boolean selected) {
+        float val = selected ? 0.5f : 1f;
+        if (hovered || selected)
+            guiGraphics.blit(0, index * spacing, 0, highlightSize, highlightSize, highlight, val, val, val, 1);
+        guiGraphics.blit(highlightPadding, highlightPadding + index * spacing, 0, iconSize, iconSize, texture, val, val, val, 1);
     }
 
     public void pickColor(MapWidget widget, Vector2i world) {

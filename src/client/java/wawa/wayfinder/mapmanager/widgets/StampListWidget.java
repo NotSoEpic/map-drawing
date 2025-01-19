@@ -70,8 +70,7 @@ public class StampListWidget extends AbstractWidget {
 
             ResourceLocation texture = getClickedStamp(mouseX, mouseY);
             if (texture != null) {
-                guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable(texture.toLanguageKey("stamp")),
-                        mouseX, mouseY, -1, true);
+                guiGraphics.renderTooltip(Minecraft.getInstance().font, Component.translatable(texture.toLanguageKey("stamp")), mouseX, mouseY);
             }
         }
     }
