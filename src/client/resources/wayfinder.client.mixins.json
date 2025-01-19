@@ -5,7 +5,8 @@
   "client": [
     "BiomeAccessAccessor",
     "DrawContextAccessor",
-    "RenderTypeMixin"
+    "RenderTypeMixin",
+    "QuietIKnowItsAMissingTexture"
   ],
   "injectors": {
     "defaultRequire": 1
