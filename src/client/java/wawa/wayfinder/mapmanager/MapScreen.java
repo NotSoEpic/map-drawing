@@ -19,7 +19,6 @@ import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.color.ColorPaletteManager;
 import wawa.wayfinder.mapmanager.tools.Tool;
 import wawa.wayfinder.mapmanager.widgets.MapWidget;
-import wawa.wayfinder.mapmanager.widgets.StampListWidget;
 import wawa.wayfinder.mapmanager.widgets.ToolSelectionWidget;
 
 import java.util.List;
@@ -49,8 +48,6 @@ public class MapScreen extends Screen {
         addRenderableWidget(map);
 
         WayfinderClient.palette = ColorPaletteManager.get(Wayfinder.id("default"));
-
-        addRenderableWidget(new StampListWidget());
 
         toolSelection = new ToolSelectionWidget(this);
         addRenderableWidget(toolSelection);
