@@ -99,6 +99,8 @@ public class MapScreen extends Screen {
             toolSelection.selectEraser();
         } else if (MapBindings.RULER.matches(keyCode, scanCode)) {
             toolSelection.selectRuler();
+        } else if (MapBindings.SCISSORS.matches(keyCode, scanCode)) {
+            toolSelection.selectScissors();
         }
         return true;
     }

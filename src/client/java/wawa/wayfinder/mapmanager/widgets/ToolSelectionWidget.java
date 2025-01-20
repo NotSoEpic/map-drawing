@@ -13,10 +13,7 @@ import wawa.wayfinder.Wayfinder;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.color.ColorPalette;
 import wawa.wayfinder.mapmanager.MapScreen;
-import wawa.wayfinder.mapmanager.tools.PenTool;
-import wawa.wayfinder.mapmanager.tools.RulerTool;
-import wawa.wayfinder.mapmanager.tools.StampTool;
-import wawa.wayfinder.mapmanager.tools.Tool;
+import wawa.wayfinder.mapmanager.tools.*;
 
 public class ToolSelectionWidget extends AbstractWidget {
     private static final TextureAtlasSprite pencilSprite = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool/pencil"));
@@ -28,12 +25,15 @@ public class ToolSelectionWidget extends AbstractWidget {
     private static final TextureAtlasSprite eraserHighlight = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool/eraser_highlight"));
     private static final TextureAtlasSprite rulerSprite = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool/ruler"));
     private static final TextureAtlasSprite rulerHighlight = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool/ruler_highlight"));
+    private static final TextureAtlasSprite scissorsSprite = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool/scissors"));
+    private static final TextureAtlasSprite scissorsHighlight = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool/scissors_highlight"));
     private static final TextureAtlasSprite stampSprite = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool/stamp"));
     private static final TextureAtlasSprite stampHighlight = Minecraft.getInstance().getGuiSprites().getSprite(Wayfinder.id("tool/stamp_highlight"));
     public static final PenTool pencil = new PenTool(1, 0, false);
     public final PalettePickerWidget palettePicker;
     public static final PenTool eraser = new PenTool(1, -1, false).sizeSettings(2, 7);
     public static final RulerTool ruler = new RulerTool();
+    public static final SelectTool select = new SelectTool();
     public final StampListWidget stampList;
     private final MapScreen screen;
 
@@ -46,7 +46,7 @@ public class ToolSelectionWidget extends AbstractWidget {
 
     public ToolSelectionWidget(MapScreen screen) {
         super(screen.width - (50 + highlightSize) / 2, 30,
-                highlightSize + padding * 2, spacing * 5 + padding * 2, Component.literal("tool selection"));
+                highlightSize + padding * 2, spacing * 6 + padding * 2, Component.literal("tool selection"));
         this.screen = screen;
         palettePicker = new PalettePickerWidget(this, ColorPalette.GRAYSCALE, (i, c) -> i != 0);
         palettePicker.visible = false;
@@ -62,7 +62,7 @@ public class ToolSelectionWidget extends AbstractWidget {
 
     public int getTool(double mouseX, double mouseY) {
         int rowIndex = (int)Math.floor((mouseY - getY()) / spacing);
-        if (rowIndex >= 0 && rowIndex < (stampEnabled ? 5 : 4)) {
+        if (rowIndex >= 0 && rowIndex < (stampEnabled ? 6 : 5)) {
             mouseY = mouseY - rowIndex * spacing;
             if (mouseY >= getY() && mouseY < getY() + highlightSize + 1 && mouseX >= getX() && mouseX < getX() + highlightSize + 1)
                 return rowIndex;
@@ -78,9 +78,10 @@ public class ToolSelectionWidget extends AbstractWidget {
             case 1 -> selectBrush();
             case 2 -> selectEraser();
             case 3 -> selectRuler();
-            case 4 -> selectStamp();
+            case 4 -> selectScissors();
+            case 5 -> selectStamp();
         }
-        if (tool != 4) {
+        if (tool != 5) {
             stampList.visible = false;
         }
     }
@@ -89,20 +90,28 @@ public class ToolSelectionWidget extends AbstractWidget {
         Tool.set(pencil);
     }
     public void selectBrush() {
-        if (!palettePicker.visible && Tool.get() == palettePicker.getLastSelected()) {
+        if (!palettePicker.visible && Tool.get() == palettePicker.getLastSelected() && !stampList.visible) {
             Vector2d mouse = RenderHelper.smootherMouse();
             palettePicker.moveTo(mouse.x, mouse.y);
         }
 
         Tool.set(palettePicker.getLastSelected());
+        stampList.visible = false;
     }
     public void selectEraser() {
         Tool.set(eraser);
+        stampList.visible = false;
     }
     public void selectRuler() {
         if (Tool.get() == ruler)
             ruler.resetPos();
         Tool.set(ruler);
+        stampList.visible = false;
+    }
+
+    public void selectScissors() {
+        Tool.set(select);
+        stampList.visible = false;
     }
 
     public void selectStamp() {
@@ -117,7 +126,7 @@ public class ToolSelectionWidget extends AbstractWidget {
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         int hover = getTool(mouseX, mouseY);
-        palettePicker.visible = hover == 1 || palettePicker.isMouseOver(mouseX, mouseY);
+        palettePicker.visible = (hover == 1 || palettePicker.isMouseOver(mouseX, mouseY)) && !stampList.visible;
         if (!palettePicker.visible) {
             palettePicker.resetPos();
         }
@@ -134,8 +143,9 @@ public class ToolSelectionWidget extends AbstractWidget {
 
         renderToolIcon(guiGraphics, 2, eraserSprite, eraserHighlight, hover == 2, Tool.get() == eraser);
         renderToolIcon(guiGraphics, 3, rulerSprite, rulerHighlight, hover == 3, Tool.get() == ruler);
+        renderToolIcon(guiGraphics, 4, scissorsSprite, scissorsHighlight, hover == 4, Tool.get() == select);
         if (stampEnabled)
-            renderToolIcon(guiGraphics, 4, stampSprite, stampHighlight, hover == 4 || stampList.visible, Tool.get() instanceof StampTool);
+            renderToolIcon(guiGraphics, 5, stampSprite, stampHighlight, hover == 5 || stampList.visible, Tool.get() instanceof StampTool);
         guiGraphics.pose().popPose();
 
         if (Tool.get() != ruler && ruler.startPos != null && ruler.endPos != null) {

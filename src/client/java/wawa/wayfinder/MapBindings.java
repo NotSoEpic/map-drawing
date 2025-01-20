@@ -15,7 +15,8 @@ public class MapBindings {
     PENCIL = registerNonBlocking("pencil", GLFW.GLFW_KEY_N),
     BRUSH = registerNonBlocking("brush", GLFW.GLFW_KEY_B),
     ERASER = registerNonBlocking("eraser", GLFW.GLFW_KEY_E),
-    RULER = registerNonBlocking("ruler", GLFW.GLFW_KEY_R);
+    RULER = registerNonBlocking("ruler", GLFW.GLFW_KEY_R),
+    SCISSORS = registerNonBlocking("scissors", GLFW.GLFW_KEY_C);
 
     private static KeyMapping register(String name, int key) {
         return KeyBindingHelper.registerKeyBinding(new KeyMapping(
