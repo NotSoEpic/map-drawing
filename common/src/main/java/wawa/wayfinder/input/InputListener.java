@@ -1,8 +1,7 @@
 package wawa.wayfinder.input;
 
 import net.minecraft.client.Minecraft;
-import wawa.wayfinder.WayfinderClient;
-import wawa.wayfinder.screen.MapScreen;
+import wawa.wayfinder.map.MapScreen;
 
 public class InputListener {
     public static void tick(Minecraft minecraft) {
