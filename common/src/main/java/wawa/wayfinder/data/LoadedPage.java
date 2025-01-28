@@ -38,12 +38,12 @@ public class LoadedPage extends AbstractPage {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics) {
-        super.render(guiGraphics);
+    public void render(GuiGraphics guiGraphics, int xOff, int yOff) {
+        super.render(guiGraphics, xOff, yOff);
         if (uploadDirty) {
             texture.upload();
         }
-        guiGraphics.blit(textureID, left, top, 0, 0, 512, 512, 512, 512);
+        guiGraphics.blit(textureID, left + xOff, top + yOff, 0, 0, 512, 512, 512, 512);
     }
 
     @Override

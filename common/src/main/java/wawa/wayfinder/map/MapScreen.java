@@ -31,7 +31,10 @@ public class MapScreen extends Screen {
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(width / 2f, height / 2f, 0);
         guiGraphics.pose().scale(zoom, zoom, 1);
-        guiGraphics.pose().translate(-panning.x, -panning.y, 0);
+        // offset for rendering elements relative to the world, prevents floating point imprecision at extreme values
+        int xOff = -Math.floorDiv(Mth.floor(panning.x), 512) * 512;
+        int yOff = -Math.floorDiv(Mth.floor(panning.y), 512) * 512;
+        guiGraphics.pose().translate(-panning.x - xOff, -panning.y - yOff, 0);
         guiGraphics.enableScissor(padding, padding, width - padding, height - padding);
 
         Vector2i topLeft = new Vector2i(screenToWorld(new Vector2d(padding, padding)).div(512), RoundingMode.FLOOR);
@@ -39,15 +42,15 @@ public class MapScreen extends Screen {
 
         for (int x = topLeft.x; x < bottomRight.x; x++) {
             for (int y = topLeft.y; y < bottomRight.y; y++) {
-                WayfinderClient.PAGE_MANAGER.getOrCreateRegion(x, y).render(guiGraphics);
+                WayfinderClient.PAGE_MANAGER.getOrCreateRegion(x, y).render(guiGraphics, xOff, yOff);
             }
         }
         Vector2d world = screenToWorld(new Vector2d(mouseX, mouseY));
 
-        WayfinderClient.POSITION_HISTORY.render(guiGraphics);
+        WayfinderClient.POSITION_HISTORY.render(guiGraphics, xOff, yOff);
 
         if (Tool.get() != null) {
-            Tool.get().renderWorld(guiGraphics, Mth.floor(world.x), Mth.floor(world.y));
+            Tool.get().renderWorld(guiGraphics, Mth.floor(world.x), Mth.floor(world.y), xOff, yOff);
         }
 
         guiGraphics.pose().popPose();

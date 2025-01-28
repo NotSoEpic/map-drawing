@@ -38,7 +38,7 @@ public abstract class AbstractPage {
         return lastRendertime;
     }
 
-    public void render(GuiGraphics guiGraphics) {
+    public void render(GuiGraphics guiGraphics, int xOff, int yOff) {
         lastRendertime = Util.getMillis();
     }
 

@@ -39,8 +39,8 @@ public class PlayerPositions {
         newest = current;
     }
 
-    public void render(GuiGraphics guiGraphics) {
-        positions.forEach(v -> guiGraphics.fill((int)v.x, (int)v.y, (int)v.x + 1, (int)v.y + 1, 0xFFFF00FF));
-        guiGraphics.fill((int)current.x - 1, (int)current.y - 1, (int)current.x + 2, (int)current.y + 2, 0xFFFF00FF);
+    public void render(GuiGraphics guiGraphics, int xOff, int yOff) {
+        positions.forEach(v -> guiGraphics.fill((int)v.x + xOff, (int)v.y + yOff, (int)v.x + 1 + xOff, (int)v.y + 1 + yOff, 0xFFFF00FF));
+        guiGraphics.fill((int)current.x - 1 + xOff, (int)current.y - 1 + yOff, (int)current.x + 2 +xOff, (int)current.y + 2 + yOff, 0xFFFF00FF);
     }
 }

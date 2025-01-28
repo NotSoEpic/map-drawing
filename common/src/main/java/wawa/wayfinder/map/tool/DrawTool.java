@@ -49,7 +49,7 @@ public class DrawTool extends Tool {
     }
 
     @Override
-    public void renderWorld(GuiGraphics graphics, int worldX, int worldY) {
-        graphics.blit(id, worldX - r, worldY - r, 0, 0, r * 2 + 1, r * 2 + 1);
+    public void renderWorld(GuiGraphics graphics, int worldX, int worldY, int xOff, int yOff) {
+        graphics.blit(id, worldX - r + xOff, worldY - r + yOff, 0, 0, r * 2 + 1, r * 2 + 1);
     }
 }
