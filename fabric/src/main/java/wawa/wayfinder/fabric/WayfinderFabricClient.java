@@ -7,6 +7,8 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.input.InputListener;
 import wawa.wayfinder.input.KeyMappings;
+import wawa.wayfinder.map.tool.DrawTool;
+import wawa.wayfinder.map.tool.Tool;
 
 public final class WayfinderFabricClient implements ClientModInitializer {
     @Override
@@ -18,7 +20,10 @@ public final class WayfinderFabricClient implements ClientModInitializer {
             InputListener.tick(client);
             WayfinderClient.PAGE_MANAGER.tick();
         });
-        ClientPlayConnectionEvents.JOIN.register(((handler, sender, client) -> WayfinderClient.PAGE_MANAGER.reloadPageIO(client.level, client)));
+        ClientPlayConnectionEvents.JOIN.register(((handler, sender, client) -> {
+            WayfinderClient.PAGE_MANAGER.reloadPageIO(client.level, client);
+            Tool.set(new DrawTool());
+        }));
         ClientPlayConnectionEvents.DISCONNECT.register(((handler, client) -> WayfinderClient.PAGE_MANAGER.saveAndClear()));
     }
 }

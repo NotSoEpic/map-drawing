@@ -51,6 +51,14 @@ public class PageManager {
         }
     }
 
+    public void putSquare(int x, int y, int RGBA, int r) {
+        for (int i = -r + x; i <= r + x; i++) {
+            for (int j = -r + y; j <= r + y; j++) {
+                putPixel(i, j, RGBA);
+            }
+        }
+    }
+
     public void replacePage(int rx, int ry, AbstractPage replacement) {
         deltaCount(pages.get(new Vector2i(rx, ry)), -1);
         pages.put(new Vector2i(rx, ry), replacement);

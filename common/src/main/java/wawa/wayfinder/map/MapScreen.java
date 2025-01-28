@@ -42,11 +42,18 @@ public class MapScreen extends Screen {
                 WayfinderClient.PAGE_MANAGER.getOrCreateRegion(x, y).render(guiGraphics);
             }
         }
+        Vector2d world = screenToWorld(new Vector2d(mouseX, mouseY));
+
+        if (Tool.get() != null) {
+            Tool.get().renderWorld(guiGraphics, Mth.floor(world.x), Mth.floor(world.y));
+        }
 
         guiGraphics.pose().popPose();
         guiGraphics.disableScissor();
 
-        Vector2d world = screenToWorld(new Vector2d(mouseX, mouseY));
+        if (Tool.get() != null) {
+            Tool.get().renderScreen(guiGraphics, mouseX, mouseY);
+        }
 
         guiGraphics.drawString(Minecraft.getInstance().font,
                 (int)world.x + " " + (int)world.y, 0, 0, -1, false);
@@ -87,8 +94,12 @@ public class MapScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        zoomNum = Mth.clamp(zoomNum + (int)scrollY, -2, 2);
-        zoom = (float) Math.pow(2, zoomNum);
+        if (Tool.get() != null && Screen.hasControlDown()) {
+            Tool.get().controlScroll(WayfinderClient.PAGE_MANAGER, mouseX, mouseY, scrollY);
+        } else {
+            zoomNum = Mth.clamp(zoomNum + (int) scrollY, -2, 2);
+            zoom = (float) Math.pow(2, zoomNum);
+        }
         return true;
     }
 
@@ -107,6 +118,10 @@ public class MapScreen extends Screen {
             case GLFW.GLFW_MOUSE_BUTTON_RIGHT -> Mouse.RIGHT;
             case GLFW.GLFW_MOUSE_BUTTON_MIDDLE -> Mouse.MIDDLE;
         };
+        if ((mouse == Mouse.LEFT || mouse == Mouse.RIGHT) && Tool.get() != null) {
+            Vector2d world = screenToWorld(new Vector2d(mouseX, mouseY));
+            Tool.get().hold(WayfinderClient.PAGE_MANAGER, mouse, world, world);
+        }
         return true;
     }
 

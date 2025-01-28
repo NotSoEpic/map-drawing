@@ -10,6 +10,8 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.input.InputListener;
+import wawa.wayfinder.map.tool.DrawTool;
+import wawa.wayfinder.map.tool.Tool;
 
 @EventBusSubscriber(modid = WayfinderClient.MOD_ID, value = Dist.CLIENT)
 public class ClientEventsRuntime {
@@ -23,6 +25,7 @@ public class ClientEventsRuntime {
     public static void levelLoad(LevelEvent.Load event) {
         if (event.getLevel() instanceof ClientLevel level && Minecraft.getInstance().isLocalServer()) {
             WayfinderClient.PAGE_MANAGER.reloadPageIO(level, Minecraft.getInstance());
+            Tool.set(new DrawTool());
         }
     }
 
