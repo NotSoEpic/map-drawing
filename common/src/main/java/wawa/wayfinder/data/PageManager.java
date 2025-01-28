@@ -66,6 +66,7 @@ public class PageManager {
     }
 
     public void reloadPageIO(Level level, Minecraft client) {
+        saveAndClear();
         pageIO = new PageIO(level, client);
     }
 

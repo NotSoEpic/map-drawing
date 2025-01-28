@@ -38,7 +38,7 @@ public class PageIO {
             path = path.resolve("multiplayer")
                     .resolve(uuid + "_" + client.getCurrentServer().name);
         }
-        return path;
+        return path.resolve(level.dimension().location().toDebugFileName());
     }
 
     public Path getMapPath() {
