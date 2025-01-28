@@ -12,11 +12,13 @@ import wawa.wayfinder.map.MapScreen;
 public class InputListener {
     public static void tick(Minecraft minecraft) {
         while (minecraft.level != null && KeyMappings.OPEN_MAP.consumeClick()) {
-            minecraft.setScreen(new MapScreen(getOpeningPosition(minecraft.player)));
+            minecraft.setScreen(new MapScreen(
+                    new Vector2d((int)minecraft.player.getX(), (int)minecraft.player.getZ()),
+                    getEndingPosition(minecraft.player)));
         }
     }
 
-    private static Vector2d getOpeningPosition(LocalPlayer player) {
+    private static Vector2d getEndingPosition(LocalPlayer player) {
         int distance = Minecraft.getInstance().options.getEffectiveRenderDistance();
 
         if (player.getMainHandItem().is(Items.SPYGLASS) || player.getOffhandItem().is(Items.SPYGLASS)) {

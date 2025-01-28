@@ -9,6 +9,7 @@ import org.joml.RoundingMode;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
+import wawa.wayfinder.LerpedVector2d;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.input.KeyMappings;
 import wawa.wayfinder.map.tool.Tool;
@@ -16,15 +17,17 @@ import wawa.wayfinder.map.tool.Tool;
 public class MapScreen extends Screen {
     private int zoomNum = 0;
     private float zoom = 1f; // gui pixels per block (>1 zoom in, <1 zoom out)
-    public Vector2d panning; // world space coordinate to center on
+    public LerpedVector2d lerpedPanning; // world space coordinate to center on
 
-    public MapScreen(Vector2d openingPos) {
+    public MapScreen(Vector2d openingPos, Vector2d endingPos) {
         super(Component.literal("Wayfinder Map"));
-        panning = openingPos;
+        lerpedPanning = new LerpedVector2d(openingPos, endingPos);
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        lerpedPanning.tickProgress(0.05 * Minecraft.getInstance().getTimer().getRealtimeDeltaTicks());
+        Vector2d panning = lerpedPanning.get();
         renderTransparentBackground(guiGraphics);
         final int padding = 30;
 
@@ -73,7 +76,7 @@ public class MapScreen extends Screen {
      * @return Coordinate in world space, with top left of block at (0, 0) being (0, 0)
      */
     public Vector2d screenToWorld(Vector2d mouse) {
-        return new Vector2d(mouse).sub(width / 2d, height / 2d).div(zoom).add(panning);
+        return new Vector2d(mouse).sub(width / 2d, height / 2d).div(zoom).add(lerpedPanning.get());
     }
 
     private Mouse mouse = Mouse.NONE;
@@ -88,7 +91,7 @@ public class MapScreen extends Screen {
         Vector2d world = screenToWorld(new Vector2d(mouseX, mouseY));
         Vector2d oldWorld = screenToWorld(new Vector2d(oldMouseX, oldMouseY));
         if (mouse == Mouse.MIDDLE) {
-            panning.add(oldWorld).sub(world);
+            lerpedPanning.set(lerpedPanning.get().add(oldWorld).sub(world));
         }
         if (Tool.get() != null) {
             Tool.get().hold(WayfinderClient.PAGE_MANAGER, mouse, oldWorld, world);
@@ -116,7 +119,8 @@ public class MapScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-
+        oldMouseX = mouseX;
+        oldMouseY = mouseY;
         mouse = switch (button) {
             default -> Mouse.NONE;
             case GLFW.GLFW_MOUSE_BUTTON_LEFT -> Mouse.LEFT;
