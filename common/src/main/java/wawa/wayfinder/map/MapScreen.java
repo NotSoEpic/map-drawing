@@ -18,13 +18,14 @@ public class MapScreen extends Screen {
     private float zoom = 1f; // gui pixels per block (>1 zoom in, <1 zoom out)
     public Vector2d panning; // world space coordinate to center on
 
-    public MapScreen(double x, double z) {
+    public MapScreen(Vector2d openingPos) {
         super(Component.literal("Wayfinder Map"));
-        panning = new Vector2d(x, z);
+        panning = openingPos;
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        renderTransparentBackground(guiGraphics);
         final int padding = 30;
 
         guiGraphics.pose().pushPose();
@@ -45,8 +46,10 @@ public class MapScreen extends Screen {
         guiGraphics.pose().popPose();
         guiGraphics.disableScissor();
 
+        Vector2d world = screenToWorld(new Vector2d(mouseX, mouseY));
+
         guiGraphics.drawString(Minecraft.getInstance().font,
-                screenToWorld(new Vector2d(mouseX, mouseY)).toString(), 0, 0, -1, false);
+                (int)world.x + " " + (int)world.y, 0, 0, -1, false);
         guiGraphics.drawString(Minecraft.getInstance().font,
                 WayfinderClient.PAGE_MANAGER.pageIO.getMapPath().toString(), 0, 10, -1, false);
         guiGraphics.drawString(Minecraft.getInstance().font,
