@@ -36,7 +36,7 @@ public class MapScreen extends Screen {
 
         for (int x = topLeft.x; x < bottomRight.x; x++) {
             for (int y = topLeft.y; y < bottomRight.y; y++) {
-                WayfinderClient.PAGE_MANAGER.getOrLoadRegion(x, y).render(guiGraphics);
+                WayfinderClient.PAGE_MANAGER.getOrCreateRegion(x, y).render(guiGraphics);
             }
         }
 

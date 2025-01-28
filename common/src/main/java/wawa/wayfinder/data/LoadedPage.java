@@ -1,11 +1,15 @@
 package wawa.wayfinder.data;
 
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import wawa.wayfinder.WayfinderClient;
+
+import java.io.IOException;
+import java.nio.file.Path;
 
 public class LoadedPage extends AbstractPage {
     private final ResourceLocation textureID;
@@ -38,5 +42,20 @@ public class LoadedPage extends AbstractPage {
             texture.upload();
         }
         guiGraphics.blit(textureID, left, top, 0, 0, 512, 512, 512, 512);
+    }
+
+    @Override
+    public void save(PageIO pageIO) {
+        Path path = pageIO.pageFilepath(rx, ry);
+        if (diskDirty) {
+            diskDirty = false;
+            Util.ioPool().execute(() -> {
+                try {
+                    texture.getPixels().writeToFile(path);
+                } catch (IOException e) {
+                    WayfinderClient.LOGGER.error("Failed to save region {} {} to {}\n{}", rx, ry, path, e);
+                }
+            });
+        }
     }
 }

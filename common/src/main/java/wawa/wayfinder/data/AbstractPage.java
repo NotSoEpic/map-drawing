@@ -33,4 +33,6 @@ public abstract class AbstractPage {
     public abstract @Nullable AbstractPage putPixel(int x, int y, int RGBA);
 
     public abstract void render(GuiGraphics guiGraphics);
+
+    public void save(PageIO pageIO) {}
 }

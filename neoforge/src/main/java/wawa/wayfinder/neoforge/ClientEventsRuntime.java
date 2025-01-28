@@ -1,10 +1,12 @@
 package wawa.wayfinder.neoforge;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.input.InputListener;
 
@@ -13,5 +15,17 @@ public class ClientEventsRuntime {
     @SubscribeEvent
     public static void clientTick(ClientTickEvent.Post event) {
         InputListener.tick(Minecraft.getInstance());
+    }
+
+    @SubscribeEvent
+    public static void levelLoad(LevelEvent.Load event) {
+        if (event.getLevel() instanceof ClientLevel level) {
+            WayfinderClient.PAGE_MANAGER.reloadPageIO(level, Minecraft.getInstance());
+        }
+    }
+
+    @SubscribeEvent
+    public static void levelUnload(LevelEvent.Unload event) {
+        WayfinderClient.PAGE_MANAGER.saveAndClear();
     }
 }
