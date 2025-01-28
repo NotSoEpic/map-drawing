@@ -38,6 +38,7 @@ public class LoadedPage extends AbstractPage {
 
     @Override
     public void render(GuiGraphics guiGraphics) {
+        super.render(guiGraphics);
         if (uploadDirty) {
             texture.upload();
         }
@@ -45,17 +46,25 @@ public class LoadedPage extends AbstractPage {
     }
 
     @Override
-    public void save(PageIO pageIO) {
+    public void save(PageIO pageIO, boolean close) {
         Path path = pageIO.pageFilepath(rx, ry);
         if (diskDirty) {
             diskDirty = false;
             Util.ioPool().execute(() -> {
                 try {
                     texture.getPixels().writeToFile(path);
+                    if (close) {
+                        close();
+                    }
                 } catch (IOException e) {
                     WayfinderClient.LOGGER.error("Failed to save region {} {} to {}\n{}", rx, ry, path, e);
                 }
             });
         }
+    }
+
+    @Override
+    protected void close() {
+        Minecraft.getInstance().getTextureManager().release(textureID);
     }
 }

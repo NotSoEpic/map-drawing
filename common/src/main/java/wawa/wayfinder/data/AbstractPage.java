@@ -1,5 +1,6 @@
 package wawa.wayfinder.data;
 
+import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,6 +16,7 @@ public abstract class AbstractPage {
     public final int top;
     public final int right;
     public final int bottom;
+    private long lastRendertime = 0;
 
     protected AbstractPage(int rx, int ry) {
         this.rx = rx;
@@ -32,7 +34,15 @@ public abstract class AbstractPage {
      */
     public abstract @Nullable AbstractPage putPixel(int x, int y, int RGBA);
 
-    public abstract void render(GuiGraphics guiGraphics);
+    public long getLastRendertime() {
+        return lastRendertime;
+    }
 
-    public void save(PageIO pageIO) {}
+    public void render(GuiGraphics guiGraphics) {
+        lastRendertime = Util.getMillis();
+    }
+
+    public void save(PageIO pageIO, boolean close) {}
+
+    protected void close() {}
 }

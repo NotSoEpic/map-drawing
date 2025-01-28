@@ -50,6 +50,7 @@ public class UnloadedPage extends AbstractPage {
 
     @Override
     public void render(GuiGraphics guiGraphics) {
+        super.render(guiGraphics);
         if (loadedImage != null) {
             parent.replacePage(rx, ry, new LoadedPage(rx, ry, new DynamicTexture(loadedImage)));
         }

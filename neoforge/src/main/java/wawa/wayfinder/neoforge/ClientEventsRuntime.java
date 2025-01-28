@@ -15,6 +15,7 @@ public class ClientEventsRuntime {
     @SubscribeEvent
     public static void clientTick(ClientTickEvent.Post event) {
         InputListener.tick(Minecraft.getInstance());
+        WayfinderClient.PAGE_MANAGER.tick();
     }
 
     @SubscribeEvent

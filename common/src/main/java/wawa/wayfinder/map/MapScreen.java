@@ -1,5 +1,6 @@
 package wawa.wayfinder.map;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -15,10 +16,11 @@ import wawa.wayfinder.map.tool.Tool;
 public class MapScreen extends Screen {
     private int zoomNum = 0;
     private float zoom = 1f; // gui pixels per block (>1 zoom in, <1 zoom out)
-    public Vector2d panning = new Vector2d(); // world space coordinate to center on
+    public Vector2d panning; // world space coordinate to center on
 
-    public MapScreen() {
+    public MapScreen(double x, double z) {
         super(Component.literal("Wayfinder Map"));
+        panning = new Vector2d(x, z);
     }
 
     @Override
@@ -42,6 +44,13 @@ public class MapScreen extends Screen {
 
         guiGraphics.pose().popPose();
         guiGraphics.disableScissor();
+
+        guiGraphics.drawString(Minecraft.getInstance().font,
+                screenToWorld(new Vector2d(mouseX, mouseY)).toString(), 0, 0, -1, false);
+        guiGraphics.drawString(Minecraft.getInstance().font,
+                WayfinderClient.PAGE_MANAGER.pageIO.getMapPath().toString(), 0, 10, -1, false);
+        guiGraphics.drawString(Minecraft.getInstance().font,
+                WayfinderClient.PAGE_MANAGER.getDebugCount(), 0, 20, -1, false);
     }
 
     /**

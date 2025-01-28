@@ -41,6 +41,10 @@ public class PageIO {
         return path;
     }
 
+    public Path getMapPath() {
+        return mapPath;
+    }
+
     public Path pageFilepath(int rx, int ry) {
         return mapPath.resolve(String.format("%d_%d.png", rx, ry));
     }

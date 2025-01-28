@@ -14,7 +14,10 @@ public final class WayfinderFabricClient implements ClientModInitializer {
         WayfinderClient.init();
 
         KeyMappings.toRegister.forEach(KeyBindingHelper::registerKeyBinding);
-        ClientTickEvents.END_CLIENT_TICK.register(InputListener::tick);
+        ClientTickEvents.END_CLIENT_TICK.register((client) -> {
+            InputListener.tick(client);
+            WayfinderClient.PAGE_MANAGER.tick();
+        });
         ClientPlayConnectionEvents.JOIN.register(((handler, sender, client) -> WayfinderClient.PAGE_MANAGER.reloadPageIO(client.level, client)));
         ClientPlayConnectionEvents.DISCONNECT.register(((handler, client) -> WayfinderClient.PAGE_MANAGER.saveAndClear()));
     }
