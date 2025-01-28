@@ -44,6 +44,8 @@ public class MapScreen extends Screen {
         }
         Vector2d world = screenToWorld(new Vector2d(mouseX, mouseY));
 
+        WayfinderClient.POSITION_HISTORY.render(guiGraphics);
+
         if (Tool.get() != null) {
             Tool.get().renderWorld(guiGraphics, Mth.floor(world.x), Mth.floor(world.y));
         }
