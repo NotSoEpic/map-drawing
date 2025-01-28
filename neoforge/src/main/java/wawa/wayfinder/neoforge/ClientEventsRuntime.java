@@ -5,6 +5,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import wawa.wayfinder.WayfinderClient;
@@ -20,9 +21,14 @@ public class ClientEventsRuntime {
 
     @SubscribeEvent
     public static void levelLoad(LevelEvent.Load event) {
-        if (event.getLevel() instanceof ClientLevel level) {
+        if (event.getLevel() instanceof ClientLevel level && Minecraft.getInstance().isLocalServer()) {
             WayfinderClient.PAGE_MANAGER.reloadPageIO(level, Minecraft.getInstance());
         }
+    }
+
+    @SubscribeEvent
+    public static void serverJoin(ClientPlayerNetworkEvent.LoggingIn event) {
+        WayfinderClient.PAGE_MANAGER.reloadPageIO(event.getPlayer().level(), Minecraft.getInstance());
     }
 
     @SubscribeEvent

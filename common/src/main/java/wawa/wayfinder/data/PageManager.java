@@ -2,7 +2,7 @@ package wawa.wayfinder.data;
 
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.level.Level;
 import org.joml.Vector2i;
 
 import java.util.HashMap;
@@ -57,7 +57,7 @@ public class PageManager {
         deltaCount(replacement, 1);
     }
 
-    public void reloadPageIO(ClientLevel level, Minecraft client) {
+    public void reloadPageIO(Level level, Minecraft client) {
         pageIO = new PageIO(level, client);
     }
 

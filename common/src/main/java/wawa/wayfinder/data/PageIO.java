@@ -1,9 +1,9 @@
 package wawa.wayfinder.data;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.mixin.BiomeManagerAccessor;
 
@@ -14,7 +14,7 @@ import java.util.UUID;
 
 public class PageIO {
     private final Path mapPath;
-    public PageIO(ClientLevel level, Minecraft client) {
+    public PageIO(Level level, Minecraft client) {
         mapPath = buildMapPath(level, client);
         try {
             Files.createDirectories(mapPath);
@@ -26,7 +26,7 @@ public class PageIO {
     /**
      * @return "minecraftinstance/wayfinder_maps/singleplayer/uuid_worldname"
      */
-    private Path buildMapPath(ClientLevel level, Minecraft client) {
+    private Path buildMapPath(Level level, Minecraft client) {
         Path path = client.gameDirectory.toPath()
                 .resolve("wayfinder_maps");
         long seed = ((BiomeManagerAccessor)level.getBiomeManager()).getBiomeZoomSeed();
