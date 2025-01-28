@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import wawa.wayfinder.WayfinderClient;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class LoadedPage extends AbstractPage {
@@ -52,7 +53,11 @@ public class LoadedPage extends AbstractPage {
             diskDirty = false;
             Util.ioPool().execute(() -> {
                 try {
-                    texture.getPixels().writeToFile(path);
+                    if (isEmpty()) {
+                        Files.deleteIfExists(path);
+                    } else {
+                        texture.getPixels().writeToFile(path);
+                    }
                     if (close) {
                         close();
                     }
@@ -61,6 +66,16 @@ public class LoadedPage extends AbstractPage {
                 }
             });
         }
+    }
+
+    public boolean isEmpty() {
+        int[] pixels = texture.getPixels().getPixelsRGBA();
+        for (int pixel : pixels) {
+            if (pixel != 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
