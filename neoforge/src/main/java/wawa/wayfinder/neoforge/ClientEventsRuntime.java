@@ -32,6 +32,7 @@ public class ClientEventsRuntime {
     @SubscribeEvent
     public static void serverJoin(ClientPlayerNetworkEvent.LoggingIn event) {
         WayfinderClient.PAGE_MANAGER.reloadPageIO(event.getPlayer().level(), Minecraft.getInstance());
+        Tool.set(new DrawTool());
     }
 
     @SubscribeEvent
