@@ -10,7 +10,7 @@ import org.joml.Vector2d;
 import org.joml.Vector2i;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.data.PageManager;
-import wawa.wayfinder.map.MapScreen;
+import wawa.wayfinder.map.widgets.MapWidget;
 
 import java.util.function.Consumer;
 
@@ -25,7 +25,7 @@ public class DrawTool extends Tool {
         Minecraft.getInstance().getTextureManager().register(id, preview);
     }
     @Override
-    public void hold(PageManager activePage, MapScreen.Mouse mouse, Vector2d oldWorld, Vector2d world) {
+    public void hold(PageManager activePage, MapWidget.Mouse mouse, Vector2d oldWorld, Vector2d world) {
         switch (mouse) {
             case LEFT -> pixelLine(oldWorld.floor(), world.floor(), pos -> activePage.putSquare(pos.x, pos.y, -1, r));
             case RIGHT -> pixelLine(oldWorld.floor(), world.floor(), pos -> activePage.putSquare(pos.x, pos.y, 0, r));

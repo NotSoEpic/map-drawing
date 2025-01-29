@@ -4,7 +4,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
 import wawa.wayfinder.data.PageManager;
-import wawa.wayfinder.map.MapScreen;
+import wawa.wayfinder.map.widgets.MapWidget;
 
 public abstract class Tool {
     private static Tool tool;
@@ -28,7 +28,7 @@ public abstract class Tool {
 
     public void onDeselect() {}
 
-    public void hold(PageManager activePage, MapScreen.Mouse mouse, Vector2d oldWorld, Vector2d world) {}
+    public void hold(PageManager activePage, MapWidget.Mouse mouse, Vector2d oldWorld, Vector2d world) {}
 
     public void controlScroll(PageManager activePage, double mouseX, double mouseY, double scrollY) {}
 
