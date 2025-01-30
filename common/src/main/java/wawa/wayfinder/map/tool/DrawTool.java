@@ -5,9 +5,11 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec2;
 import org.joml.RoundingMode;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
+import wawa.wayfinder.Helper;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.data.PageManager;
 import wawa.wayfinder.map.widgets.MapWidget;
@@ -15,6 +17,7 @@ import wawa.wayfinder.map.widgets.MapWidget;
 import java.util.function.Consumer;
 
 public class DrawTool extends Tool {
+    public ResourceLocation icon = null;
     private int color = -1;
     private int r = 0;
     private static final ResourceLocation id = WayfinderClient.id("draw");
@@ -59,6 +62,17 @@ public class DrawTool extends Tool {
     @Override
     public void renderWorld(GuiGraphics graphics, int worldX, int worldY, int xOff, int yOff) {
         graphics.blit(id, worldX - r + xOff, worldY - r + yOff, 0, 0, r * 2 + 1, r * 2 + 1);
+    }
+
+    @Override
+    public void renderScreen(GuiGraphics graphics, double mouseX, double mouseY) {
+        if (icon != null) {
+            Vec2 mouse = Helper.preciseMousePos();
+            graphics.pose().pushPose();
+            graphics.pose().translate(mouse.x % 1, mouse.y % 1, 0);
+            graphics.blitSprite(icon, (int)mouse.x - 16, (int)mouse.y - 16, 32, 32);
+            graphics.pose().popPose();
+        }
     }
 
     @Override

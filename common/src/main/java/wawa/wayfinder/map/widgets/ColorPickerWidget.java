@@ -5,11 +5,13 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.DyeColor;
+import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.map.tool.DrawTool;
 import wawa.wayfinder.map.tool.Tool;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class ColorPickerWidget extends AbstractWidget {
     private final List<PaletteSwabWidget> swabs = new ArrayList<>();
@@ -18,11 +20,11 @@ public class ColorPickerWidget extends AbstractWidget {
         super(x, y, 0, 0, Component.literal("color picker"));
         for (int i = 0; i < DyeColor.values().length; i++) {
             DyeColor color = DyeColor.values()[i];
-            int sx = x + (i % 2) * 10;
-            int sy = y + (i / 2) * 10;
-            width = Math.max(width, sx - getX() + 10);
-            height = Math.max(height, sy - getY() + 10);
-            swabs.add(new PaletteSwabWidget(sx, sy, color.getTextColor() | 0xFF000000));
+            int sx = (i % 2) * 10;
+            int sy = (i / 2) * 10;
+            width = Math.max(width, sx + 10);
+            height = Math.max(height, sy + 10);
+            swabs.add(new PaletteSwabWidget(this, sx, sy, color.getTextColor() | 0xFF000000));
         }
     }
 
@@ -52,11 +54,27 @@ public class ColorPickerWidget extends AbstractWidget {
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 
     public static class PaletteSwabWidget extends AbstractWidget {
+        private final ColorPickerWidget parent;
+        private final int relX;
+        private final int relY;
         private final int color;
 
-        public PaletteSwabWidget(int x, int y, int color) {
-            super(x, y, 8, 8, Component.literal("color swab"));
+        public PaletteSwabWidget(ColorPickerWidget parent, int x, int y, int color) {
+            super(0, 0, 8, 8, Component.literal("color swab"));
+            this.parent = parent;
+            this.relX = x;
+            this.relY = y;
             this.color = color;
+        }
+
+        @Override
+        public int getX() {
+            return parent.getX() + relX;
+        }
+
+        @Override
+        public int getY() {
+            return parent.getY() + relY;
         }
 
         @Override
@@ -71,6 +89,11 @@ public class ColorPickerWidget extends AbstractWidget {
             int R = color >> 16 & 0xFF;
             int A = color >> 24 & 0xFF;
             tool.setColor(A << 24 | B << 16 | G << 8 | R);
+            tool.icon = switch (new Random().nextInt(3)) {
+                default -> WayfinderClient.id("cursor/brush");
+                case 1 -> WayfinderClient.id("cursor/eraser");
+                case 2 -> WayfinderClient.id("cursor/pencil");
+            };
             Tool.set(tool);
         }
 
