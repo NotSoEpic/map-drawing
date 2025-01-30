@@ -75,19 +75,22 @@ public class MapWidget extends AbstractWidget {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        oldMouseX = mouseX;
-        oldMouseY = mouseY;
-        mouse = switch (button) {
-            default -> Mouse.NONE;
-            case GLFW.GLFW_MOUSE_BUTTON_LEFT -> Mouse.LEFT;
-            case GLFW.GLFW_MOUSE_BUTTON_RIGHT -> Mouse.RIGHT;
-            case GLFW.GLFW_MOUSE_BUTTON_MIDDLE -> Mouse.MIDDLE;
-        };
-        if ((mouse == Mouse.LEFT || mouse == Mouse.RIGHT) && Tool.get() != null) {
-            Vector2d world = parent.screenToWorld(new Vector2d(mouseX, mouseY));
-            Tool.get().hold(WayfinderClient.PAGE_MANAGER, mouse, world, world);
+        if (isMouseOver(mouseX, mouseY)) {
+            oldMouseX = mouseX;
+            oldMouseY = mouseY;
+            mouse = switch (button) {
+                default -> Mouse.NONE;
+                case GLFW.GLFW_MOUSE_BUTTON_LEFT -> Mouse.LEFT;
+                case GLFW.GLFW_MOUSE_BUTTON_RIGHT -> Mouse.RIGHT;
+                case GLFW.GLFW_MOUSE_BUTTON_MIDDLE -> Mouse.MIDDLE;
+            };
+            if ((mouse == Mouse.LEFT || mouse == Mouse.RIGHT) && Tool.get() != null) {
+                Vector2d world = parent.screenToWorld(new Vector2d(mouseX, mouseY));
+                Tool.get().hold(WayfinderClient.PAGE_MANAGER, mouse, world, world);
+            }
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override

@@ -15,6 +15,7 @@ import wawa.wayfinder.map.widgets.MapWidget;
 import java.util.function.Consumer;
 
 public class DrawTool extends Tool {
+    private int color = -1;
     private int r = 0;
     private static final ResourceLocation id = WayfinderClient.id("draw");
     private static final DynamicTexture preview = new DynamicTexture(1, 1, false);
@@ -24,10 +25,17 @@ public class DrawTool extends Tool {
         preview.upload();
         Minecraft.getInstance().getTextureManager().register(id, preview);
     }
+
+    public void setColor(int color) {
+        this.color = color;
+        preview.getPixels().setPixelRGBA(0, 0, color);
+        preview.upload();
+    }
+
     @Override
     public void hold(PageManager activePage, MapWidget.Mouse mouse, Vector2d oldWorld, Vector2d world) {
         switch (mouse) {
-            case LEFT -> pixelLine(oldWorld.floor(), world.floor(), pos -> activePage.putSquare(pos.x, pos.y, -1, r));
+            case LEFT -> pixelLine(oldWorld.floor(), world.floor(), pos -> activePage.putSquare(pos.x, pos.y, color, r));
             case RIGHT -> pixelLine(oldWorld.floor(), world.floor(), pos -> activePage.putSquare(pos.x, pos.y, 0, r));
         }
     }
@@ -51,5 +59,10 @@ public class DrawTool extends Tool {
     @Override
     public void renderWorld(GuiGraphics graphics, int worldX, int worldY, int xOff, int yOff) {
         graphics.blit(id, worldX - r + xOff, worldY - r + yOff, 0, 0, r * 2 + 1, r * 2 + 1);
+    }
+
+    @Override
+    public void onSelect() {
+        setColor(color);
     }
 }

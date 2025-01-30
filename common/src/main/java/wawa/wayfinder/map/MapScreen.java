@@ -10,6 +10,7 @@ import org.joml.Vector2d;
 import wawa.wayfinder.LerpedVector2d;
 import wawa.wayfinder.input.KeyMappings;
 import wawa.wayfinder.map.tool.Tool;
+import wawa.wayfinder.map.widgets.ColorPickerWidget;
 import wawa.wayfinder.map.widgets.DebugTextRenderable;
 import wawa.wayfinder.map.widgets.MapWidget;
 
@@ -31,6 +32,7 @@ public class MapScreen extends Screen {
         super.init();
         mapWidget = new MapWidget(this);
         addRenderableWidget(mapWidget);
+        addRenderableWidget(new ColorPickerWidget(width - 25, 35));
         addRenderableOnly(new DebugTextRenderable(this));
     }
 
