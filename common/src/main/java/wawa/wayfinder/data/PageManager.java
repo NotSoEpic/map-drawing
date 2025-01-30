@@ -51,6 +51,12 @@ public class PageManager {
         }
     }
 
+    public int getPixel(int x, int y) {
+        int rx = Math.floorDiv(x, 512);
+        int ry = Math.floorDiv(y, 512);
+        return getOrCreateRegion(rx, ry).getPixel(x - rx * 512, y - ry * 512);
+    }
+
     public void putSquare(int x, int y, int RGBA, int r) {
         for (int i = -r + x; i <= r + x; i++) {
             for (int j = -r + y; j <= r + y; j++) {

@@ -1,7 +1,9 @@
 package wawa.wayfinder.map.tool;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -21,7 +23,7 @@ public class DrawTool extends Tool {
     private int color = -1;
     private int r = 0;
     private static final ResourceLocation id = WayfinderClient.id("draw");
-    private static final DynamicTexture preview = new DynamicTexture(1, 1, false);
+    private static DynamicTexture preview = new DynamicTexture(1, 1, false);
     static {
         // crashes the game if this class is loaded too early. boowomp
         preview.getPixels().setPixelRGBA(0, 0, -1);
@@ -31,14 +33,36 @@ public class DrawTool extends Tool {
 
     public void setColor(int color) {
         this.color = color;
-        preview.getPixels().setPixelRGBA(0, 0, color);
+        rebuildPixels();
+    }
+
+    private void rebuildPixels() {
+        preview.close();
+        int wh = r * 2 + 1;
+        NativeImage im = new NativeImage(wh, wh, true);
+        if (color == 0) { // black hollow rectangle
+            im.fillRect(0, 0, wh, wh, 0xFF000000);
+            if (wh >= 3) {
+                im.fillRect(1, 1, wh - 2, wh - 2, 0);
+            }
+        } else {
+            im.fillRect(0, 0, wh, wh, color);
+        }
+        preview = new DynamicTexture(im);
         preview.upload();
+        Minecraft.getInstance().getTextureManager().register(id, preview);
     }
 
     @Override
     public void hold(PageManager activePage, MapWidget.Mouse mouse, Vector2d oldWorld, Vector2d world) {
         switch (mouse) {
-            case LEFT -> pixelLine(oldWorld.floor(), world.floor(), pos -> activePage.putSquare(pos.x, pos.y, color, r));
+            case LEFT -> {
+                if (Screen.hasAltDown()) {
+                    setColor(activePage.getPixel(Mth.floor(world.x), Mth.floor(world.y)));
+                } else {
+                    pixelLine(oldWorld.floor(), world.floor(), pos -> activePage.putSquare(pos.x, pos.y, color, r));
+                }
+            }
             case RIGHT -> pixelLine(oldWorld.floor(), world.floor(), pos -> activePage.putSquare(pos.x, pos.y, 0, r));
         }
     }
@@ -57,11 +81,13 @@ public class DrawTool extends Tool {
     @Override
     public void controlScroll(PageManager activePage, double mouseX, double mouseY, double scrollY) {
         r = Mth.clamp(r + (int)scrollY, 0, 4);
+        rebuildPixels();
     }
 
     @Override
     public void renderWorld(GuiGraphics graphics, int worldX, int worldY, int xOff, int yOff) {
-        graphics.blit(id, worldX - r + xOff, worldY - r + yOff, 0, 0, r * 2 + 1, r * 2 + 1);
+        int wh = r * 2 + 1;
+        graphics.blit(id, worldX - r + xOff, worldY - r + yOff, 0, 0, wh, wh, wh, wh);
     }
 
     @Override
@@ -78,5 +104,9 @@ public class DrawTool extends Tool {
     @Override
     public void onSelect() {
         setColor(color);
+    }
+
+    public int getVisualColor() {
+        return color;
     }
 }

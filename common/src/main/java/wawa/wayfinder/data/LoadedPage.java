@@ -38,6 +38,11 @@ public class LoadedPage extends AbstractPage {
     }
 
     @Override
+    public int getPixel(int x, int y) {
+        return texture.getPixels().getPixelRGBA(x, y);
+    }
+
+    @Override
     public void render(GuiGraphics guiGraphics, int xOff, int yOff) {
         super.render(guiGraphics, xOff, yOff);
         if (uploadDirty) {

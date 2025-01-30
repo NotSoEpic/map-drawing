@@ -34,6 +34,10 @@ public abstract class AbstractPage {
      */
     public abstract @Nullable AbstractPage putPixel(int x, int y, int RGBA);
 
+    public int getPixel(int x, int y) {
+        return 0;
+    }
+
     public long getLastRendertime() {
         return lastRendertime;
     }
