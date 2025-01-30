@@ -16,6 +16,7 @@ public class PlayerPositions {
     Vector2d current = new Vector2d();
     Vector2d newest = new Vector2d();
     int timer = 0;
+    public boolean visible = true;
 
     public void tick(Player player) {
         if (player == null)
@@ -40,7 +41,9 @@ public class PlayerPositions {
     }
 
     public void render(GuiGraphics guiGraphics, int xOff, int yOff) {
-        positions.forEach(v -> guiGraphics.fill((int)v.x + xOff, (int)v.y + yOff, (int)v.x + 1 + xOff, (int)v.y + 1 + yOff, 0xFFFF00FF));
-        guiGraphics.fill((int)current.x - 1 + xOff, (int)current.y - 1 + yOff, (int)current.x + 2 +xOff, (int)current.y + 2 + yOff, 0xFFFF00FF);
+        if (visible) {
+            positions.forEach(v -> guiGraphics.fill((int) v.x + xOff, (int) v.y + yOff, (int) v.x + 1 + xOff, (int) v.y + 1 + yOff, 0xFFFF00FF));
+            guiGraphics.fill((int) current.x - 1 + xOff, (int) current.y - 1 + yOff, (int) current.x + 2 + xOff, (int) current.y + 2 + yOff, 0xFFFF00FF);
+        }
     }
 }

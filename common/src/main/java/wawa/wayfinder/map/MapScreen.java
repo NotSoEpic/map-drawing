@@ -8,10 +8,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import org.joml.Vector2d;
 import wawa.wayfinder.LerpedVector2d;
+import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.input.KeyMappings;
 import wawa.wayfinder.map.tool.Tool;
 import wawa.wayfinder.map.widgets.DebugTextRenderable;
 import wawa.wayfinder.map.widgets.MapWidget;
+import wawa.wayfinder.map.widgets.SideTabWidget;
 import wawa.wayfinder.map.widgets.ToolPickerWidget;
 
 import java.util.List;
@@ -36,6 +38,12 @@ public class MapScreen extends Screen {
         toolPicker = new ToolPickerWidget(width - 15 - 16/2, 30);
         addRenderableWidget(toolPicker);
         addRenderableOnly(new DebugTextRenderable(this));
+        addRenderableWidget(new SideTabWidget(30 - 16, 30 + 8, "Toggle player",
+                () -> WayfinderClient.id(WayfinderClient.POSITION_HISTORY.visible ? "tabs/player_visible" : "tabs/player_hidden"),
+                () -> WayfinderClient.POSITION_HISTORY.visible = !WayfinderClient.POSITION_HISTORY.visible));
+        addRenderableWidget(new SideTabWidget(30 - 16, 30 + 8 + 28, "Clear history",
+                () -> WayfinderClient.id("tabs/clear_history"), () -> WayfinderClient.POSITION_HISTORY.clear()));
+
     }
 
     @Override
