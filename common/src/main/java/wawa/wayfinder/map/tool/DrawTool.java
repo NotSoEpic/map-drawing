@@ -19,20 +19,19 @@ import java.util.function.Consumer;
 
 public class DrawTool extends Tool {
     public ResourceLocation icon = null;
-    private int color = -1;
+    private final int color;
     private int r = 0;
     private static final ResourceLocation id = WayfinderClient.id("draw");
     private static DynamicTexture preview = new DynamicTexture(1, 1, false);
     static {
         // crashes the game if this class is loaded too early. boowomp
-        preview.getPixels().setPixelRGBA(0, 0, -1);
+        preview.getPixels().setPixelRGBA(0, 0, 0xFF000000);
         preview.upload();
         Minecraft.getInstance().getTextureManager().register(id, preview);
     }
 
-    public void setColor(int color) {
+    public DrawTool(int color) {
         this.color = color;
-        rebuildPixels();
     }
 
     private void rebuildPixels() {
@@ -96,7 +95,7 @@ public class DrawTool extends Tool {
 
     @Override
     public void onSelect() {
-        setColor(color);
+        rebuildPixels();
     }
 
     public int getVisualColor() {

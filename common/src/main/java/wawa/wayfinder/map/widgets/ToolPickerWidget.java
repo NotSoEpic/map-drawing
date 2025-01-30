@@ -4,6 +4,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.phys.Vec2;
+import wawa.wayfinder.Helper;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.map.tool.DrawTool;
 import wawa.wayfinder.map.tool.Tool;
@@ -13,12 +15,11 @@ import java.util.List;
 
 public class ToolPickerWidget extends AbstractWidget {
     private final List<SingleToolWidget> tools = new ArrayList<>();
-    private final DrawTool pencil = new DrawTool();
+    private final DrawTool pencil = new DrawTool(0xFF000000);
     private final SingleToolWidget.Brush brush;
-    private final DrawTool eraser = new DrawTool();
+    private final DrawTool eraser = new DrawTool(0);
     public ToolPickerWidget(int x, int y) {
         super(x, y, 0, 0, Component.literal("tool picker"));
-        pencil.setColor(0xFF000000);
         pencil.icon = WayfinderClient.id("cursor/pencil");
         tools.add(new SingleToolWidget(
                 getX(), getY(),
@@ -29,7 +30,6 @@ public class ToolPickerWidget extends AbstractWidget {
         ));
         brush = new SingleToolWidget.Brush(getX(), getY() + 20);
         tools.add(brush);
-        eraser.setColor(0);
         eraser.icon = WayfinderClient.id("cursor/eraser");
         tools.add(new SingleToolWidget(
                 getX(), getY() + 40,
@@ -39,6 +39,19 @@ public class ToolPickerWidget extends AbstractWidget {
                 Component.literal("eraser")
         ));
         updateBounds();
+    }
+
+    public void pickPencil() {
+        Tool.set(pencil);
+    }
+
+    public void pickBrush() {
+        if (Tool.get() == brush.last) {
+            Vec2 mouse = Helper.preciseMousePos();
+            brush.openToMouse((int)mouse.x, (int)mouse.y);
+        } else {
+            Tool.set(brush.last);
+        }
     }
 
     public void pickColor(int color) {

@@ -43,7 +43,6 @@ public class MapScreen extends Screen {
                 () -> WayfinderClient.POSITION_HISTORY.visible = !WayfinderClient.POSITION_HISTORY.visible));
         addRenderableWidget(new SideTabWidget(30 - 16, 30 + 8 + 28, "Clear history",
                 () -> WayfinderClient.id("tabs/clear_history"), () -> WayfinderClient.POSITION_HISTORY.clear()));
-
     }
 
     @Override
@@ -92,6 +91,12 @@ public class MapScreen extends Screen {
         if (KeyMappings.OPEN_MAP.matches(keyCode, scanCode)) {
             onClose();
             return true;
+        } else if (KeyMappings.SWAP.matches(keyCode, scanCode)) {
+            Tool.swap();
+        } else if (KeyMappings.PENCIL.matches(keyCode, scanCode)) {
+            toolPicker.pickPencil();
+        } else if (KeyMappings.BRUSH.matches(keyCode, scanCode)) {
+            toolPicker.pickBrush();
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
     }

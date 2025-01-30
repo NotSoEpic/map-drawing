@@ -7,7 +7,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.DyeColor;
 import wawa.wayfinder.WayfinderClient;
-import wawa.wayfinder.map.tool.DrawTool;
+import wawa.wayfinder.map.tool.PaletteDrawTool;
 import wawa.wayfinder.map.tool.Tool;
 
 import java.util.ArrayList;
@@ -17,9 +17,13 @@ import java.util.stream.Collectors;
 public class ColorPickerWidget extends AbstractWidget {
     private final List<PaletteSwabWidget> swabs = new ArrayList<>();
     private final SingleToolWidget.Brush brush;
+    private final int defaultX;
+    private final int defaultY;
     public ColorPickerWidget(int x, int y, SingleToolWidget.Brush brush) {
         super(x, y, 0, 0, Component.literal("color picker"));
         this.brush = brush;
+        this.defaultX = x;
+        this.defaultY = y;
         for (int i = 0; i < DyeColor.values().length; i++) {
             DyeColor color = DyeColor.values()[i];
             int sx = (i % 4) * 10;
@@ -31,7 +35,12 @@ public class ColorPickerWidget extends AbstractWidget {
         brush.last = swabs.getFirst().tool;
     }
 
-    public List<DrawTool> getBrushes() {
+    public void resetPos() {
+        setX(defaultX);
+        setY(defaultY);
+    }
+
+    public List<PaletteDrawTool> getBrushes() {
         return swabs.stream().map(swab -> swab.tool).collect(Collectors.toList());
     }
 
@@ -51,6 +60,7 @@ public class ColorPickerWidget extends AbstractWidget {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         for (PaletteSwabWidget swab : swabs) {
             if (swab.mouseClicked(mouseX, mouseY, button)) {
+                active = false;
                 return true;
             }
         }
@@ -73,7 +83,7 @@ public class ColorPickerWidget extends AbstractWidget {
         private final int relX;
         private final int relY;
         public final int color;
-        public final DrawTool tool;
+        public final PaletteDrawTool tool;
 
         public PaletteSwabWidget(ColorPickerWidget parent, int x, int y, int color) {
             super(0, 0, 8, 8, Component.literal("color swab"));
@@ -81,8 +91,7 @@ public class ColorPickerWidget extends AbstractWidget {
             this.relX = x;
             this.relY = y;
             this.color = color;
-            this.tool = new DrawTool();
-            tool.setColor(getABGR());
+            this.tool = new PaletteDrawTool(getABGR(), parent.brush);
             tool.icon = WayfinderClient.id("cursor/brush");
         }
 

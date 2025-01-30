@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import wawa.wayfinder.WayfinderClient;
-import wawa.wayfinder.map.tool.DrawTool;
+import wawa.wayfinder.map.tool.PaletteDrawTool;
 import wawa.wayfinder.map.tool.Tool;
 
 import java.awt.*;
@@ -48,7 +48,7 @@ public class SingleToolWidget extends AbstractWidget {
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 
     public static class Brush extends SingleToolWidget {
-        public DrawTool last;
+        public PaletteDrawTool last;
         private static final TextureAtlasSprite mask = Minecraft.getInstance().getGuiSprites().getSprite(WayfinderClient.id("tool/brush_mask"));
         private final ColorPickerWidget colorPicker;
 
@@ -63,8 +63,14 @@ public class SingleToolWidget extends AbstractWidget {
             colorPicker.active = false;
         }
 
-        public List<DrawTool> getBrushes() {
+        public List<PaletteDrawTool> getBrushes() {
             return colorPicker.getBrushes();
+        }
+
+        public void openToMouse(double mouseX, double mouseY) {
+            colorPicker.active = true;
+            colorPicker.setX((int) (mouseX - width/2));
+            colorPicker.setY((int) (mouseY - height/2));
         }
 
         @Override
@@ -73,7 +79,12 @@ public class SingleToolWidget extends AbstractWidget {
             float[] rgb = new Color(last.getVisualColor()).getRGBColorComponents(null);
             guiGraphics.blit(getX(), getY(), 0, 16, 16, mask, rgb[2], rgb[1], rgb[0], 1);
 
-            colorPicker.active = isMouseOver(mouseX, mouseY) || (colorPicker.isMouseOver(mouseX, mouseY) && colorPicker.isActive());
+            if (isMouseOver(mouseX, mouseY) || (colorPicker.isMouseOver(mouseX, mouseY) && colorPicker.isActive())) {
+                colorPicker.active = true;
+            } else {
+                colorPicker.active = false;
+                colorPicker.resetPos();
+            }
 
             if (colorPicker.isActive()) {
                 colorPicker.renderWidget(guiGraphics, mouseX, mouseY, partialTick);

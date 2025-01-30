@@ -8,11 +8,13 @@ import wawa.wayfinder.map.widgets.MapWidget;
 
 public abstract class Tool {
     private static Tool tool;
+    private static Tool previous;
 
     public static void set(@Nullable Tool tool) {
         if (Tool.tool != null) {
             Tool.tool.onDeselect();
         }
+        Tool.previous = Tool.tool;
         Tool.tool = tool;
         if (tool != null) {
             tool.onSelect();
@@ -22,6 +24,16 @@ public abstract class Tool {
     @Nullable
     public static Tool get() {
         return tool;
+    }
+
+    public static void swap() {
+        if (Tool.previous != null) {
+            Tool temp = Tool.tool;
+            Tool.tool.onDeselect();
+            Tool.tool = Tool.previous;
+            Tool.tool.onSelect();
+            Tool.previous = temp;
+        }
     }
 
     public void onSelect() {}
