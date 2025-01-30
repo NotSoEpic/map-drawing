@@ -11,9 +11,10 @@ import wawa.wayfinder.map.MapScreen;
 
 public class InputListener {
     public static void tick(Minecraft minecraft) {
-        while (minecraft.level != null && KeyMappings.OPEN_MAP.consumeClick()) {
+        while (minecraft.level != null && KeyMappings.NormalMappings.OPEN_MAP.mapping.
+                consumeClick()) {
             minecraft.setScreen(new MapScreen(
-                    new Vector2d((int)minecraft.player.getX(), (int)minecraft.player.getZ()),
+                    new Vector2d((int) minecraft.player.getX(), (int) minecraft.player.getZ()),
                     getEndingPosition(minecraft.player)));
         }
     }
@@ -27,9 +28,9 @@ public class InputListener {
                     player.getEyePosition().add(player.getLookAngle().scale(distance * 16)),
                     ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY, player));
             if (result.getType() != HitResult.Type.MISS) {
-                return new Vector2d((int)result.getLocation().x, (int)result.getLocation().z);
+                return new Vector2d((int) result.getLocation().x, (int) result.getLocation().z);
             }
         }
-        return new Vector2d((int)player.getX(), (int)player.getZ());
+        return new Vector2d((int) player.getX(), (int) player.getZ());
     }
 }
