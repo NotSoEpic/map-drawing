@@ -6,6 +6,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.DyeColor;
+import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.map.tool.DrawTool;
 import wawa.wayfinder.map.tool.Tool;
 
@@ -16,7 +17,6 @@ import java.util.stream.Collectors;
 public class ColorPickerWidget extends AbstractWidget {
     private final List<PaletteSwabWidget> swabs = new ArrayList<>();
     private final SingleToolWidget.Brush brush;
-    private static final DrawTool tool = new DrawTool();
     public ColorPickerWidget(int x, int y, SingleToolWidget.Brush brush) {
         super(x, y, 0, 0, Component.literal("color picker"));
         this.brush = brush;
@@ -31,8 +31,8 @@ public class ColorPickerWidget extends AbstractWidget {
         brush.last = swabs.getFirst().tool;
     }
 
-    public List<Integer> getColors() {
-        return swabs.stream().map(PaletteSwabWidget::getABGR).collect(Collectors.toList());
+    public List<DrawTool> getBrushes() {
+        return swabs.stream().map(swab -> swab.tool).collect(Collectors.toList());
     }
 
     @Override
@@ -83,6 +83,7 @@ public class ColorPickerWidget extends AbstractWidget {
             this.color = color;
             this.tool = new DrawTool();
             tool.setColor(getABGR());
+            tool.icon = WayfinderClient.id("cursor/brush");
         }
 
         @Override

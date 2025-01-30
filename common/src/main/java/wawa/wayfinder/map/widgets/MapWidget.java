@@ -84,9 +84,12 @@ public class MapWidget extends AbstractWidget {
                 case GLFW.GLFW_MOUSE_BUTTON_RIGHT -> Mouse.RIGHT;
                 case GLFW.GLFW_MOUSE_BUTTON_MIDDLE -> Mouse.MIDDLE;
             };
-            if ((mouse == Mouse.LEFT || mouse == Mouse.RIGHT) && Tool.get() != null) {
-                Vector2d world = parent.screenToWorld(new Vector2d(mouseX, mouseY));
+            Vector2d world = parent.screenToWorld(new Vector2d(mouseX, mouseY));
+            if ((mouse == Mouse.LEFT || mouse == Mouse.RIGHT) && Tool.get() != null && !Screen.hasAltDown()) {
                 Tool.get().hold(WayfinderClient.PAGE_MANAGER, mouse, world, world);
+            } else if (Screen.hasAltDown()) {
+                int color = WayfinderClient.PAGE_MANAGER.getPixel(Mth.floor(world.x), Mth.floor(world.y));
+                parent.toolPicker.pickColor(color);
             }
             return true;
         }
@@ -103,7 +106,7 @@ public class MapWidget extends AbstractWidget {
             mouse = Mouse.NONE;
             return;
         }
-        if (Tool.get() != null) {
+        if (Tool.get() != null && !Screen.hasAltDown()) {
             Tool.get().hold(WayfinderClient.PAGE_MANAGER, mouse, oldWorld, world);
         }
         oldMouseX = mouseX;

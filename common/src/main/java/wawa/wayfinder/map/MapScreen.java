@@ -21,6 +21,7 @@ public class MapScreen extends Screen {
     private float zoom = 1f; // gui pixels per block (>1 zoom in, <1 zoom out)
     public LerpedVector2d lerpedPanning; // world space coordinate to center on
     private MapWidget mapWidget;
+    public ToolPickerWidget toolPicker;
 
     public MapScreen(Vector2d openingPos, Vector2d endingPos) {
         super(Component.literal("Wayfinder Map"));
@@ -32,8 +33,8 @@ public class MapScreen extends Screen {
         super.init();
         mapWidget = new MapWidget(this);
         addRenderableWidget(mapWidget);
-//        addRenderableWidget(new ColorPickerWidget(width - 30 - 45, 35));
-        addRenderableWidget(new ToolPickerWidget(width - 15 - 16/2, 30));
+        toolPicker = new ToolPickerWidget(width - 15 - 16/2, 30);
+        addRenderableWidget(toolPicker);
         addRenderableOnly(new DebugTextRenderable(this));
     }
 

@@ -6,6 +6,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.map.tool.DrawTool;
+import wawa.wayfinder.map.tool.Tool;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 public class ToolPickerWidget extends AbstractWidget {
     private final List<SingleToolWidget> tools = new ArrayList<>();
     private final DrawTool pencil = new DrawTool();
+    private final SingleToolWidget.Brush brush;
     private final DrawTool eraser = new DrawTool();
     public ToolPickerWidget(int x, int y) {
         super(x, y, 0, 0, Component.literal("tool picker"));
@@ -25,7 +27,8 @@ public class ToolPickerWidget extends AbstractWidget {
                 (w) -> pencil,
                 Component.literal("pencil")
         ));
-        tools.add(new SingleToolWidget.Brush(getX(), getY() + 20));
+        brush = new SingleToolWidget.Brush(getX(), getY() + 20);
+        tools.add(brush);
         eraser.setColor(0);
         eraser.icon = WayfinderClient.id("cursor/eraser");
         tools.add(new SingleToolWidget(
@@ -36,6 +39,19 @@ public class ToolPickerWidget extends AbstractWidget {
                 Component.literal("eraser")
         ));
         updateBounds();
+    }
+
+    public void pickColor(int color) {
+        if (color == 0xFF000000) {
+            Tool.set(pencil);
+        } else {
+            for (DrawTool tool : brush.getBrushes()) {
+                if (tool.getInternalColor() == color) {
+                    Tool.set(tool);
+                    return;
+                }
+            }
+        }
     }
 
     private void updateBounds() {

@@ -12,6 +12,7 @@ import wawa.wayfinder.map.tool.DrawTool;
 import wawa.wayfinder.map.tool.Tool;
 
 import java.awt.*;
+import java.util.List;
 import java.util.function.Function;
 
 public class SingleToolWidget extends AbstractWidget {
@@ -60,6 +61,10 @@ public class SingleToolWidget extends AbstractWidget {
             );
             colorPicker = new ColorPickerWidget(getX() - 40, getY() - 20, this);
             colorPicker.active = false;
+        }
+
+        public List<DrawTool> getBrushes() {
+            return colorPicker.getBrushes();
         }
 
         @Override

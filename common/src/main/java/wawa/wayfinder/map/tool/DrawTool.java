@@ -3,7 +3,6 @@ package wawa.wayfinder.map.tool;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -56,13 +55,7 @@ public class DrawTool extends Tool {
     @Override
     public void hold(PageManager activePage, MapWidget.Mouse mouse, Vector2d oldWorld, Vector2d world) {
         switch (mouse) {
-            case LEFT -> {
-                if (Screen.hasAltDown()) {
-                    setColor(activePage.getPixel(Mth.floor(world.x), Mth.floor(world.y)));
-                } else {
-                    pixelLine(oldWorld.floor(), world.floor(), pos -> activePage.putSquare(pos.x, pos.y, color, r));
-                }
-            }
+            case LEFT -> pixelLine(oldWorld.floor(), world.floor(), pos -> activePage.putSquare(pos.x, pos.y, color, r));
             case RIGHT -> pixelLine(oldWorld.floor(), world.floor(), pos -> activePage.putSquare(pos.x, pos.y, 0, r));
         }
     }
@@ -107,6 +100,10 @@ public class DrawTool extends Tool {
     }
 
     public int getVisualColor() {
+        return color;
+    }
+
+    public int getInternalColor() {
         return color;
     }
 }
