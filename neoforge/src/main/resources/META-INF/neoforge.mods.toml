@@ -1,15 +1,15 @@
 modLoader = "javafml"
 loaderVersion = "[4,)"
 #issueTrackerURL = ""
-license = "Insert License Here"
+license = "MIT"
 
 [[mods]]
 modId = "wayfinder"
 version = "${version}"
 displayName = "Wayfinder"
-authors = "Me!"
+authors = "beeisyou"
 description = '''
-This is an example description! Tell everyone what your mod is about!
+Oh you want a map so badly? Draw it yourself then
 '''
 #logoFile = ""
 
@@ -25,7 +25,7 @@ modId = "minecraft"
 type = "required"
 versionRange = "[1.21.1,)"
 ordering = "NONE"
-side = "BOTH"
+side = "CLIENT"
 
 [[mixins]]
 config = "wayfinder.mixins.json"

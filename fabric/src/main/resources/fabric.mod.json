@@ -3,9 +3,9 @@
   "id": "wayfinder",
   "version": "${version}",
   "name": "Wayfinder",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "description": "Oh you want a map so badly? Draw it yourself then",
   "authors": [
-    "Me!"
+    "beeisyou"
   ],
   "contact": {
     "homepage": "https://fabricmc.net/",
@@ -30,8 +30,5 @@
     "minecraft": "~1.21.1",
     "java": ">=21",
     "fabric-api": "*"
-  },
-  "suggests": {
-    "another-mod": "*"
   }
 }
