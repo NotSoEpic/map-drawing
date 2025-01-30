@@ -74,6 +74,12 @@ public class MapScreen extends Screen {
     }
 
     @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        mapWidget.mouse = MapWidget.Mouse.NONE;
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (KeyMappings.OPEN_MAP.matches(keyCode, scanCode)) {
             onClose();
