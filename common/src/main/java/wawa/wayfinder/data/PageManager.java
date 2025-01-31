@@ -21,11 +21,9 @@ public class PageManager {
     public PageIO pageIO;
     private final Map<Vector2i, AbstractPage> pages = new HashMap<>();
 
-    //TODO: some type of memory leak help bee
     Stack<OperationHistory> pastHistories = new Stack<>();
 //    Stack<OperationHistory> futureHistories = new Stack<>();
 
-    //TODO: some type of memory leak help bee
     OperationHistory currentHistory = null;
 
     private int emptyCount = 0;
@@ -165,7 +163,6 @@ public class PageManager {
         }
     }
 
-    //TODO: some type of memory leak help bee
     public void undoChanges() {
         if (!this.pastHistories.empty()) {
             final OperationHistory history = this.pastHistories.pop();
