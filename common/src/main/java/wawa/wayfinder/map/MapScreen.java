@@ -9,7 +9,7 @@ import net.minecraft.util.Mth;
 import org.joml.Vector2d;
 import wawa.wayfinder.LerpedVector2d;
 import wawa.wayfinder.WayfinderClient;
-import wawa.wayfinder.input.KeyMappings;
+import wawa.wayfinder.input.KeyMappings.NormalMappings;
 import wawa.wayfinder.map.tool.Tool;
 import wawa.wayfinder.map.widgets.DebugTextRenderable;
 import wawa.wayfinder.map.widgets.MapWidget;
@@ -17,6 +17,8 @@ import wawa.wayfinder.map.widgets.SideTabWidget;
 import wawa.wayfinder.map.widgets.ToolPickerWidget;
 
 import java.util.List;
+
+import static wawa.wayfinder.input.KeyMappings.ToolPickerMappings;
 
 public class MapScreen extends Screen {
     private int zoomNum = 0;
@@ -88,16 +90,26 @@ public class MapScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (KeyMappings.OPEN_MAP.matches(keyCode, scanCode)) {
+        if (NormalMappings.OPEN_MAP.mapping.matches(keyCode, scanCode)) {
             onClose();
             return true;
-        } else if (KeyMappings.SWAP.matches(keyCode, scanCode)) {
-            Tool.swap();
-        } else if (KeyMappings.PENCIL.matches(keyCode, scanCode)) {
-            toolPicker.pickPencil();
-        } else if (KeyMappings.BRUSH.matches(keyCode, scanCode)) {
-            toolPicker.pickBrush();
         }
+
+        if (NormalMappings.SWAP.mapping.matches(keyCode, scanCode)) {
+            Tool.swap();
+        }
+
+        if (NormalMappings.UNDO.mapping.matches(keyCode, scanCode)) {
+            WayfinderClient.PAGE_MANAGER.undoChanges();
+        }
+
+        for (ToolPickerMappings mapping : ToolPickerMappings.values()) {
+            if (mapping.mapping.matches(keyCode, scanCode)) {
+                mapping.swapToTool(toolPicker);
+                return true;
+            }
+        }
+
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 

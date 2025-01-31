@@ -19,7 +19,7 @@ public class DebugTextRenderable implements Renderable {
         guiGraphics.drawString(Minecraft.getInstance().font,
                 (int)world.x + " " + (int)world.y, 0, 0, -1, false);
         guiGraphics.drawString(Minecraft.getInstance().font,
-                WayfinderClient.PAGE_MANAGER.pageIO.getMapPath().toString(), 0, 10, -1, false);
+                WayfinderClient.PAGE_MANAGER.pageIO.getPagePath().toString(), 0, 10, -1, false);
         guiGraphics.drawString(Minecraft.getInstance().font,
                 WayfinderClient.PAGE_MANAGER.getDebugCount(), 0, 20, -1, false);
     }

@@ -3,26 +3,56 @@ package wawa.wayfinder.input;
 import net.minecraft.client.KeyMapping;
 import org.lwjgl.glfw.GLFW;
 import wawa.wayfinder.WayfinderClient;
+import wawa.wayfinder.map.widgets.ToolPickerWidget;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class KeyMappings {
-    public static final List<KeyMapping> toRegister = new ArrayList<>();
-    public static final KeyMapping OPEN_MAP = create("map", GLFW.GLFW_KEY_M),
-            SWAP = createNonBlocking("swap", GLFW.GLFW_KEY_X),
-            PENCIL = createNonBlocking("pencil", GLFW.GLFW_KEY_N),
-            BRUSH = createNonBlocking("brush", GLFW.GLFW_KEY_B),
-            ERASER = createNonBlocking("eraser", GLFW.GLFW_KEY_E);
 
-    private static KeyMapping create(String name, int keyCode) {
-        KeyMapping mapping = new KeyMapping("key." + WayfinderClient.MOD_ID + "." + name, keyCode, "key.categories.wayfinder");
-        toRegister.add(mapping);
-        return mapping;
+    public static final List<KeyMapping> toRegister = new ArrayList<>();
+
+    /**
+     * Normal KeyMappings used for opening maps etc
+     */
+    public enum NormalMappings {
+        OPEN_MAP("map", GLFW.GLFW_KEY_M, true),
+        UNDO("undo", GLFW.GLFW_KEY_Z, false),
+        SWAP("swap", GLFW.GLFW_KEY_X, false);
+
+        final public KeyMapping mapping;
+
+        NormalMappings(String name, int keyCode, boolean blocking) {
+            if (blocking) {
+                mapping = new KeyMapping("key." + WayfinderClient.MOD_ID + "." + name, keyCode, "key.categories.wayfinder");
+            } else {
+                mapping = new NonBlockingKeyMapping("key." + WayfinderClient.MOD_ID + "." + name, keyCode, "key.categories.wayfinder");
+            }
+
+            toRegister.add(mapping);
+        }
     }
-    private static KeyMapping createNonBlocking(String name, int keyCode) {
-        KeyMapping mapping = new NonBlockingKeyMapping("key." + WayfinderClient.MOD_ID + "." + name, keyCode, "key.categories.wayfinder");
-        toRegister.add(mapping);
-        return mapping;
+
+    /**
+     * Specific ToolPickerKeyMappings with associated consumers for switching to the specified tool
+     */
+    public enum ToolPickerMappings {
+        PENCIL("pencil", GLFW.GLFW_KEY_N, ToolPickerWidget::pickPencil),
+        BRUSH("brush", GLFW.GLFW_KEY_B, ToolPickerWidget::pickBrush);
+
+        final public KeyMapping mapping;
+        final Consumer<ToolPickerWidget> swapper;
+
+        ToolPickerMappings(String name, int keyCode, Consumer<ToolPickerWidget> swapper) {
+            mapping = new NonBlockingKeyMapping("key." + WayfinderClient.MOD_ID + "." + name, keyCode, "key.categories.wayfinder");
+            toRegister.add(mapping);
+            this.swapper = swapper;
+        }
+
+        public void swapToTool(ToolPickerWidget widget) {
+            swapper.accept(widget);
+        }
     }
 }
+
