@@ -175,8 +175,6 @@ public class PageManager {
                     continue;
                 }
 
-                page.closeAndNullify();
-
                 final NativeImage image = entry.getValue();
                 page.setImageExternally(image);
             }
