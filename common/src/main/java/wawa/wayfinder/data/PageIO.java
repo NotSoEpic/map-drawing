@@ -13,11 +13,12 @@ import java.nio.file.Path;
 import java.util.UUID;
 
 public class PageIO {
-    private final Path mapPath;
+    private final Path pagePath;
+
     public PageIO(Level level, Minecraft client) {
-        mapPath = buildMapPath(level, client);
+        pagePath = buildMapPath(level, client);
         try {
-            Files.createDirectories(mapPath);
+            Files.createDirectories(pagePath);
         } catch (IOException e) {
             WayfinderClient.LOGGER.error("Could not create map directory\n{}", e);
         }
@@ -29,7 +30,7 @@ public class PageIO {
     private Path buildMapPath(Level level, Minecraft client) {
         Path path = client.gameDirectory.toPath()
                 .resolve("wayfinder_maps");
-        long seed = ((BiomeManagerAccessor)level.getBiomeManager()).getBiomeZoomSeed();
+        long seed = ((BiomeManagerAccessor) level.getBiomeManager()).getBiomeZoomSeed();
         UUID uuid = Mth.createInsecureUUID(RandomSource.create(seed));
         if (client.isLocalServer()) {
             path = path.resolve("singleplayer")
@@ -41,11 +42,11 @@ public class PageIO {
         return path.resolve(level.dimension().location().toDebugFileName());
     }
 
-    public Path getMapPath() {
-        return mapPath;
+    public Path getPagePath() {
+        return pagePath;
     }
 
     public Path pageFilepath(int rx, int ry) {
-        return mapPath.resolve(String.format("%d_%d.png", rx, ry));
+        return pagePath.resolve(String.format("%d_%d.png", rx, ry));
     }
 }
