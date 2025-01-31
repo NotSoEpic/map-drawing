@@ -11,7 +11,6 @@ import org.joml.Vector2d;
 import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
 import wawa.wayfinder.WayfinderClient;
-import wawa.wayfinder.data.pages.LoadedPage;
 import wawa.wayfinder.map.MapScreen;
 import wawa.wayfinder.map.tool.Tool;
 
@@ -27,7 +26,6 @@ public class MapWidget extends AbstractWidget {
     public Mouse mouse = Mouse.NONE;
     public double oldMouseX;
     public double oldMouseY;
-
     public enum Mouse {
         NONE, LEFT, RIGHT, MIDDLE
     }
@@ -50,11 +48,7 @@ public class MapWidget extends AbstractWidget {
 
         for (int x = topLeft.x; x < bottomRight.x; x++) {
             for (int y = topLeft.y; y < bottomRight.y; y++) {
-                LoadedPage page = WayfinderClient.PAGE_MANAGER.getOrCreateRegion(x, y);
-
-                if (page != null) {
-                    page.render(guiGraphics, xOff, yOff);
-                }
+                WayfinderClient.PAGE_MANAGER.getOrCreatePage(x, y).render(guiGraphics, xOff, yOff);
             }
         }
         Vector2d world = parent.screenToWorld(new Vector2d(mouseX, mouseY));
@@ -74,7 +68,7 @@ public class MapWidget extends AbstractWidget {
         if (Tool.get() != null && Screen.hasControlDown()) {
             Tool.get().controlScroll(WayfinderClient.PAGE_MANAGER, mouseX, mouseY, scrollY);
         } else {
-            parent.deltaZoom((int) scrollY);
+            parent.deltaZoom((int)scrollY);
         }
         return true;
     }
@@ -82,17 +76,14 @@ public class MapWidget extends AbstractWidget {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (isMouseOver(mouseX, mouseY)) {
-
             oldMouseX = mouseX;
             oldMouseY = mouseY;
-
             mouse = switch (button) {
                 default -> Mouse.NONE;
                 case GLFW.GLFW_MOUSE_BUTTON_LEFT -> Mouse.LEFT;
                 case GLFW.GLFW_MOUSE_BUTTON_RIGHT -> Mouse.RIGHT;
                 case GLFW.GLFW_MOUSE_BUTTON_MIDDLE -> Mouse.MIDDLE;
             };
-
             Vector2d world = parent.screenToWorld(new Vector2d(mouseX, mouseY));
             if ((mouse == Mouse.LEFT || mouse == Mouse.RIGHT) && Tool.get() != null && !Screen.hasAltDown()) {
                 Tool.get().hold(WayfinderClient.PAGE_MANAGER, mouse, world, world);
@@ -100,7 +91,6 @@ public class MapWidget extends AbstractWidget {
                 int color = WayfinderClient.PAGE_MANAGER.getPixel(Mth.floor(world.x), Mth.floor(world.y));
                 parent.toolPicker.pickColor(color);
             }
-
             return true;
         }
         return false;
@@ -110,34 +100,25 @@ public class MapWidget extends AbstractWidget {
     public void mouseMoved(double mouseX, double mouseY) {
         Vector2d world = parent.screenToWorld(new Vector2d(mouseX, mouseY));
         Vector2d oldWorld = parent.screenToWorld(new Vector2d(oldMouseX, oldMouseY));
-
         if (mouse == Mouse.MIDDLE) {
             parent.lerpedPanning.set(parent.lerpedPanning.get().add(oldWorld).sub(world));
         } else if (!isMouseOver(mouseX, mouseY)) {
             mouse = Mouse.NONE;
             return;
         }
-
         if (Tool.get() != null && !Screen.hasAltDown()) {
             Tool.get().hold(WayfinderClient.PAGE_MANAGER, mouse, oldWorld, world);
         }
-
         oldMouseX = mouseX;
         oldMouseY = mouseY;
     }
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        Tool tool = Tool.get();
-        if (tool != null) {
-            tool.release(WayfinderClient.PAGE_MANAGER);
-        }
-
         mouse = Mouse.NONE;
         return true;
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-    }
+    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 }
