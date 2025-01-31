@@ -12,7 +12,9 @@ import wawa.wayfinder.data.pages.AbstractPage;
 import wawa.wayfinder.data.pages.LoadedPage;
 import wawa.wayfinder.data.pages.UnloadedPage;
 
+import java.lang.reflect.Executable;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Handles loading, getting, modifying, and saving {@link AbstractPage} instances
@@ -42,20 +44,31 @@ public class PageManager {
 
     @Nullable
     public LoadedPage getOrCreateRegion(final int rx, final int ry) {
+        return getOrCreateRegion(rx, ry, ($) -> {});
+    }
+
+    @Nullable
+    public LoadedPage getOrCreateRegion(final int rx, final int ry, Consumer<LoadedPage> runWhenDone) {
         final AbstractPage page = this.pages.get(new Vector2i(rx, ry));
 
         final LoadedPage loaded;
+        boolean newPage = false;
         if (page == null) {
-            loaded = new UnloadedPage(rx, ry, this).attemptToLoad();
+            newPage = true;
+            loaded = new UnloadedPage(rx, ry, this, runWhenDone).attemptToLoad();
         } else if (page instanceof final UnloadedPage up) {
             loaded = up.attemptToLoad();
         } else {
-            return (LoadedPage) page;
+            loaded = (LoadedPage) page;
         }
 
         if (loaded.isFailedToLoad()) {
             WayfinderClient.LOGGER.error("Unable to load WayFinder Page for {} {}", rx, ry);
             return null;
+        }
+
+        if (!newPage) {
+            runWhenDone.accept(loaded);
         }
 
         this.pages.put(new Vector2i(loaded.rx, loaded.ry), loaded);
@@ -170,13 +183,11 @@ public class PageManager {
 
             for (final Map.Entry<Vector2i, NativeImage> entry : history.pagesModified().entrySet()) {
                 final Vector2i pos = entry.getKey();
-                final LoadedPage page = this.getOrCreateRegion(pos.x, pos.y);
-                if (page == null) {
-                    continue;
-                }
-
-                final NativeImage image = entry.getValue();
-                page.setImageExternally(image);
+                this.getOrCreateRegion(pos.x, pos.y, (localPage) -> {
+                    localPage.closeAndNullify();
+                    final NativeImage image = entry.getValue();
+                    localPage.setImageExternally(image);
+                });
             }
 
             history.pagesModified().clear();

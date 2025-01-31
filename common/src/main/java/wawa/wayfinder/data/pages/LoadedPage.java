@@ -113,7 +113,7 @@ public class LoadedPage extends AbstractPage {
         this.savePage(close);
 
         this.unloaded = true;
-        return new UnloadedPage(this.rx, this.ry, this.manager);
+        return new UnloadedPage(this.rx, this.ry, this.manager, ($) -> {});
     }
 
     public void savePage() {

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 
 /**
  * An Unloaded region of a WayFinder map
@@ -23,8 +24,12 @@ public class UnloadedPage extends AbstractPage {
     @NotNull
     Path associatedImage;
 
-    public UnloadedPage(final int rx, final int ry, final PageManager manager) {
+    Consumer<LoadedPage> toRun;
+
+    public UnloadedPage(final int rx, final int ry, final PageManager manager, final Consumer<LoadedPage> toRunWhenLoaded) {
         super(rx, ry, manager);
+
+        this.toRun = toRunWhenLoaded;
 
         this.associatedImage = manager.pageIO.pageFilepath(rx, ry);
     }
@@ -56,6 +61,8 @@ public class UnloadedPage extends AbstractPage {
             if (gatheredImage != null) {
                 page.setImageExternally(gatheredImage);
             }
+
+            this.toRun.accept(page);
         });
 
         return page;
