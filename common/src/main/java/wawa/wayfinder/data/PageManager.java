@@ -174,5 +174,15 @@ public class PageManager {
         pages.clear();
         emptyCount = 0;
         loadedCount = 0;
+
+        for (OperationHistory history : pastHistories) {
+            for (NativeImage value : history.pagesModified().values()) {
+                value.close();
+            }
+
+            history.pagesModified().clear();
+        }
+
+        pastHistories.clear();
     }
 }
