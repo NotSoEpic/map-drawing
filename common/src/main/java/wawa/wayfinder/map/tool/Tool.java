@@ -42,6 +42,8 @@ public abstract class Tool {
 
     public void hold(PageManager activePage, MapWidget.Mouse mouse, Vector2d oldWorld, Vector2d world) {}
 
+    public void release(PageManager activePage) {};
+
     public void controlScroll(PageManager activePage, double mouseX, double mouseY, double scrollY) {}
 
     /**

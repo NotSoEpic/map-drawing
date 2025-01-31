@@ -49,7 +49,7 @@ public class UnloadedPage extends AbstractPage {
                     gatheredImage = NativeImage.read(inputStream);
                 } catch (final IOException e) {
                     WayfinderClient.LOGGER.error("Failed to load image {}\n{}", this.associatedImage, e);
-                    page.failedToLoad = true;
+                    page.setFailedToLoad(true);
                 }
             }
 

@@ -99,6 +99,10 @@ public class MapScreen extends Screen {
             Tool.swap();
         }
 
+        if (NormalMappings.UNDO.mapping.matches(keyCode, scanCode)) {
+            WayfinderClient.PAGE_MANAGER.undoChanges();
+        }
+
         for (ToolPickerMappings mapping : ToolPickerMappings.values()) {
             if (mapping.mapping.matches(keyCode, scanCode)) {
                 mapping.swapToTool(toolPicker);

@@ -1,11 +1,13 @@
 package wawa.wayfinder.data;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import wawa.wayfinder.WayfinderClient;
+import wawa.wayfinder.data.history.OperationHistory;
 import wawa.wayfinder.data.pages.AbstractPage;
 import wawa.wayfinder.data.pages.LoadedPage;
 import wawa.wayfinder.data.pages.UnloadedPage;
@@ -19,16 +21,32 @@ public class PageManager {
     public PageIO pageIO;
     private final Map<Vector2i, AbstractPage> pages = new HashMap<>();
 
+    //TODO: some type of memory leak help bee
+    Stack<OperationHistory> pastHistories = new Stack<>();
+//    Stack<OperationHistory> futureHistories = new Stack<>();
+
+    //TODO: some type of memory leak help bee
+    OperationHistory currentHistory = null;
+
     private int emptyCount = 0;
     private int loadedCount = 0;
 
     private int cleanupTimer = 0;
 
+    private SnapShotState state = SnapShotState.STATIC;
+
+    /**
+     * SNAPSHOTTING = saves all operations into an OperationHistory, and pushes that onto an operation stack
+     */
+    public enum SnapShotState {
+        SNAPSHOTTING, STATIC
+    }
+
     @Nullable
     public LoadedPage getOrCreateRegion(final int rx, final int ry) {
         final AbstractPage page = this.pages.get(new Vector2i(rx, ry));
 
-        LoadedPage loaded = null;
+        final LoadedPage loaded;
         if (page == null) {
             loaded = new UnloadedPage(rx, ry, this).attemptToLoad();
         } else if (page instanceof final UnloadedPage up) {
@@ -37,7 +55,7 @@ public class PageManager {
             return (LoadedPage) page;
         }
 
-        if (loaded.failedToLoad) {
+        if (loaded.isFailedToLoad()) {
             WayfinderClient.LOGGER.error("Unable to load WayFinder Page for {} {}", rx, ry);
             return null;
         }
@@ -46,16 +64,25 @@ public class PageManager {
         return loaded;
     }
 
-    private void deltaCount(final AbstractPage page, final int delta) {
-/*        if (page instanceof EmptyPage) {
-            emptyCount += delta;
-        } else if (page instanceof LoadedPage) {
-            loadedCount += delta;
-        }*/
-    }
-
     public String getDebugCount() {
         return (this.emptyCount + this.loadedCount) + " (" + this.emptyCount + " / " + this.loadedCount + ")";
+    }
+
+    public void startSnapshot() {
+        this.state = SnapShotState.SNAPSHOTTING;
+
+        if (this.currentHistory == null) {
+            this.currentHistory = new OperationHistory(new HashMap<>());
+        }
+    }
+
+    public void endSnapshot() {
+        this.state = SnapShotState.STATIC;
+
+        if (this.currentHistory != null) {
+            this.pastHistories.push(this.currentHistory);
+            this.currentHistory = null;
+        }
     }
 
     /**
@@ -67,6 +94,19 @@ public class PageManager {
 
         final LoadedPage newPage = this.getOrCreateRegion(rx, ry);
         if (newPage != null) {
+            newPage.createImageIfEmpty();
+
+            if (this.state == SnapShotState.SNAPSHOTTING) {
+                final Vector2i pos = new Vector2i(rx, ry);
+                final NativeImage image = this.currentHistory.pagesModified().get(pos);
+                if (image == null) {
+                    final NativeImage copyImage = new NativeImage(512, 512, false);
+                    copyImage.copyFrom(newPage.getAssociatedImage().getPixels());
+
+                    this.currentHistory.pagesModified().put(pos, copyImage);
+                }
+            }
+
             newPage.setPixel(x - rx * 512, y - ry * 512, RGBA);
             this.replacePage(rx, ry, newPage);
         }
@@ -93,9 +133,7 @@ public class PageManager {
     }
 
     public void replacePage(final int rx, final int ry, final AbstractPage replacement) {
-        this.deltaCount(this.pages.get(new Vector2i(rx, ry)), -1);
         this.pages.put(new Vector2i(rx, ry), replacement);
-        this.deltaCount(replacement, 1);
     }
 
     public void reloadPageIO(final Level level, final Minecraft client) {
@@ -114,7 +152,7 @@ public class PageManager {
             final Iterator<AbstractPage> iter = this.pages.values().iterator();
             while (iter.hasNext()) {
                 final AbstractPage page = iter.next();
-                if (page instanceof final LoadedPage lp && rendertime - lp.lastRenderedTime > 10 * 20) {
+                if (page instanceof final LoadedPage lp && rendertime - lp.getLastRenderedTime() > 10 * 20) {
                     final UnloadedPage newPage = lp.unloadPage(false);
                     newPageMap.put(new Vector2i(newPage.rx, newPage.ry), newPage);
 
@@ -122,7 +160,31 @@ public class PageManager {
                 }
             }
 
+//            this.futureHistories.clear();
             this.pages.putAll(newPageMap);
+        }
+    }
+
+    //TODO: some type of memory leak help bee
+    public void undoChanges() {
+        if (!this.pastHistories.empty()) {
+            final OperationHistory history = this.pastHistories.pop();
+//            this.futureHistories.push(history);
+
+            for (final Map.Entry<Vector2i, NativeImage> entry : history.pagesModified().entrySet()) {
+                final Vector2i pos = entry.getKey();
+                final LoadedPage page = this.getOrCreateRegion(pos.x, pos.y);
+                if (page == null) {
+                    continue;
+                }
+
+                page.closeAndNullify();
+
+                final NativeImage image = entry.getValue();
+                page.setImageExternally(image);
+            }
+
+            history.pagesModified().clear();
         }
     }
 
@@ -139,5 +201,7 @@ public class PageManager {
         this.pages.clear();
         this.emptyCount = 0;
         this.loadedCount = 0;
+
+        this.pastHistories.clear();
     }
 }
