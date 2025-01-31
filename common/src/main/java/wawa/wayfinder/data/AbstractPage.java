@@ -1,7 +1,9 @@
 package wawa.wayfinder.data;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A 512x512 pixel/block region of map data
@@ -35,6 +37,11 @@ public abstract class AbstractPage {
      * @param y relative y coordinate (0-511)
      */
     public abstract void setPixel(int x, int y, int RGBA);
+
+    @Nullable
+    public abstract NativeImage getImage();
+
+    public abstract void unboChanges(NativeImage replacement);
 
     /**
      * @param x relative x coordinate (0-511)

@@ -18,6 +18,7 @@ public class KeyMappings {
      */
     public enum NormalMappings {
         OPEN_MAP("map", GLFW.GLFW_KEY_M, true),
+        UNDO("undo", GLFW.GLFW_KEY_Z, false),
         SWAP("swap", GLFW.GLFW_KEY_X, false);
 
         final public KeyMapping mapping;

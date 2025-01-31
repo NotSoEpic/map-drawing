@@ -16,6 +16,10 @@ public class EmptyPage extends AbstractPage {
     private final PageManager parent;
     private boolean loading = true;
     private NativeImage loadedImage = null;
+
+    boolean attemptedUndo = false;
+    NativeImage undoImage = null;
+
     public EmptyPage(int rx, int ry, PageManager parent, PageIO pageIO) {
         super(rx, ry);
         this.parent = parent;
@@ -35,12 +39,36 @@ public class EmptyPage extends AbstractPage {
     @Override
     public void setPixel(int x, int y, int RGBA) {
         // if the file loading is not complete, then either the loaded image or any edits made before will be lost if it does load
-        if (!loading) {
+        if (!isLoading()) {
             if (loadedImage == null) {
                 loadedImage = new NativeImage(512, 512, true);
             }
             loadedImage.setPixelRGBA(x, y, RGBA);
         }
+    }
+
+    @Override
+    public NativeImage getImage() {
+        return loadedImage;
+    }
+
+    @Override
+    public void unboChanges(NativeImage replacement) {
+        if (!isLoading()) {
+            DynamicTexture texture = new DynamicTexture(512, 512, false);
+            texture.getPixels().copyFrom(replacement);
+            parent.replacePage(rx, ry, new Page(rx, ry, texture)); //I think this is right?
+
+            attemptedUndo = false;
+            replacement.close();
+            undoImage = null;
+        } else {
+            attemptedUndo = true;
+            undoImage = replacement;
+        }
+
+        //replace this empty page with a new one if an undo is requested and we are currently empty
+        //if we are currently trying to load, differ the undo until we are loaded
     }
 
     @Override
@@ -62,5 +90,9 @@ public class EmptyPage extends AbstractPage {
     protected void close() {
         if (loadedImage != null)
             loadedImage.close();
+    }
+
+    public boolean isLoading() {
+        return loading;
     }
 }

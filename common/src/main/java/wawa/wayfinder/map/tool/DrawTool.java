@@ -53,10 +53,23 @@ public class DrawTool extends Tool {
 
     @Override
     public void hold(PageManager activePage, MapWidget.Mouse mouse, Vector2d oldWorld, Vector2d world) {
+
         switch (mouse) {
-            case LEFT -> pixelLine(oldWorld.floor(), world.floor(), pos -> activePage.putSquare(pos.x, pos.y, color, r));
-            case RIGHT -> pixelLine(oldWorld.floor(), world.floor(), pos -> activePage.putSquare(pos.x, pos.y, 0, r));
+            case LEFT -> pixelLine(oldWorld.floor(), world.floor(), pos ->  {
+                activePage.startSnapshot();
+                activePage.putSquare(pos.x, pos.y, color, r);
+            });
+            case RIGHT -> pixelLine(oldWorld.floor(), world.floor(), pos -> {
+                activePage.startSnapshot();
+                activePage.putSquare(pos.x, pos.y, 0, r);
+            });
         }
+    }
+
+    @Override
+    public void release(final PageManager activePage) {
+        activePage.endSnapshot();
+        super.release(activePage);
     }
 
     private void pixelLine(Vector2d point1, Vector2d point2, Consumer<Vector2i> perPixel) {

@@ -115,6 +115,11 @@ public class MapWidget extends AbstractWidget {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        Tool tool = Tool.get();
+        if (tool != null) {
+            tool.release(WayfinderClient.PAGE_MANAGER);
+        }
+
         mouse = Mouse.NONE;
         return true;
     }

@@ -1,5 +1,6 @@
 package wawa.wayfinder.data;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -16,6 +17,7 @@ public class Page extends AbstractPage {
     private final DynamicTexture texture;
     private boolean uploadDirty = true; // whether the texture needs to reuploaded
     private boolean diskDirty = false; // whether the texture needs to be saved
+
     public Page(int rx, int ry, DynamicTexture texture) {
         super(rx, ry);
         this.texture = texture;
@@ -36,6 +38,20 @@ public class Page extends AbstractPage {
     }
 
     @Override
+    public NativeImage getImage() {
+        return texture.getPixels();
+    }
+
+    @Override
+    public void unboChanges(NativeImage replacement) {
+        texture.getPixels().copyFrom(replacement);
+        replacement.close();
+
+        diskDirty = true;
+        uploadDirty = true;
+    }
+
+    @Override
     public int getPixel(int x, int y) {
         return texture.getPixels().getPixelRGBA(x, y);
     }
@@ -46,6 +62,7 @@ public class Page extends AbstractPage {
         if (uploadDirty) {
             texture.upload();
         }
+
         guiGraphics.blit(textureID, left() + xOff, top() + yOff, 0, 0, 512, 512, 512, 512);
     }
 
@@ -53,8 +70,9 @@ public class Page extends AbstractPage {
      * Attempts saving its image asynchronously
      * <br>
      * <strong>Be careful about accidentally closing the texture before this is done via {@link DynamicTexture#close()}, {@link net.minecraft.client.renderer.texture.TextureManager#register(ResourceLocation, AbstractTexture)}, or otherwise</strong>
+     *
      * @param pageIO instance for output path
-     * @param close whether to close the image once done
+     * @param close  whether to close the image once done
      */
     @Override
     public void save(PageIO pageIO, boolean close) {
