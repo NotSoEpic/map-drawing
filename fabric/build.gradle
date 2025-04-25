@@ -32,9 +32,9 @@ dependencies {
 
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionFabric')
-    implementation("foundry.veil:veil-fabric-${rootProject.minecraft_version}:${rootProject.veil_version}") {
+    include(modImplementation("foundry.veil:veil-fabric-${rootProject.minecraft_version}:${rootProject.veil_version}") {
         exclude group: "maven.modrinth"
-    }
+    })
 }
 
 processResources {
