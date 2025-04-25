@@ -5,11 +5,11 @@
   "minVersion": "0.8",
   "client": [
     "BiomeManagerAccessor",
-    "KeyBindingAccessor"
+    "KeyBindingAccessor",
+    "VeilImGuiImplMixin",
+    "VeilRenderSystemMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-  },
-  "mixins": [
-  ]
+  }
 }
