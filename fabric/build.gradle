@@ -52,6 +52,7 @@ shadowJar {
 
 remapJar {
     inputFile.set shadowJar.archiveFile
+    injectAccessWidener = true
 }
 
 fabricApi {
