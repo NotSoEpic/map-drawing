@@ -5,7 +5,6 @@ import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.Level;
 import org.joml.Vector2i;
-import org.lwjgl.system.linux.Stat;
 import wawa.wayfinder.data.history.OperationHistory;
 
 import java.util.HashMap;
@@ -18,13 +17,13 @@ import java.util.Stack;
  */
 public class PageManager {
     public PageIO pageIO;
-    private Map<Vector2i, AbstractPage> pages = new HashMap<>();
+    private final Map<Vector2i, AbstractPage> pages = new HashMap<>();
 
     private int emptyCount = 0;
     private int loadedCount = 0;
 
     private SnapshotState state = SnapshotState.IDLE;
-    private Stack<OperationHistory> pastHistories = new Stack<>();
+    private final Stack<OperationHistory> pastHistories = new Stack<>();
     private OperationHistory currentHistory;
 
     public enum SnapshotState {
@@ -36,46 +35,46 @@ public class PageManager {
      * @param ry region y coordinate
      * @return
      */
-    public AbstractPage getOrCreatePage(int rx, int ry) {
-        return pages.computeIfAbsent(new Vector2i(rx, ry), v -> {
-            EmptyPage page = new EmptyPage(v.x, v.y, this, pageIO);
-            deltaCount(page, 1);
+    public AbstractPage getOrCreatePage(final int rx, final int ry) {
+        return this.pages.computeIfAbsent(new Vector2i(rx, ry), v -> {
+            final EmptyPage page = new EmptyPage(v.x, v.y, this, this.pageIO);
+            this.deltaCount(page, 1);
             return page;
         });
     }
 
-    private void deltaCount(AbstractPage page, int delta) {
+    private void deltaCount(final AbstractPage page, final int delta) {
         if (page instanceof EmptyPage) {
-            emptyCount += delta;
+            this.emptyCount += delta;
         } else if (page instanceof Page) {
-            loadedCount += delta;
+            this.loadedCount += delta;
         }
     }
 
     public String getDebugCount() {
-        return (emptyCount + loadedCount) + " (" + emptyCount + " / " + loadedCount + ")";
+        return (this.emptyCount + this.loadedCount) + " (" + this.emptyCount + " / " + this.loadedCount + ")";
     }
 
     public void startSnapshot() {
-        if (state != SnapshotState.SNAPSHOTTING) {
-            state = SnapshotState.SNAPSHOTTING;
-            currentHistory = new OperationHistory(new HashMap<>());
+        if (this.state != SnapshotState.SNAPSHOTTING) {
+            this.state = SnapshotState.SNAPSHOTTING;
+            this.currentHistory = new OperationHistory(new HashMap<>());
         }
     }
 
     public void endSnapshot() {
-        if (state != SnapshotState.IDLE && currentHistory != null) {
-            state = SnapshotState.IDLE;
-            pastHistories.push(currentHistory);
+        if (this.state != SnapshotState.IDLE && this.currentHistory != null) {
+            this.state = SnapshotState.IDLE;
+            this.pastHistories.push(this.currentHistory);
         }
     }
 
     public void undoChanges() {
-        if (!pastHistories.empty() && state == SnapshotState.IDLE) { //make sure we can't undo while we are currently modifying pages) {
-            OperationHistory recentHistory = pastHistories.pop();
+        if (!this.pastHistories.empty() && this.state == SnapshotState.IDLE) { //make sure we can't undo while we are currently modifying pages) {
+            final OperationHistory recentHistory = this.pastHistories.pop();
 
-            for (Map.Entry<Vector2i, NativeImage> entry : recentHistory.pagesModified().entrySet()) {
-                AbstractPage page = getOrCreatePage(entry.getKey().x, entry.getKey().y);
+            for (final Map.Entry<Vector2i, NativeImage> entry : recentHistory.pagesModified().entrySet()) {
+                final AbstractPage page = this.getOrCreatePage(entry.getKey().x, entry.getKey().y);
                 page.unboChanges(entry.getValue());
             }
 
@@ -86,23 +85,23 @@ public class PageManager {
     /**
      * Absolute world coordinates
      */
-    public void putPixel(int x, int y, int RGBA) {
-        int rx = Math.floorDiv(x, 512);
-        int ry = Math.floorDiv(y, 512);
+    public void putPixel(final int x, final int y, final int RGBA) {
+        final int rx = Math.floorDiv(x, 512);
+        final int ry = Math.floorDiv(y, 512);
 
 
-        AbstractPage newPage = getOrCreatePage(rx, ry);
-        if (newPage instanceof EmptyPage ep && ep.isLoading()) { //don't try to take snapshots of pages that are still loading
+        final AbstractPage newPage = this.getOrCreatePage(rx, ry);
+        if (newPage instanceof final EmptyPage ep && ep.isLoading()) { //don't try to take snapshots of pages that are still loading
             return;
         }
 
-        if (state == SnapshotState.SNAPSHOTTING) {
-            Map<Vector2i, NativeImage> history = currentHistory.pagesModified();
+        if (this.state == SnapshotState.SNAPSHOTTING) {
+            final Map<Vector2i, NativeImage> history = this.currentHistory.pagesModified();
 
-            Vector2i key = new Vector2i(rx, ry);
+            final Vector2i key = new Vector2i(rx, ry);
             if (history.get(key) == null) {
-                NativeImage image = new NativeImage(512, 512, false);
-                NativeImage pageImg = newPage.getImage();
+                final NativeImage image = new NativeImage(512, 512, false);
+                final NativeImage pageImg = newPage.getImage();
                 if (pageImg != null) {
                     image.copyFrom(pageImg);
                 }
@@ -114,75 +113,75 @@ public class PageManager {
         newPage.setPixel(x - rx * 512, y - ry * 512, RGBA);
     }
 
-    public int getPixel(int x, int y) {
-        int rx = Math.floorDiv(x, 512);
-        int ry = Math.floorDiv(y, 512);
-        return getOrCreatePage(rx, ry).getPixel(x - rx * 512, y - ry * 512);
+    public int getPixel(final int x, final int y) {
+        final int rx = Math.floorDiv(x, 512);
+        final int ry = Math.floorDiv(y, 512);
+        return this.getOrCreatePage(rx, ry).getPixel(x - rx * 512, y - ry * 512);
     }
 
-    public void putSquare(int x, int y, int RGBA, int r) {
+    public void putSquare(final int x, final int y, final int RGBA, final int r) {
         for (int i = -r + x; i <= r + x; i++) {
             for (int j = -r + y; j <= r + y; j++) {
-                putPixel(i, j, RGBA);
+                this.putPixel(i, j, RGBA);
             }
         }
     }
 
-    public void replacePage(int rx, int ry, AbstractPage replacement) {
-        deltaCount(pages.get(new Vector2i(rx, ry)), -1);
-        pages.put(new Vector2i(rx, ry), replacement);
-        deltaCount(replacement, 1);
+    public void replacePage(final int rx, final int ry, final AbstractPage replacement) {
+        this.deltaCount(this.pages.get(new Vector2i(rx, ry)), -1);
+        this.pages.put(new Vector2i(rx, ry), replacement);
+        this.deltaCount(replacement, 1);
     }
 
-    public void reloadPageIO(Level level, Minecraft client) {
-        saveAndClear();
-        pageIO = new PageIO(level, client);
+    public void reloadPageIO(final Level level, final Minecraft client) {
+        this.saveAndClear();
+        this.pageIO = new PageIO(level, client);
     }
 
     private int cleanupTimer = 0;
 
     public void tick() {
-        long rendertime = Util.getMillis();
-        if (--cleanupTimer < 0) {
-            cleanupTimer = 20 * 10;
-            Iterator<AbstractPage> it = pages.values().iterator();
+        final long rendertime = Util.getMillis();
+        if (--this.cleanupTimer < 0) {
+            this.cleanupTimer = 20 * 10;
+            final Iterator<AbstractPage> it = this.pages.values().iterator();
             while (it.hasNext()) {
-                AbstractPage page = it.next();
+                final AbstractPage page = it.next();
                 if (rendertime - page.getLastRendertime() > 1000 * 20) {
-                    page.save(pageIO, true);
+                    page.save(this.pageIO, true);
                     it.remove();
-                    deltaCount(page, -1);
+                    this.deltaCount(page, -1);
 
                     continue;
                 }
 
-                if (page instanceof EmptyPage ep && ep.attemptedUndo && !ep.isLoading()) {
+                if (page instanceof final EmptyPage ep && ep.attemptedUndo && !ep.isLoading()) {
                     ep.unboChanges(ep.undoImage);
                 }
             }
         }
     }
 
-    public void save(boolean close) {
-        for (AbstractPage page : pages.values()) {
-            page.save(pageIO, close);
+    public void save(final boolean close) {
+        for (final AbstractPage page : this.pages.values()) {
+            page.save(this.pageIO, close);
         }
     }
 
     public void saveAndClear() {
-        save(true);
-        pages.clear();
-        emptyCount = 0;
-        loadedCount = 0;
+        this.save(true);
+        this.pages.clear();
+        this.emptyCount = 0;
+        this.loadedCount = 0;
 
-        for (OperationHistory history : pastHistories) {
-            for (NativeImage value : history.pagesModified().values()) {
+        for (final OperationHistory history : this.pastHistories) {
+            for (final NativeImage value : history.pagesModified().values()) {
                 value.close();
             }
 
             history.pagesModified().clear();
         }
 
-        pastHistories.clear();
+        this.pastHistories.clear();
     }
 }

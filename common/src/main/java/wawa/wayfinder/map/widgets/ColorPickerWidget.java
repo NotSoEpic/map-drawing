@@ -19,64 +19,64 @@ public class ColorPickerWidget extends AbstractWidget {
     private final SingleToolWidget.Brush brush;
     private final int defaultX;
     private final int defaultY;
-    public ColorPickerWidget(int x, int y, SingleToolWidget.Brush brush) {
+    public ColorPickerWidget(final int x, final int y, final SingleToolWidget.Brush brush) {
         super(x, y, 0, 0, Component.literal("color picker"));
         this.brush = brush;
         this.defaultX = x;
         this.defaultY = y;
         for (int i = 0; i < DyeColor.values().length; i++) {
-            DyeColor color = DyeColor.values()[i];
-            int sx = (i % 4) * 10;
-            int sy = (i / 4) * 10;
-            width = Math.max(width, sx + 8);
-            height = Math.max(height, sy + 8);
-            swabs.add(new PaletteSwabWidget(this, sx, sy, color.getTextColor() | 0xFF000000));
+            final DyeColor color = DyeColor.values()[i];
+            final int sx = (i % 4) * 10;
+            final int sy = (i / 4) * 10;
+            this.width = Math.max(this.width, sx + 8);
+            this.height = Math.max(this.height, sy + 8);
+            this.swabs.add(new PaletteSwabWidget(this, sx, sy, color.getTextColor() | 0xFF000000));
         }
-        brush.last = swabs.getFirst().tool;
+        brush.last = this.swabs.getFirst().tool;
     }
 
     public void resetPos() {
-        setX(defaultX);
-        setY(defaultY);
+        this.setX(this.defaultX);
+        this.setY(this.defaultY);
     }
 
     public List<PaletteDrawTool> getBrushes() {
-        return swabs.stream().map(swab -> swab.tool).collect(Collectors.toList());
+        return this.swabs.stream().map(swab -> swab.tool).collect(Collectors.toList());
     }
 
     @Override
-    public boolean isMouseOver(double mouseX, double mouseY) {
+    public boolean isMouseOver(final double mouseX, final double mouseY) {
         final int padding = 10;
-        return isActive() && ((
+        return this.isActive() && ((
                 mouseX >= (double)this.getX() - padding
                 && mouseY >= (double)this.getY() - padding
                 && mouseX < (double)(this.getX() + this.width + padding)
                 && mouseY < (double)(this.getY() + this.height + padding)
-                ) || swabs.stream().anyMatch(swab -> swab.isMouseOver(mouseX, mouseY))
+                ) || this.swabs.stream().anyMatch(swab -> swab.isMouseOver(mouseX, mouseY))
         );
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        for (PaletteSwabWidget swab : swabs) {
+    public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
+        for (final PaletteSwabWidget swab : this.swabs) {
             if (swab.mouseClicked(mouseX, mouseY, button)) {
-                active = false;
+                this.active = false;
                 return true;
             }
         }
-        return isMouseOver(mouseX, mouseY);
+        return this.isMouseOver(mouseX, mouseY);
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        TooltipRenderUtil.renderTooltipBackground(guiGraphics, getX(), getY(), width, height, 0);
-        for (PaletteSwabWidget swab : swabs) {
+    protected void renderWidget(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
+        TooltipRenderUtil.renderTooltipBackground(guiGraphics, this.getX(), this.getY(), this.width, this.height, 0);
+        for (final PaletteSwabWidget swab : this.swabs) {
             swab.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
         }
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
+    protected void updateWidgetNarration(final NarrationElementOutput narrationElementOutput) {}
 
     public static class PaletteSwabWidget extends AbstractWidget {
         private final ColorPickerWidget parent;
@@ -85,46 +85,46 @@ public class ColorPickerWidget extends AbstractWidget {
         public final int color;
         public final PaletteDrawTool tool;
 
-        public PaletteSwabWidget(ColorPickerWidget parent, int x, int y, int color) {
+        public PaletteSwabWidget(final ColorPickerWidget parent, final int x, final int y, final int color) {
             super(0, 0, 8, 8, Component.literal("color swab"));
             this.parent = parent;
             this.relX = x;
             this.relY = y;
             this.color = color;
-            this.tool = new PaletteDrawTool(getABGR(), parent.brush);
-            tool.icon = WayfinderClient.id("cursor/brush");
+            this.tool = new PaletteDrawTool(this.getABGR(), parent.brush);
+            this.tool.icon = WayfinderClient.id("cursor/brush");
         }
 
         @Override
         public int getX() {
-            return parent.getX() + relX;
+            return this.parent.getX() + this.relX;
         }
 
         @Override
         public int getY() {
-            return parent.getY() + relY;
+            return this.parent.getY() + this.relY;
         }
 
         @Override
-        protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-            guiGraphics.fill(getX(), getY(), getRight(), getBottom(), color);
+        protected void renderWidget(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
+            guiGraphics.fill(this.getX(), this.getY(), this.getRight(), this.getBottom(), this.color);
         }
 
         @Override
-        public void onClick(double mouseX, double mouseY) {
-            Tool.set(tool);
-            parent.brush.last = tool;
+        public void onClick(final double mouseX, final double mouseY) {
+            Tool.set(this.tool);
+            this.parent.brush.last = this.tool;
         }
 
         public int getABGR() {
-            int B = color & 0xFF;
-            int G = color >> 8 & 0xFF;
-            int R = color >> 16 & 0xFF;
-            int A = color >> 24 & 0xFF;
+            final int B = this.color & 0xFF;
+            final int G = this.color >> 8 & 0xFF;
+            final int R = this.color >> 16 & 0xFF;
+            final int A = this.color >> 24 & 0xFF;
             return A << 24 | B << 16 | G << 8 | R;
         }
 
         @Override
-        protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
+        protected void updateWidgetNarration(final NarrationElementOutput narrationElementOutput) {}
     }
 }

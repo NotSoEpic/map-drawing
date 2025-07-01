@@ -18,32 +18,32 @@ public class PlayerPositions {
     int timer = 0;
     public boolean visible = true;
 
-    public void tick(Player player) {
+    public void tick(final Player player) {
         if (player == null)
             return;
-        timer++;
-        Vector2d pos = new Vector2d(player.getX(), player.getZ());
-        double dist = pos.distanceSquared(newest);
-        if (dist > 16 || (dist > 1 && timer > 20 * 10)) {
-            timer = 0;
-            while (positions.size() >= MAX_POINTS) {
-                positions.remove();
+        this.timer++;
+        final Vector2d pos = new Vector2d(player.getX(), player.getZ());
+        final double dist = pos.distanceSquared(this.newest);
+        if (dist > 16 || (dist > 1 && this.timer > 20 * 10)) {
+            this.timer = 0;
+            while (this.positions.size() >= MAX_POINTS) {
+                this.positions.remove();
             }
-            positions.add(pos);
-            newest = pos;
+            this.positions.add(pos);
+            this.newest = pos;
         }
-        current = pos;
+        this.current = pos;
     }
 
     public void clear() {
-        positions.clear();
-        newest = current;
+        this.positions.clear();
+        this.newest = this.current;
     }
 
-    public void render(GuiGraphics guiGraphics, int xOff, int yOff) {
-        if (visible) {
-            positions.forEach(v -> guiGraphics.fill((int) v.x + xOff, (int) v.y + yOff, (int) v.x + 1 + xOff, (int) v.y + 1 + yOff, 0xFFFF00FF));
-            guiGraphics.fill((int) current.x - 1 + xOff, (int) current.y - 1 + yOff, (int) current.x + 2 + xOff, (int) current.y + 2 + yOff, 0xFFFF00FF);
+    public void render(final GuiGraphics guiGraphics, final int xOff, final int yOff) {
+        if (this.visible) {
+            this.positions.forEach(v -> guiGraphics.fill((int) v.x + xOff, (int) v.y + yOff, (int) v.x + 1 + xOff, (int) v.y + 1 + yOff, 0xFFFF00FF));
+            guiGraphics.fill((int) this.current.x - 1 + xOff, (int) this.current.y - 1 + yOff, (int) this.current.x + 2 + xOff, (int) this.current.y + 2 + yOff, 0xFFFF00FF);
         }
     }
 }

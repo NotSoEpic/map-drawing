@@ -10,7 +10,7 @@ import wawa.wayfinder.input.KeyMappings;
 @EventBusSubscriber(modid = WayfinderClient.MOD_ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
 public class ClientEventsStartup {
     @SubscribeEvent
-    public static void registerBindings(RegisterKeyMappingsEvent event) {
+    public static void registerBindings(final RegisterKeyMappingsEvent event) {
         KeyMappings.toRegister.forEach(event::register);
     }
 }

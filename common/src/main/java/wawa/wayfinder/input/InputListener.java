@@ -10,7 +10,7 @@ import org.joml.Vector2d;
 import wawa.wayfinder.map.MapScreen;
 
 public class InputListener {
-    public static void tick(Minecraft minecraft) {
+    public static void tick(final Minecraft minecraft) {
         while (minecraft.level != null && KeyMappings.NormalMappings.OPEN_MAP.mapping.
                 consumeClick()) {
             minecraft.setScreen(new MapScreen(
@@ -19,11 +19,11 @@ public class InputListener {
         }
     }
 
-    private static Vector2d getEndingPosition(LocalPlayer player) {
-        int distance = Minecraft.getInstance().options.getEffectiveRenderDistance();
+    private static Vector2d getEndingPosition(final LocalPlayer player) {
+        final int distance = Minecraft.getInstance().options.getEffectiveRenderDistance();
 
         if (player.getMainHandItem().is(Items.SPYGLASS) || player.getOffhandItem().is(Items.SPYGLASS)) {
-            BlockHitResult result = player.level().clip(new ClipContext(
+            final BlockHitResult result = player.level().clip(new ClipContext(
                     player.getEyePosition(),
                     player.getEyePosition().add(player.getLookAngle().scale(distance * 16)),
                     ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY, player));

@@ -30,21 +30,21 @@ public class DrawTool extends Tool {
         Minecraft.getInstance().getTextureManager().register(id, preview);
     }
 
-    public DrawTool(int color) {
+    public DrawTool(final int color) {
         this.color = color;
     }
 
     private void rebuildPixels() {
         preview.close();
-        int wh = r * 2 + 1;
-        NativeImage im = new NativeImage(wh, wh, true);
-        if (color == 0) { // black hollow rectangle
+        final int wh = this.r * 2 + 1;
+        final NativeImage im = new NativeImage(wh, wh, true);
+        if (this.color == 0) { // black hollow rectangle
             im.fillRect(0, 0, wh, wh, 0xFF000000);
             if (wh >= 3) {
                 im.fillRect(1, 1, wh - 2, wh - 2, 0);
             }
         } else {
-            im.fillRect(0, 0, wh, wh, color);
+            im.fillRect(0, 0, wh, wh, this.color);
         }
         preview = new DynamicTexture(im);
         preview.upload();
@@ -52,16 +52,16 @@ public class DrawTool extends Tool {
     }
 
     @Override
-    public void hold(PageManager activePage, MapWidget.Mouse mouse, Vector2d oldWorld, Vector2d world) {
+    public void hold(final PageManager activePage, final MapWidget.Mouse mouse, final Vector2d oldWorld, final Vector2d world) {
 
         switch (mouse) {
-            case LEFT -> pixelLine(oldWorld.floor(), world.floor(), pos ->  {
+            case LEFT -> this.pixelLine(oldWorld.floor(), world.floor(), pos ->  {
                 activePage.startSnapshot();
-                activePage.putSquare(pos.x, pos.y, color, r);
+                activePage.putSquare(pos.x, pos.y, this.color, this.r);
             });
-            case RIGHT -> pixelLine(oldWorld.floor(), world.floor(), pos -> {
+            case RIGHT -> this.pixelLine(oldWorld.floor(), world.floor(), pos -> {
                 activePage.startSnapshot();
-                activePage.putSquare(pos.x, pos.y, 0, r);
+                activePage.putSquare(pos.x, pos.y, 0, this.r);
             });
         }
     }
@@ -72,11 +72,11 @@ public class DrawTool extends Tool {
         super.release(activePage);
     }
 
-    private void pixelLine(Vector2d point1, Vector2d point2, Consumer<Vector2i> perPixel) {
-        Vector2d delta = new Vector2d(point1).sub(point2);
-        int steps = (int) Math.max(1, Math.ceil(Math.max(Math.abs(delta.x), Math.abs(delta.y))));
+    private void pixelLine(final Vector2d point1, final Vector2d point2, final Consumer<Vector2i> perPixel) {
+        final Vector2d delta = new Vector2d(point1).sub(point2);
+        final int steps = (int) Math.max(1, Math.ceil(Math.max(Math.abs(delta.x), Math.abs(delta.y))));
         delta.div(steps);
-        Vector2d pos = new Vector2d(point2);
+        final Vector2d pos = new Vector2d(point2);
         for (int i = 0; i < steps + 1; i++) {
             perPixel.accept(new Vector2i(pos.x + 0.5, pos.y + 0.5, RoundingMode.FLOOR));
             pos.add(delta);
@@ -84,38 +84,38 @@ public class DrawTool extends Tool {
     }
 
     @Override
-    public void controlScroll(PageManager activePage, double mouseX, double mouseY, double scrollY) {
-        r = Mth.clamp(r + (int)scrollY, 0, 4);
-        rebuildPixels();
+    public void controlScroll(final PageManager activePage, final double mouseX, final double mouseY, final double scrollY) {
+        this.r = Mth.clamp(this.r + (int)scrollY, 0, 4);
+        this.rebuildPixels();
     }
 
     @Override
-    public void renderWorld(GuiGraphics graphics, int worldX, int worldY, int xOff, int yOff) {
-        int wh = r * 2 + 1;
-        graphics.blit(id, worldX - r + xOff, worldY - r + yOff, 0, 0, wh, wh, wh, wh);
+    public void renderWorld(final GuiGraphics graphics, final int worldX, final int worldY, final int xOff, final int yOff) {
+        final int wh = this.r * 2 + 1;
+        graphics.blit(id, worldX - this.r + xOff, worldY - this.r + yOff, 0, 0, wh, wh, wh, wh);
     }
 
     @Override
-    public void renderScreen(GuiGraphics graphics, double mouseX, double mouseY) {
-        if (icon != null) {
-            Vec2 mouse = Helper.preciseMousePos();
+    public void renderScreen(final GuiGraphics graphics, final double mouseX, final double mouseY) {
+        if (this.icon != null) {
+            final Vec2 mouse = Helper.preciseMousePos();
             graphics.pose().pushPose();
             graphics.pose().translate(mouse.x % 1, mouse.y % 1, 0);
-            graphics.blitSprite(icon, (int)mouse.x - 16, (int)mouse.y - 16, 32, 32);
+            graphics.blitSprite(this.icon, (int)mouse.x - 16, (int)mouse.y - 16, 32, 32);
             graphics.pose().popPose();
         }
     }
 
     @Override
     public void onSelect() {
-        rebuildPixels();
+        this.rebuildPixels();
     }
 
     public int getVisualColor() {
-        return color;
+        return this.color;
     }
 
     public int getInternalColor() {
-        return color;
+        return this.color;
     }
 }

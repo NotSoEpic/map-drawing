@@ -13,27 +13,27 @@ public class LerpedVector2d {
     private Vector2d start;
     private Vector2d end;
     private double progress = 0;
-    public LerpedVector2d(Vector2d start, Vector2d end) {
+    public LerpedVector2d(final Vector2d start, final Vector2d end) {
         this.start = start;
         this.end = end;
     }
 
-    public void set(Vector2d pos) {
+    public void set(final Vector2d pos) {
         this.start = pos;
         this.end = pos;
         this.progress = 0;
     }
 
-    public void setStart(Vector2d start) {
+    public void setStart(final Vector2d start) {
         this.start = start;
     }
 
-    public void setEnd(Vector2d end) {
+    public void setEnd(final Vector2d end) {
         this.end = end;
     }
 
-    public void tickProgress(double delta) {
-        progress = Math.clamp(progress + delta, 0, 1);
+    public void tickProgress(final double delta) {
+        this.progress = Math.clamp(this.progress + delta, 0, 1);
     }
 
     /**
@@ -42,11 +42,11 @@ public class LerpedVector2d {
      */
     public double getFrac() {
         final double alpha = 2;
-        return Math.pow(progress, alpha) / (Math.pow(progress, alpha) + Math.pow(1 - progress, alpha));
+        return Math.pow(this.progress, alpha) / (Math.pow(this.progress, alpha) + Math.pow(1 - this.progress, alpha));
     }
 
     public Vector2d get() {
-        double frac = getFrac();
-        return new Vector2d(start).mul(1 - frac).add(new Vector2d(end).mul(frac));
+        final double frac = this.getFrac();
+        return new Vector2d(this.start).mul(1 - frac).add(new Vector2d(this.end).mul(frac));
     }
 }

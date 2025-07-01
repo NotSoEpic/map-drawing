@@ -23,11 +23,11 @@ import java.util.UUID;
 public class PageIO {
     private final Path pagePath;
 
-    public PageIO(Level level, Minecraft client) {
-        pagePath = buildMapPath(level, client);
+    public PageIO(final Level level, final Minecraft client) {
+        this.pagePath = this.buildMapPath(level, client);
         try {
-            Files.createDirectories(pagePath);
-        } catch (IOException e) {
+            Files.createDirectories(this.pagePath);
+        } catch (final IOException e) {
             WayfinderClient.LOGGER.error("Could not create map directory\n{}", e);
         }
     }
@@ -35,11 +35,11 @@ public class PageIO {
     /**
      * @return "minecraftinstance/wayfinder_maps/singleplayer/uuid_worldname"
      */
-    private Path buildMapPath(Level level, Minecraft client) {
+    private Path buildMapPath(final Level level, final Minecraft client) {
         Path path = client.gameDirectory.toPath()
                 .resolve("wayfinder_maps");
-        long seed = ((BiomeManagerAccessor) level.getBiomeManager()).getBiomeZoomSeed();
-        UUID uuid = Mth.createInsecureUUID(RandomSource.create(seed));
+        final long seed = ((BiomeManagerAccessor) level.getBiomeManager()).getBiomeZoomSeed();
+        final UUID uuid = Mth.createInsecureUUID(RandomSource.create(seed));
         if (client.isLocalServer()) {
             path = path.resolve("singleplayer")
                     .resolve(uuid + "_" + client.getSingleplayerServer().getWorldData().getLevelName());
@@ -51,25 +51,25 @@ public class PageIO {
     }
 
     public Path getPagePath() {
-        return pagePath;
+        return this.pagePath;
     }
 
-    public Path pageFilepath(int rx, int ry) {
-        return pagePath.resolve(String.format("%d_%d.png", rx, ry));
+    public Path pageFilepath(final int rx, final int ry) {
+        return this.pagePath.resolve(String.format("%d_%d.png", rx, ry));
     }
 
     /**
      * Attempts to load an image. Should be run via {@link Util#ioPool()}
      * @return null if file doesn't exist or there was an error loading
      */
-    public @Nullable NativeImage tryLoadImage(int rx, int ry) {
-        Path path = pageFilepath(rx, ry);
-        File file = new File(path.toUri());
+    public @Nullable NativeImage tryLoadImage(final int rx, final int ry) {
+        final Path path = this.pageFilepath(rx, ry);
+        final File file = new File(path.toUri());
         if (file.isFile()) {
             try {
-                InputStream inputStream = Files.newInputStream(path);
+                final InputStream inputStream = Files.newInputStream(path);
                 return NativeImage.read(inputStream);
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 WayfinderClient.LOGGER.error("Failed to load image {}\n{}", path, e);
             }
         }
@@ -80,15 +80,15 @@ public class PageIO {
      * Attempts to save an image. Should be run via {@link Util#ioPool()}
      * @param image null to delete
      */
-    public void trySaveImage(int rx, int ry, @Nullable NativeImage image) {
-        Path path = pageFilepath(rx, ry);
+    public void trySaveImage(final int rx, final int ry, @Nullable final NativeImage image) {
+        final Path path = this.pageFilepath(rx, ry);
         try {
             if (image == null) {
                 Files.deleteIfExists(path);
             } else {
                 image.writeToFile(path);
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             WayfinderClient.LOGGER.error("Failed to save region {} {} to {}\n{}", rx, ry, path, e);
         }
     }

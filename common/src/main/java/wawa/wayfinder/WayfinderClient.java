@@ -14,7 +14,7 @@ public final class WayfinderClient {
 
     public static void init() {}
 
-    public static ResourceLocation id(String path) {
+    public static ResourceLocation id(final String path) {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
 }

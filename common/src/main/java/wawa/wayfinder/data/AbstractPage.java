@@ -14,22 +14,22 @@ public abstract class AbstractPage {
     public final int ry;
     private long lastRendertime = 0;
 
-    protected AbstractPage(int rx, int ry) {
+    protected AbstractPage(final int rx, final int ry) {
         this.rx = rx;
         this.ry = ry;
     }
 
     public int left() {
-        return rx * 512;
+        return this.rx * 512;
     }
     public int top() {
-        return ry * 512;
+        return this.ry * 512;
     }
     public int right() {
-        return (rx + 1) * 512;
+        return (this.rx + 1) * 512;
     }
     public int bottom() {
-        return (ry + 1) * 512;
+        return (this.ry + 1) * 512;
     }
 
     /**
@@ -47,19 +47,19 @@ public abstract class AbstractPage {
      * @param x relative x coordinate (0-511)
      * @param y relative y coordinate (0-511)
      */
-    public int getPixel(int x, int y) {
+    public int getPixel(final int x, final int y) {
         return 0;
     }
 
     public long getLastRendertime() {
-        return lastRendertime;
+        return this.lastRendertime;
     }
 
-    public void render(GuiGraphics guiGraphics, int xOff, int yOff) {
-        lastRendertime = Util.getMillis();
+    public void render(final GuiGraphics guiGraphics, final int xOff, final int yOff) {
+        this.lastRendertime = Util.getMillis();
     }
 
-    public void save(PageIO pageIO, boolean close) {}
+    public void save(final PageIO pageIO, final boolean close) {}
 
     protected void close() {}
 }

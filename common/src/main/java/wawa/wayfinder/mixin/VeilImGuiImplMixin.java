@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(VeilImGuiImpl.class)
 public class VeilImGuiImplMixin {
     @Redirect(method = "Lfoundry/veil/impl/client/imgui/VeilImGuiImpl;endFrame()V", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;error(Ljava/lang/String;)V"), remap = false)
-    private void noComplainingAllowed(Logger instance, String message) {
+    private void noComplainingAllowed(final Logger instance, final String message) {
         // noop
     }
 }

@@ -19,8 +19,8 @@ public class SingleToolWidget extends AbstractWidget {
     private final ResourceLocation sprite;
     private final ResourceLocation highlight;
     private final Function<SingleToolWidget, Tool> toolFunction;
-    public SingleToolWidget(int x, int y, ResourceLocation sprite, ResourceLocation highlight,
-                            Function<SingleToolWidget, Tool> toolFunction, Component message) {
+    public SingleToolWidget(final int x, final int y, final ResourceLocation sprite, final ResourceLocation highlight,
+                            final Function<SingleToolWidget, Tool> toolFunction, final Component message) {
         super(x, y, 16, 16, message);
         this.sprite = sprite;
         this.highlight = highlight;
@@ -28,78 +28,78 @@ public class SingleToolWidget extends AbstractWidget {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        if (isMouseOver(mouseX, mouseY)) {
-            guiGraphics.blitSprite(highlight, getX() - 1, getY() - 1, 18, 18);
+    protected void renderWidget(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
+        if (this.isMouseOver(mouseX, mouseY)) {
+            guiGraphics.blitSprite(this.highlight, this.getX() - 1, this.getY() - 1, 18, 18);
         }
-        guiGraphics.blitSprite(sprite, getX(), getY(), 16, 16);
+        guiGraphics.blitSprite(this.sprite, this.getX(), this.getY(), 16, 16);
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
         if (super.mouseClicked(mouseX, mouseY, button)) {
-            Tool.set(toolFunction.apply(this));
+            Tool.set(this.toolFunction.apply(this));
             return true;
         }
         return false;
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
+    protected void updateWidgetNarration(final NarrationElementOutput narrationElementOutput) {}
 
     public static class Brush extends SingleToolWidget {
         public PaletteDrawTool last;
         private static final TextureAtlasSprite mask = Minecraft.getInstance().getGuiSprites().getSprite(WayfinderClient.id("tool/brush_mask"));
         private final ColorPickerWidget colorPicker;
 
-        public Brush(int x, int y) {
+        public Brush(final int x, final int y) {
             super(x, y,
                     WayfinderClient.id("tool/brush"),
                     WayfinderClient.id("tool/brush_highlight"),
                     w -> ((Brush)w).last,
                     Component.literal("brush")
             );
-            colorPicker = new ColorPickerWidget(getX() - 40, getY() - 20, this);
-            colorPicker.active = false;
+            this.colorPicker = new ColorPickerWidget(this.getX() - 40, this.getY() - 20, this);
+            this.colorPicker.active = false;
         }
 
         public List<PaletteDrawTool> getBrushes() {
-            return colorPicker.getBrushes();
+            return this.colorPicker.getBrushes();
         }
 
-        public void openToMouse(double mouseX, double mouseY) {
-            colorPicker.active = true;
-            colorPicker.setX((int) (mouseX - width/2));
-            colorPicker.setY((int) (mouseY - height/2));
+        public void openToMouse(final double mouseX, final double mouseY) {
+            this.colorPicker.active = true;
+            this.colorPicker.setX((int) (mouseX - this.width /2));
+            this.colorPicker.setY((int) (mouseY - this.height /2));
         }
 
         @Override
-        protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        protected void renderWidget(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
             super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
-            float[] rgb = new Color(last.getVisualColor()).getRGBColorComponents(null);
-            guiGraphics.blit(getX(), getY(), 0, 16, 16, mask, rgb[2], rgb[1], rgb[0], 1);
+            final float[] rgb = new Color(this.last.getVisualColor()).getRGBColorComponents(null);
+            guiGraphics.blit(this.getX(), this.getY(), 0, 16, 16, mask, rgb[2], rgb[1], rgb[0], 1);
 
-            if (isMouseOver(mouseX, mouseY) || (colorPicker.isMouseOver(mouseX, mouseY) && colorPicker.isActive())) {
-                colorPicker.active = true;
+            if (this.isMouseOver(mouseX, mouseY) || (this.colorPicker.isMouseOver(mouseX, mouseY) && this.colorPicker.isActive())) {
+                this.colorPicker.active = true;
             } else {
-                colorPicker.active = false;
-                colorPicker.resetPos();
+                this.colorPicker.active = false;
+                this.colorPicker.resetPos();
             }
 
-            if (colorPicker.isActive()) {
-                colorPicker.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+            if (this.colorPicker.isActive()) {
+                this.colorPicker.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
             }
         }
 
         @Override
-        public boolean isMouseOver(double mouseX, double mouseY) {
-            return super.isMouseOver(mouseX, mouseY) || colorPicker.isMouseOver(mouseX, mouseY);
+        public boolean isMouseOver(final double mouseX, final double mouseY) {
+            return super.isMouseOver(mouseX, mouseY) || this.colorPicker.isMouseOver(mouseX, mouseY);
         }
 
         @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
             if (!super.mouseClicked(mouseX, mouseY, button)) {
-                return colorPicker.mouseClicked(mouseX, mouseY, button);
+                return this.colorPicker.mouseClicked(mouseX, mouseY, button);
             }
             return false;
         }

@@ -18,47 +18,47 @@ public class ToolPickerWidget extends AbstractWidget {
     private final DrawTool pencil = new DrawTool(0xFF000000);
     private final SingleToolWidget.Brush brush;
     private final DrawTool eraser = new DrawTool(0);
-    public ToolPickerWidget(int x, int y) {
+    public ToolPickerWidget(final int x, final int y) {
         super(x, y, 0, 0, Component.literal("tool picker"));
-        pencil.icon = WayfinderClient.id("cursor/pencil");
-        tools.add(new SingleToolWidget(
-                getX(), getY(),
+        this.pencil.icon = WayfinderClient.id("cursor/pencil");
+        this.tools.add(new SingleToolWidget(
+                this.getX(), this.getY(),
                 WayfinderClient.id("tool/pencil"),
                 WayfinderClient.id("tool/pencil_highlight"),
-                (w) -> pencil,
+                (w) -> this.pencil,
                 Component.literal("pencil")
         ));
-        brush = new SingleToolWidget.Brush(getX(), getY() + 20);
-        tools.add(brush);
-        eraser.icon = WayfinderClient.id("cursor/eraser");
-        tools.add(new SingleToolWidget(
-                getX(), getY() + 40,
+        this.brush = new SingleToolWidget.Brush(this.getX(), this.getY() + 20);
+        this.tools.add(this.brush);
+        this.eraser.icon = WayfinderClient.id("cursor/eraser");
+        this.tools.add(new SingleToolWidget(
+                this.getX(), this.getY() + 40,
                 WayfinderClient.id("tool/eraser"),
                 WayfinderClient.id("tool/eraser_highlight"),
-                (w) -> eraser,
+                (w) -> this.eraser,
                 Component.literal("eraser")
         ));
-        updateBounds();
+        this.updateBounds();
     }
 
     public void pickPencil() {
-        Tool.set(pencil);
+        Tool.set(this.pencil);
     }
 
     public void pickBrush() {
-        if (Tool.get() == brush.last) {
-            Vec2 mouse = Helper.preciseMousePos();
-            brush.openToMouse((int)mouse.x, (int)mouse.y);
+        if (Tool.get() == this.brush.last) {
+            final Vec2 mouse = Helper.preciseMousePos();
+            this.brush.openToMouse((int)mouse.x, (int)mouse.y);
         } else {
-            Tool.set(brush.last);
+            Tool.set(this.brush.last);
         }
     }
 
-    public void pickColor(int color) {
+    public void pickColor(final int color) {
         if (color == 0xFF000000) {
-            Tool.set(pencil);
+            Tool.set(this.pencil);
         } else {
-            for (DrawTool tool : brush.getBrushes()) {
+            for (final DrawTool tool : this.brush.getBrushes()) {
                 if (tool.getInternalColor() == color) {
                     Tool.set(tool);
                     return;
@@ -72,26 +72,26 @@ public class ToolPickerWidget extends AbstractWidget {
         int top = 100000;
         int right = 0;
         int bottom = 0;
-        for (SingleToolWidget tool : tools) {
+        for (final SingleToolWidget tool : this.tools) {
             left = Math.min(left, tool.getX());
             top = Math.min(top, tool.getY());
             right = Math.max(right, tool.getRight());
             bottom = Math.max(bottom, tool.getBottom());
         }
-        setX(left);
-        setY(top);
-        setWidth(right - left);
-        setHeight(bottom - top);
+        this.setX(left);
+        this.setY(top);
+        this.setWidth(right - left);
+        this.setHeight(bottom - top);
     }
 
     @Override
-    public boolean isMouseOver(double mouseX, double mouseY) {
-        return tools.stream().anyMatch(tool -> tool.isMouseOver(mouseX, mouseY));
+    public boolean isMouseOver(final double mouseX, final double mouseY) {
+        return this.tools.stream().anyMatch(tool -> tool.isMouseOver(mouseX, mouseY));
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        for (SingleToolWidget tool : tools) {
+    public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
+        for (final SingleToolWidget tool : this.tools) {
             if (tool.mouseClicked(mouseX, mouseY, button)) {
                 return true;
             }
@@ -100,12 +100,12 @@ public class ToolPickerWidget extends AbstractWidget {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        for (SingleToolWidget tool :tools) {
+    protected void renderWidget(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
+        for (final SingleToolWidget tool : this.tools) {
             tool.render(guiGraphics, mouseX, mouseY, partialTick);
         }
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
+    protected void updateWidgetNarration(final NarrationElementOutput narrationElementOutput) {}
 }

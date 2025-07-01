@@ -18,52 +18,52 @@ public class Page extends AbstractPage {
     private boolean uploadDirty = true; // whether the texture needs to reuploaded
     private boolean diskDirty = false; // whether the texture needs to be saved
 
-    public Page(int rx, int ry, DynamicTexture texture) {
+    public Page(final int rx, final int ry, final DynamicTexture texture) {
         super(rx, ry);
         this.texture = texture;
-        textureID = WayfinderClient.id("map_" + rx + "_" + ry);
-        Minecraft.getInstance().getTextureManager().register(textureID, texture);
+        this.textureID = WayfinderClient.id("map_" + rx + "_" + ry);
+        Minecraft.getInstance().getTextureManager().register(this.textureID, texture);
     }
 
-    public Page(int rx, int ry) {
+    public Page(final int rx, final int ry) {
         this(rx, ry, new DynamicTexture(512, 512, false));
-        texture.getPixels().fillRect(0, 0, 512, 512, 0);
+        this.texture.getPixels().fillRect(0, 0, 512, 512, 0);
     }
 
     @Override
-    public void setPixel(int x, int y, int RGBA) {
-        texture.getPixels().setPixelRGBA(x, y, RGBA);
-        uploadDirty = true;
-        diskDirty = true;
+    public void setPixel(final int x, final int y, final int RGBA) {
+        this.texture.getPixels().setPixelRGBA(x, y, RGBA);
+        this.uploadDirty = true;
+        this.diskDirty = true;
     }
 
     @Override
     public NativeImage getImage() {
-        return texture.getPixels();
+        return this.texture.getPixels();
     }
 
     @Override
-    public void unboChanges(NativeImage replacement) {
-        texture.getPixels().copyFrom(replacement);
+    public void unboChanges(final NativeImage replacement) {
+        this.texture.getPixels().copyFrom(replacement);
         replacement.close();
 
-        diskDirty = true;
-        uploadDirty = true;
+        this.diskDirty = true;
+        this.uploadDirty = true;
     }
 
     @Override
-    public int getPixel(int x, int y) {
-        return texture.getPixels().getPixelRGBA(x, y);
+    public int getPixel(final int x, final int y) {
+        return this.texture.getPixels().getPixelRGBA(x, y);
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int xOff, int yOff) {
+    public void render(final GuiGraphics guiGraphics, final int xOff, final int yOff) {
         super.render(guiGraphics, xOff, yOff);
-        if (uploadDirty) {
-            texture.upload();
+        if (this.uploadDirty) {
+            this.texture.upload();
         }
 
-        guiGraphics.blit(textureID, left() + xOff, top() + yOff, 0, 0, 512, 512, 512, 512);
+        guiGraphics.blit(this.textureID, this.left() + xOff, this.top() + yOff, 0, 0, 512, 512, 512, 512);
     }
 
     /**
@@ -75,21 +75,21 @@ public class Page extends AbstractPage {
      * @param close  whether to close the image once done
      */
     @Override
-    public void save(PageIO pageIO, boolean close) {
-        if (diskDirty) {
-            diskDirty = false;
+    public void save(final PageIO pageIO, final boolean close) {
+        if (this.diskDirty) {
+            this.diskDirty = false;
             Util.ioPool().execute(() -> {
-                pageIO.trySaveImage(rx, ry, isEmpty() ? null : texture.getPixels());
+                pageIO.trySaveImage(this.rx, this.ry, this.isEmpty() ? null : this.texture.getPixels());
                 if (close) {
-                    close();
+                    this.close();
                 }
             });
         }
     }
 
     public boolean isEmpty() {
-        int[] pixels = texture.getPixels().getPixelsRGBA();
-        for (int pixel : pixels) {
+        final int[] pixels = this.texture.getPixels().getPixelsRGBA();
+        for (final int pixel : pixels) {
             if (pixel != 0) {
                 return false;
             }
@@ -99,6 +99,6 @@ public class Page extends AbstractPage {
 
     @Override
     protected void close() {
-        Minecraft.getInstance().getTextureManager().release(textureID);
+        Minecraft.getInstance().getTextureManager().release(this.textureID);
     }
 }

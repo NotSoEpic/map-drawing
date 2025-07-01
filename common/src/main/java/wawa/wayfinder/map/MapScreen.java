@@ -28,23 +28,23 @@ public class MapScreen extends Screen {
     private MapWidget mapWidget;
     public ToolPickerWidget toolPicker;
 
-    public MapScreen(Vector2d openingPos, Vector2d endingPos) {
+    public MapScreen(final Vector2d openingPos, final Vector2d endingPos) {
         super(Component.literal("Wayfinder Map"));
-        lerpedPanning = new LerpedVector2d(openingPos, endingPos);
+        this.lerpedPanning = new LerpedVector2d(openingPos, endingPos);
     }
 
     @Override
     protected void init() {
         super.init();
-        mapWidget = new MapWidget(this);
-        addRenderableWidget(mapWidget);
-        toolPicker = new ToolPickerWidget(width - 15 - 16/2, 30);
-        addRenderableWidget(toolPicker);
-        addRenderableOnly(new DebugTextRenderable(this));
-        addRenderableWidget(new SideTabWidget(30 - 16, 30 + 8, "Toggle player",
+        this.mapWidget = new MapWidget(this);
+        this.addRenderableWidget(this.mapWidget);
+        this.toolPicker = new ToolPickerWidget(this.width - 15 - 16/2, 30);
+        this.addRenderableWidget(this.toolPicker);
+        this.addRenderableOnly(new DebugTextRenderable(this));
+        this.addRenderableWidget(new SideTabWidget(30 - 16, 30 + 8, "Toggle player",
                 () -> WayfinderClient.id(WayfinderClient.POSITION_HISTORY.visible ? "tabs/player_visible" : "tabs/player_hidden"),
                 () -> WayfinderClient.POSITION_HISTORY.visible = !WayfinderClient.POSITION_HISTORY.visible));
-        addRenderableWidget(new SideTabWidget(30 - 16, 30 + 8 + 28, "Clear history",
+        this.addRenderableWidget(new SideTabWidget(30 - 16, 30 + 8 + 28, "Clear history",
                 () -> WayfinderClient.id("tabs/clear_history"), () -> WayfinderClient.POSITION_HISTORY.clear()));
         if (Tool.get() != null) {
             GLFW.glfwSetInputMode(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
@@ -52,8 +52,8 @@ public class MapScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        lerpedPanning.tickProgress(0.05 * Minecraft.getInstance().getTimer().getRealtimeDeltaTicks());
+    public void render(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
+        this.lerpedPanning.tickProgress(0.05 * Minecraft.getInstance().getTimer().getRealtimeDeltaTicks());
 
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
@@ -72,30 +72,30 @@ public class MapScreen extends Screen {
      * @param mouse Coordinate in screen space, with top left being (0, 0)
      * @return Coordinate in world space, with top left of block at (0, 0) being (0, 0)
      */
-    public Vector2d screenToWorld(Vector2d mouse) {
-        return new Vector2d(mouse).sub(width / 2d, height / 2d).div(zoom).add(lerpedPanning.get());
+    public Vector2d screenToWorld(final Vector2d mouse) {
+        return new Vector2d(mouse).sub(this.width / 2d, this.height / 2d).div(this.zoom).add(this.lerpedPanning.get());
     }
 
-    public void deltaZoom(int delta) {
-        zoomNum = Mth.clamp(zoomNum + delta, -2, 2);
-        zoom = (float) Math.pow(2, zoomNum);
-    }
-
-    @Override
-    public void mouseMoved(double mouseX, double mouseY) {
-        mapWidget.mouseMoved(mouseX, mouseY);
+    public void deltaZoom(final int delta) {
+        this.zoomNum = Mth.clamp(this.zoomNum + delta, -2, 2);
+        this.zoom = (float) Math.pow(2, this.zoomNum);
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        mapWidget.mouse = MapWidget.Mouse.NONE;
+    public void mouseMoved(final double mouseX, final double mouseY) {
+        this.mapWidget.mouseMoved(mouseX, mouseY);
+    }
+
+    @Override
+    public boolean mouseReleased(final double mouseX, final double mouseY, final int button) {
+        this.mapWidget.mouse = MapWidget.Mouse.NONE;
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(final int keyCode, final int scanCode, final int modifiers) {
         if (NormalMappings.OPEN_MAP.mapping.matches(keyCode, scanCode)) {
-            onClose();
+            this.onClose();
             return true;
         }
 
@@ -107,9 +107,9 @@ public class MapScreen extends Screen {
             WayfinderClient.PAGE_MANAGER.undoChanges();
         }
 
-        for (ToolPickerMappings mapping : ToolPickerMappings.values()) {
+        for (final ToolPickerMappings mapping : ToolPickerMappings.values()) {
             if (mapping.mapping.matches(keyCode, scanCode)) {
-                mapping.swapToTool(toolPicker);
+                mapping.swapToTool(this.toolPicker);
                 return true;
             }
         }
@@ -123,6 +123,6 @@ public class MapScreen extends Screen {
     }
 
     public float getZoom() {
-        return zoom;
+        return this.zoom;
     }
 }

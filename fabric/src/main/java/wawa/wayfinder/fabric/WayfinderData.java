@@ -6,9 +6,9 @@ import wawa.wayfinder.WayfinderClient;
 
 public class WayfinderData implements DataGeneratorEntrypoint {
     @Override
-    public void onInitializeDataGenerator(FabricDataGenerator fabricDataGenerator) {
+    public void onInitializeDataGenerator(final FabricDataGenerator fabricDataGenerator) {
         WayfinderClient.LOGGER.info("Running Wayfinder datagen");
 
-        FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
+        final FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
     }
 }

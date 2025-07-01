@@ -12,7 +12,7 @@ public abstract class Tool {
     private static Tool tool;
     private static Tool previous;
 
-    public static void set(@Nullable Tool tool) {
+    public static void set(@Nullable final Tool tool) {
         if (Tool.tool != null) {
             Tool.tool.onDeselect();
         }
@@ -31,7 +31,7 @@ public abstract class Tool {
 
     public static void swap() {
         if (Tool.previous != null) {
-            Tool temp = Tool.tool;
+            final Tool temp = Tool.tool;
             Tool.tool.onDeselect();
             Tool.tool = Tool.previous;
             Tool.tool.onSelect();
@@ -43,23 +43,23 @@ public abstract class Tool {
 
     public void onDeselect() {}
 
-    public void hold(PageManager activePage, MapWidget.Mouse mouse, Vector2d oldWorld, Vector2d world) {}
+    public void hold(final PageManager activePage, final MapWidget.Mouse mouse, final Vector2d oldWorld, final Vector2d world) {}
 
-    public void release(PageManager activePage) {}
+    public void release(final PageManager activePage) {}
 
-    public void controlScroll(PageManager activePage, double mouseX, double mouseY, double scrollY) {}
+    public void controlScroll(final PageManager activePage, final double mouseX, final double mouseY, final double scrollY) {}
 
     /**
      * Renders tool components relative to the world, before transform pop
      * @param worldX position of mouse cursor in world
      * @param worldY position of mouse cursor in world
      */
-    public void renderWorld(GuiGraphics graphics, int worldX, int worldY, int xOff, int yOff) {}
+    public void renderWorld(final GuiGraphics graphics, final int worldX, final int worldY, final int xOff, final int yOff) {}
 
     /**
      * Renders tool components relative to the screen, after transform pop
      * @param mouseX position of mouse cursor in world
      * @param mouseY position of mouse cursor in world
      */
-    public void renderScreen(GuiGraphics graphics, double mouseX, double mouseY) {}
+    public void renderScreen(final GuiGraphics graphics, final double mouseX, final double mouseY) {}
 }

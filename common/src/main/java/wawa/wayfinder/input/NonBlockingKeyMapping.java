@@ -14,60 +14,60 @@ import wawa.wayfinder.mixin.KeyBindingAccessor;
  */
 public class NonBlockingKeyMapping extends KeyMapping {
     private InputConstants.Key realKey;
-    public NonBlockingKeyMapping(String name, int keyCode, String category) {
+    public NonBlockingKeyMapping(final String name, final int keyCode, final String category) {
         super(name, keyCode, category);
-        realKey = ((KeyBindingAccessor)this).getKey();
+        this.realKey = ((KeyBindingAccessor)this).getKey();
         super.setKey(InputConstants.UNKNOWN);
     }
 
     @Override
-    public void setKey(InputConstants.Key key) {
-        realKey = key;
+    public void setKey(final InputConstants.Key key) {
+        this.realKey = key;
     }
 
     @Override
-    public boolean same(KeyMapping binding) {
-        if (binding instanceof NonBlockingKeyMapping other) {
-            return realKey.equals(other.realKey);
+    public boolean same(final KeyMapping binding) {
+        if (binding instanceof final NonBlockingKeyMapping other) {
+            return this.realKey.equals(other.realKey);
         }
         return false;
     }
 
     @Override
     public boolean isUnbound() {
-        return realKey.equals(InputConstants.UNKNOWN);
+        return this.realKey.equals(InputConstants.UNKNOWN);
     }
 
     @Override
-    public boolean matches(int keysym, int scancode) {
+    public boolean matches(final int keysym, final int scancode) {
         if (keysym != InputConstants.UNKNOWN.getValue()) {
-            return realKey.getType() == InputConstants.Type.KEYSYM &&
-                    realKey.getValue() == keysym;
+            return this.realKey.getType() == InputConstants.Type.KEYSYM &&
+                    this.realKey.getValue() == keysym;
         } else {
-            return realKey.getType() == InputConstants.Type.SCANCODE &&
-                    realKey.getValue() == scancode;
+            return this.realKey.getType() == InputConstants.Type.SCANCODE &&
+                    this.realKey.getValue() == scancode;
         }
     }
 
     @Override
-    public boolean matchesMouse(int key) {
-        return realKey.getType() == InputConstants.Type.MOUSE &&
-                realKey.getValue() == key;
+    public boolean matchesMouse(final int key) {
+        return this.realKey.getType() == InputConstants.Type.MOUSE &&
+                this.realKey.getValue() == key;
     }
 
     @Override
     public Component getTranslatedKeyMessage() {
-        return realKey.getDisplayName();
+        return this.realKey.getDisplayName();
     }
 
     @Override
     public boolean isDefault() {
-        return realKey.equals(getDefaultKey());
+        return this.realKey.equals(this.getDefaultKey());
     }
 
     @Override
     public String saveString() {
-        return realKey.getName();
+        return this.realKey.getName();
     }
 
     @Override

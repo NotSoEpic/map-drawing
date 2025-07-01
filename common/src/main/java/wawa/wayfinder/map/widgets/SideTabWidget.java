@@ -13,27 +13,27 @@ public class SideTabWidget extends AbstractWidget {
     private final Supplier<ResourceLocation> sprite;
     private final Runnable onClick;
 
-    public SideTabWidget(int x, int y, String description, Supplier<ResourceLocation> sprite, Runnable onClick) {
+    public SideTabWidget(final int x, final int y, final String description, final Supplier<ResourceLocation> sprite, final Runnable onClick) {
         super(x, y, 16, 16, Component.literal(description));
         this.sprite = sprite;
         this.onClick = onClick;
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        guiGraphics.blitSprite(sprite.get(), getX() - 16, getY() - 8, 32, 32);
-        if (isMouseOver(mouseX, mouseY)) {
-            guiGraphics.renderTooltip(Minecraft.getInstance().font, getMessage(), mouseX, mouseY);
+    protected void renderWidget(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
+        guiGraphics.blitSprite(this.sprite.get(), this.getX() - 16, this.getY() - 8, 32, 32);
+        if (this.isMouseOver(mouseX, mouseY)) {
+            guiGraphics.renderTooltip(Minecraft.getInstance().font, this.getMessage(), mouseX, mouseY);
         }
     }
 
     @Override
-    public void onClick(double mouseX, double mouseY) {
-        onClick.run();
+    public void onClick(final double mouseX, final double mouseY) {
+        this.onClick.run();
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+    protected void updateWidgetNarration(final NarrationElementOutput narrationElementOutput) {
 
     }
 }

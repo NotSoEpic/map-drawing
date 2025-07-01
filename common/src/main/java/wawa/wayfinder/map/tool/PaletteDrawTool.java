@@ -4,7 +4,7 @@ import wawa.wayfinder.map.widgets.SingleToolWidget;
 
 public class PaletteDrawTool extends DrawTool {
     private final SingleToolWidget.Brush brushPicker;
-    public PaletteDrawTool(int color, SingleToolWidget.Brush brushPicker) {
+    public PaletteDrawTool(final int color, final SingleToolWidget.Brush brushPicker) {
         super(color);
         this.brushPicker = brushPicker;
     }
@@ -12,6 +12,6 @@ public class PaletteDrawTool extends DrawTool {
     @Override
     public void onSelect() {
         super.onSelect();
-        brushPicker.last = this;
+        this.brushPicker.last = this;
     }
 }

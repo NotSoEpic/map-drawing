@@ -23,14 +23,14 @@ public class KeyMappings {
 
         final public KeyMapping mapping;
 
-        NormalMappings(String name, int keyCode, boolean blocking) {
+        NormalMappings(final String name, final int keyCode, final boolean blocking) {
             if (blocking) {
-                mapping = new KeyMapping("key." + WayfinderClient.MOD_ID + "." + name, keyCode, "key.categories.wayfinder");
+                this.mapping = new KeyMapping("key." + WayfinderClient.MOD_ID + "." + name, keyCode, "key.categories.wayfinder");
             } else {
-                mapping = new NonBlockingKeyMapping("key." + WayfinderClient.MOD_ID + "." + name, keyCode, "key.categories.wayfinder");
+                this.mapping = new NonBlockingKeyMapping("key." + WayfinderClient.MOD_ID + "." + name, keyCode, "key.categories.wayfinder");
             }
 
-            toRegister.add(mapping);
+            toRegister.add(this.mapping);
         }
     }
 
@@ -44,14 +44,14 @@ public class KeyMappings {
         final public KeyMapping mapping;
         final Consumer<ToolPickerWidget> swapper;
 
-        ToolPickerMappings(String name, int keyCode, Consumer<ToolPickerWidget> swapper) {
-            mapping = new NonBlockingKeyMapping("key." + WayfinderClient.MOD_ID + "." + name, keyCode, "key.categories.wayfinder");
-            toRegister.add(mapping);
+        ToolPickerMappings(final String name, final int keyCode, final Consumer<ToolPickerWidget> swapper) {
+            this.mapping = new NonBlockingKeyMapping("key." + WayfinderClient.MOD_ID + "." + name, keyCode, "key.categories.wayfinder");
+            toRegister.add(this.mapping);
             this.swapper = swapper;
         }
 
-        public void swapToTool(ToolPickerWidget widget) {
-            swapper.accept(widget);
+        public void swapToTool(final ToolPickerWidget widget) {
+            this.swapper.accept(widget);
         }
     }
 }

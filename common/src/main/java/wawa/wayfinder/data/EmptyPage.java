@@ -20,51 +20,51 @@ public class EmptyPage extends AbstractPage {
     boolean attemptedUndo = false;
     NativeImage undoImage = null;
 
-    public EmptyPage(int rx, int ry, PageManager parent, PageIO pageIO) {
+    public EmptyPage(final int rx, final int ry, final PageManager parent, final PageIO pageIO) {
         super(rx, ry);
         this.parent = parent;
-        runPageLoadThread(pageIO);
+        this.runPageLoadThread(pageIO);
     }
 
     /**
      * Attempts loading an image asynchronously
      */
-    private void runPageLoadThread(PageIO pageIO) {
+    private void runPageLoadThread(final PageIO pageIO) {
         Util.ioPool().execute(() -> {
-            loadedImage = pageIO.tryLoadImage(rx, ry);
-            loading = false;
+            this.loadedImage = pageIO.tryLoadImage(this.rx, this.ry);
+            this.loading = false;
         });
     }
 
     @Override
-    public void setPixel(int x, int y, int RGBA) {
+    public void setPixel(final int x, final int y, final int RGBA) {
         // if the file loading is not complete, then either the loaded image or any edits made before will be lost if it does load
-        if (!isLoading()) {
-            if (loadedImage == null) {
-                loadedImage = new NativeImage(512, 512, true);
+        if (!this.isLoading()) {
+            if (this.loadedImage == null) {
+                this.loadedImage = new NativeImage(512, 512, true);
             }
-            loadedImage.setPixelRGBA(x, y, RGBA);
+            this.loadedImage.setPixelRGBA(x, y, RGBA);
         }
     }
 
     @Override
     public NativeImage getImage() {
-        return loadedImage;
+        return this.loadedImage;
     }
 
     @Override
-    public void unboChanges(NativeImage replacement) {
-        if (!isLoading()) {
-            DynamicTexture texture = new DynamicTexture(512, 512, false);
+    public void unboChanges(final NativeImage replacement) {
+        if (!this.isLoading()) {
+            final DynamicTexture texture = new DynamicTexture(512, 512, false);
             texture.getPixels().copyFrom(replacement);
-            parent.replacePage(rx, ry, new Page(rx, ry, texture)); //I think this is right?
+            this.parent.replacePage(this.rx, this.ry, new Page(this.rx, this.ry, texture)); //I think this is right?
 
-            attemptedUndo = false;
+            this.attemptedUndo = false;
             replacement.close();
-            undoImage = null;
+            this.undoImage = null;
         } else {
-            attemptedUndo = true;
-            undoImage = replacement;
+            this.attemptedUndo = true;
+            this.undoImage = replacement;
         }
 
         //replace this empty page with a new one if an undo is requested and we are currently empty
@@ -72,27 +72,27 @@ public class EmptyPage extends AbstractPage {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int xOff, int yOff) {
+    public void render(final GuiGraphics guiGraphics, final int xOff, final int yOff) {
         super.render(guiGraphics, xOff, yOff);
-        if (loadedImage != null) {
-            parent.replacePage(rx, ry, new Page(rx, ry, new DynamicTexture(loadedImage)));
+        if (this.loadedImage != null) {
+            this.parent.replacePage(this.rx, this.ry, new Page(this.rx, this.ry, new DynamicTexture(this.loadedImage)));
         }
     }
 
     @Override
-    public void save(PageIO pageIO, boolean close) {
+    public void save(final PageIO pageIO, final boolean close) {
         if (close) {
-            close();
+            this.close();
         }
     }
 
     @Override
     protected void close() {
-        if (loadedImage != null)
-            loadedImage.close();
+        if (this.loadedImage != null)
+            this.loadedImage.close();
     }
 
     public boolean isLoading() {
-        return loading;
+        return this.loading;
     }
 }
