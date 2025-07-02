@@ -59,7 +59,7 @@ public class SingleToolWidget extends AbstractWidget {
                     w -> ((Brush)w).last,
                     Component.literal("brush")
             );
-            this.colorPicker = new ColorPickerWidget(this.getX() - 40, this.getY() - 20, this);
+            this.colorPicker = new ColorPickerWidget(this.getX() - 5, this.getY(), this);
             this.colorPicker.active = false;
         }
 

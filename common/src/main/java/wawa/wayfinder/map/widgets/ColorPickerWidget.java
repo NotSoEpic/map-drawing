@@ -19,11 +19,9 @@ public class ColorPickerWidget extends AbstractWidget {
     private final SingleToolWidget.Brush brush;
     private final int defaultX;
     private final int defaultY;
-    public ColorPickerWidget(final int x, final int y, final SingleToolWidget.Brush brush) {
-        super(x, y, 0, 0, Component.literal("color picker"));
+    public ColorPickerWidget(final int rightAnchor, final int centerY, final SingleToolWidget.Brush brush) {
+        super(rightAnchor, centerY, 0, 0, Component.literal("color picker"));
         this.brush = brush;
-        this.defaultX = x;
-        this.defaultY = y;
         for (int i = 0; i < DyeColor.values().length; i++) {
             final DyeColor color = DyeColor.values()[i];
             final int sx = (i % 4) * 10;
@@ -32,6 +30,11 @@ public class ColorPickerWidget extends AbstractWidget {
             this.height = Math.max(this.height, sy + 8);
             this.swabs.add(new PaletteSwabWidget(this, sx, sy, color.getTextColor() | 0xFF000000));
         }
+        this.defaultX = rightAnchor - this.width;
+        this.defaultY = centerY - this.height / 2;
+        this.setX(this.defaultX);
+        this.setY(this.defaultY);
+
         brush.last = this.swabs.getFirst().tool;
     }
 
@@ -107,7 +110,14 @@ public class ColorPickerWidget extends AbstractWidget {
 
         @Override
         protected void renderWidget(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
-            guiGraphics.fill(this.getX(), this.getY(), this.getRight(), this.getBottom(), this.color);
+            if (this.isMouseOver(mouseX, mouseY)) {
+                guiGraphics.fill(this.getX() - 1, this.getY() - 1, this.getRight() + 1, this.getBottom() + 1, 0xFFFFFFFF);
+                guiGraphics.fill(this.getX(), this.getY(), this.getRight(), this.getBottom(), 0xFF000000);
+                guiGraphics.fill(this.getX() + 1, this.getY() + 1, this.getRight() - 1, this.getBottom() - 1, this.color);
+            } else {
+                guiGraphics.fill(this.getX(), this.getY(), this.getRight(), this.getBottom(), this.color);
+            }
+
         }
 
         @Override
