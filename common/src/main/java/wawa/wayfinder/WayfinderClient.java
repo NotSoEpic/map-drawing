@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import wawa.wayfinder.data.PageManager;
 import wawa.wayfinder.map.PlayerPositions;
+import wawa.wayfinder.platform.Services;
 
 public final class WayfinderClient {
     public static final String MOD_ID = "wayfinder";
@@ -12,7 +13,9 @@ public final class WayfinderClient {
     public static PageManager PAGE_MANAGER = new PageManager();
     public static PlayerPositions POSITION_HISTORY = new PlayerPositions();
 
-    public static void init() {}
+    public static void init() {
+        LOGGER.info("Hello from {}!", Services.PLATFORM.getPlatformName());
+    }
 
     public static ResourceLocation id(final String path) {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
