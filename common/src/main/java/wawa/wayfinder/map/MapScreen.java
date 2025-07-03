@@ -10,16 +10,15 @@ import org.joml.Vector2d;
 import org.lwjgl.glfw.GLFW;
 import wawa.wayfinder.LerpedVector2d;
 import wawa.wayfinder.WayfinderClient;
-import wawa.wayfinder.input.KeyMappings.NormalMappings;
 import wawa.wayfinder.map.tool.Tool;
 import wawa.wayfinder.map.widgets.DebugTextRenderable;
 import wawa.wayfinder.map.widgets.MapWidget;
 import wawa.wayfinder.map.widgets.SideTabWidget;
 import wawa.wayfinder.map.widgets.ToolPickerWidget;
+import wawa.wayfinder.platform.Services;
+import wawa.wayfinder.platform.services.IKeyMappings;
 
 import java.util.List;
-
-import static wawa.wayfinder.input.KeyMappings.ToolPickerMappings;
 
 public class MapScreen extends Screen {
     private int zoomNum = 0;
@@ -94,24 +93,23 @@ public class MapScreen extends Screen {
 
     @Override
     public boolean keyPressed(final int keyCode, final int scanCode, final int modifiers) {
-        if (NormalMappings.OPEN_MAP.mapping.matches(keyCode, scanCode)) {
+        if (Services.KEY_MAPPINGS.matches(IKeyMappings.Normal.OPEN_MAP, keyCode, scanCode, modifiers)) {
             this.onClose();
             return true;
         }
 
-        if (NormalMappings.SWAP.mapping.matches(keyCode, scanCode)) {
+        if (Services.KEY_MAPPINGS.matches(IKeyMappings.Normal.SWAP, keyCode, scanCode, modifiers)) {
             Tool.swap();
         }
 
-        if (NormalMappings.UNDO.mapping.matches(keyCode, scanCode) && Screen.hasControlDown()) {
+        if (Services.KEY_MAPPINGS.matches(IKeyMappings.Normal.UNDO, keyCode, scanCode, modifiers)) {
             WayfinderClient.PAGE_MANAGER.undoChanges();
         }
 
-        for (final ToolPickerMappings mapping : ToolPickerMappings.values()) {
-            if (mapping.mapping.matches(keyCode, scanCode)) {
-                mapping.swapToTool(this.toolPicker);
-                return true;
-            }
+        switch (Services.KEY_MAPPINGS.getToolSwap(keyCode, scanCode, modifiers)) {
+            case BRUSH -> this.toolPicker.pickBrush();
+            case PENCIL -> this.toolPicker.pickPencil();
+            case null -> {}
         }
 
         return super.keyPressed(keyCode, scanCode, modifiers);

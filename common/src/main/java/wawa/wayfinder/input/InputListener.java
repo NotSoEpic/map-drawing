@@ -8,11 +8,12 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.joml.Vector2d;
 import wawa.wayfinder.map.MapScreen;
+import wawa.wayfinder.platform.Services;
+import wawa.wayfinder.platform.services.IKeyMappings;
 
 public class InputListener {
     public static void tick(final Minecraft minecraft) {
-        while (minecraft.level != null && KeyMappings.NormalMappings.OPEN_MAP.mapping.
-                consumeClick()) {
+        while (minecraft.level != null && Services.KEY_MAPPINGS.consume(IKeyMappings.Normal.OPEN_MAP)) {
             minecraft.setScreen(new MapScreen(
                     new Vector2d((int) minecraft.player.getX(), (int) minecraft.player.getZ()),
                     getEndingPosition(minecraft.player)));

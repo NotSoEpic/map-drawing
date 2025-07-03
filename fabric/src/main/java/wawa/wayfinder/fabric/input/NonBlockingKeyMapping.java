@@ -1,8 +1,9 @@
-package wawa.wayfinder.input;
+package wawa.wayfinder.fabric.input;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.network.chat.Component;
+import org.lwjgl.glfw.GLFW;
 import wawa.wayfinder.mixin.KeyBindingAccessor;
 
 /**
@@ -10,14 +11,21 @@ import wawa.wayfinder.mixin.KeyBindingAccessor;
  * <p>
  * {@link KeyMapping#isDown()} and {@link KeyMapping#consumeClick()} will not work, use {@link KeyMapping#matches(int, int)} somewhere that passes in the appropriate values
  * <p>
- * Based off of <a href="https://github.com/mezz/JustEnoughItems/blob/1.21.x/Fabric/src/main/java/mezz/jei/fabric/input/FabricKeyMapping.java">JEI's implementation</a>
+ * Based off of <a href="https://github.com/mezz/JustEnoughItems/blob/1.21.x/Fabric/src/main/java/mezz/jei/fabric/input/FabricKeyMapping.java">JEI's implementation</a><br>
+ * Also supports a key modifier
  */
 public class NonBlockingKeyMapping extends KeyMapping {
     private InputConstants.Key realKey;
+    private int keyModifier = 0;
     public NonBlockingKeyMapping(final String name, final int keyCode, final String category) {
         super(name, keyCode, category);
         this.realKey = ((KeyBindingAccessor)this).getKey();
         super.setKey(InputConstants.UNKNOWN);
+    }
+
+    public NonBlockingKeyMapping setKeyModifier(final int modifier) {
+        this.keyModifier = modifier;
+        return this;
     }
 
     @Override
@@ -49,6 +57,10 @@ public class NonBlockingKeyMapping extends KeyMapping {
         }
     }
 
+    public boolean matchesWithModifier(final int keysym, final int scancode, final int modifier) {
+        return this.matches(keysym, scancode) && (this.keyModifier == 0 || (this.keyModifier & modifier) != 0);
+    }
+
     @Override
     public boolean matchesMouse(final int key) {
         return this.realKey.getType() == InputConstants.Type.MOUSE &&
@@ -57,6 +69,9 @@ public class NonBlockingKeyMapping extends KeyMapping {
 
     @Override
     public Component getTranslatedKeyMessage() {
+        if (this.keyModifier == GLFW.GLFW_MOD_CONTROL) { // this is the point where i give up making it generalized
+            return Component.literal("CTRL + ").append(this.realKey.getDisplayName());
+        }
         return this.realKey.getDisplayName();
     }
 
