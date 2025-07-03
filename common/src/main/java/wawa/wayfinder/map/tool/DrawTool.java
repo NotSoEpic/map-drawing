@@ -1,8 +1,12 @@
 package wawa.wayfinder.map.tool;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.systems.RenderSystem;
+import foundry.veil.api.client.color.Color;
+import foundry.veil.api.client.render.rendertype.VeilRenderType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -11,10 +15,12 @@ import org.joml.RoundingMode;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
 import wawa.wayfinder.Helper;
+import wawa.wayfinder.Rendering;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.data.PageManager;
 import wawa.wayfinder.map.widgets.MapWidget;
 
+import java.util.Arrays;
 import java.util.function.Consumer;
 
 public class DrawTool extends Tool {
@@ -91,8 +97,13 @@ public class DrawTool extends Tool {
 
     @Override
     public void renderWorld(final GuiGraphics graphics, final int worldX, final int worldY, final int xOff, final int yOff) {
+        RenderType renderType = VeilRenderType.get(Rendering.PALETTE_SWAP_RENDER_TYPE, id);
+        if(renderType == null) return;
+
         final int wh = this.r * 2 + 1;
-        graphics.blit(id, worldX - this.r + xOff, worldY - this.r + yOff, 0, 0, wh, wh, wh, wh);
+        int x = worldX - this.r + xOff;
+        int y = worldY - this.r + yOff;
+        Rendering.renderTypeBlit(graphics, renderType, x, y, 0, 0.0f, 0.0f, wh, wh, wh, wh);
     }
 
     @Override

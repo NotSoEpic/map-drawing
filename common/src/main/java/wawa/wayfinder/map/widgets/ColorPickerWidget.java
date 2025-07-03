@@ -1,11 +1,13 @@
 package wawa.wayfinder.map.widgets;
 
+import com.mojang.blaze3d.platform.NativeImage;
+import foundry.veil.api.client.color.Color;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.DyeColor;
+import wawa.wayfinder.Rendering;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.map.tool.PaletteDrawTool;
 import wawa.wayfinder.map.tool.Tool;
@@ -15,6 +17,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ColorPickerWidget extends AbstractWidget {
+    public static final int COLOR_COUNT = 9;
+
     private final List<PaletteSwabWidget> swabs = new ArrayList<>();
     private final SingleToolWidget.Brush brush;
     private final int defaultX;
@@ -22,14 +26,22 @@ public class ColorPickerWidget extends AbstractWidget {
     public ColorPickerWidget(final int rightAnchor, final int centerY, final SingleToolWidget.Brush brush) {
         super(rightAnchor, centerY, 0, 0, Component.literal("color picker"));
         this.brush = brush;
-        for (int i = 0; i < DyeColor.values().length; i++) {
-            final DyeColor color = DyeColor.values()[i];
+
+        NativeImage texture = Rendering.getPaletteTexture();
+
+        int colorCount = Math.min(COLOR_COUNT, texture.getWidth());
+        for (int i = 0; i < colorCount; i++) {
+            float n = (float) i / COLOR_COUNT;
+            Color color = new Color(n, n, n);
+            int pixelRGBA = texture.getPixelRGBA(i, 0);
+            Color trueColor = new Color(Integer.reverseBytes(pixelRGBA) >> 8);
             final int sx = (i % 4) * 10;
             final int sy = (i / 4) * 10;
             this.width = Math.max(this.width, sx + 8);
             this.height = Math.max(this.height, sy + 8);
-            this.swabs.add(new PaletteSwabWidget(this, sx, sy, color.getTextColor() | 0xFF000000));
+            this.swabs.add(new PaletteSwabWidget(this, sx, sy, color.argb(), trueColor.argb()));
         }
+
         this.defaultX = rightAnchor - this.width;
         this.defaultY = centerY - this.height / 2;
         this.setX(this.defaultX);
@@ -86,14 +98,16 @@ public class ColorPickerWidget extends AbstractWidget {
         private final int relX;
         private final int relY;
         public final int color;
+        public final int visualColor;
         public final PaletteDrawTool tool;
 
-        public PaletteSwabWidget(final ColorPickerWidget parent, final int x, final int y, final int color) {
+        public PaletteSwabWidget(final ColorPickerWidget parent, final int x, final int y, final int color, final int visualColor) {
             super(0, 0, 8, 8, Component.literal("color swab"));
             this.parent = parent;
             this.relX = x;
             this.relY = y;
             this.color = color;
+            this.visualColor = visualColor;
             this.tool = new PaletteDrawTool(this.getABGR(), parent.brush);
             this.tool.icon = WayfinderClient.id("cursor/brush");
         }
@@ -113,9 +127,9 @@ public class ColorPickerWidget extends AbstractWidget {
             if (this.isMouseOver(mouseX, mouseY)) {
                 guiGraphics.fill(this.getX() - 1, this.getY() - 1, this.getRight() + 1, this.getBottom() + 1, 0xFFFFFFFF);
                 guiGraphics.fill(this.getX(), this.getY(), this.getRight(), this.getBottom(), 0xFF000000);
-                guiGraphics.fill(this.getX() + 1, this.getY() + 1, this.getRight() - 1, this.getBottom() - 1, this.color);
+                guiGraphics.fill(this.getX() + 1, this.getY() + 1, this.getRight() - 1, this.getBottom() - 1, this.visualColor);
             } else {
-                guiGraphics.fill(this.getX(), this.getY(), this.getRight(), this.getBottom(), this.color);
+                guiGraphics.fill(this.getX(), this.getY(), this.getRight(), this.getBottom(), this.visualColor);
             }
 
         }

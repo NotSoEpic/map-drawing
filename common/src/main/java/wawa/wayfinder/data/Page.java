@@ -1,12 +1,15 @@
 package wawa.wayfinder.data;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import foundry.veil.api.client.render.rendertype.VeilRenderType;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
+import wawa.wayfinder.Rendering;
 import wawa.wayfinder.WayfinderClient;
 
 /**
@@ -59,11 +62,15 @@ public class Page extends AbstractPage {
     @Override
     public void render(final GuiGraphics guiGraphics, final int xOff, final int yOff) {
         super.render(guiGraphics, xOff, yOff);
+        RenderType renderType = VeilRenderType.get(Rendering.PALETTE_SWAP_RENDER_TYPE, this.textureID);
+        if(renderType == null) return;
+
         if (this.uploadDirty) {
             this.texture.upload();
         }
 
-        guiGraphics.blit(this.textureID, this.left() + xOff, this.top() + yOff, 0, 0, 512, 512, 512, 512);
+        Rendering.renderTypeBlit(guiGraphics, renderType,
+                this.left() + xOff, this.top() + yOff, 0, 0.0f, 0.0f, 512, 512, 512, 512);
     }
 
     /**
