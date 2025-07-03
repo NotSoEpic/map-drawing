@@ -100,7 +100,7 @@ public class PageManager {
 
             final Vector2i key = new Vector2i(rx, ry);
             if (history.get(key) == null) {
-                final NativeImage image = new NativeImage(512, 512, false);
+                final NativeImage image = new NativeImage(512, 512, true);
                 final NativeImage pageImg = newPage.getImage();
                 if (pageImg != null) {
                     image.copyFrom(pageImg);
