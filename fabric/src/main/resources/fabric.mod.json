@@ -17,9 +17,6 @@
   "entrypoints": {
     "client": [
       "wawa.wayfinder.fabric.WayfinderFabricClient"
-    ],
-    "data": [
-      "wawa.wayfinder.fabric.WayfinderData"
     ]
   },
   "mixins": [
