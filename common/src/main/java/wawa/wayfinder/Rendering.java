@@ -5,27 +5,63 @@ import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import foundry.veil.api.client.render.VeilRenderSystem;
+import foundry.veil.api.client.render.VeilRenderer;
+import foundry.veil.api.client.render.rendertype.VeilRenderType;
+import foundry.veil.api.client.render.shader.uniform.ShaderUniform;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 public class Rendering {
-	public static final ResourceLocation PALETTE_SWAP_RENDER_TYPE = WayfinderClient.id("palette_swap");
-	public static final ResourceLocation PALETTE_TEXTURE = WayfinderClient.id("textures/gui/palette.png");
+
+	public static class RenderTypes {
+		public static final ResourceLocation PALETTE_SWAP = WayfinderClient.id("palette_swap");
+		public static final ResourceLocation UV_REMAP = WayfinderClient.id("uv_remap");
+	}
+
+	public static class Textures {
+		public static final ResourceLocation PALETTE = WayfinderClient.id("textures/gui/palette.png");
+		public static final ResourceLocation HEAD_ICON = WayfinderClient.id("textures/gui/head_icon.png");
+	}
+
+	public static class Shaders {
+		public static final ResourceLocation PALETTE_SWAP = WayfinderClient.id("palette_swap");
+		public static final ResourceLocation UV_REMAP = WayfinderClient.id("uv_remap");
+	}
+
+	public static void renderPlayerIcon(GuiGraphics graphics, int x, int y, LocalPlayer player) {
+		ResourceLocation skinTexture = player.getSkin().texture();
+
+		RenderType renderType = VeilRenderType.get(RenderTypes.UV_REMAP, skinTexture, Textures.HEAD_ICON);
+		if(renderType == null) return;
+		ShaderUniform xOffset = VeilRenderSystem.setShader(Shaders.UV_REMAP).getOrCreateUniform("XOffset");
+
+		float rot = ((player.yRotO + 90) % 360) / 360.0f;
+		int frame = Math.round(rot * 16);
+
+		xOffset.setFloat(0.0f);
+		Rendering.renderTypeBlit(graphics, renderType, x, y, 0, 0.0f, 16.0f * frame, 16, 16, 16, 256);
+
+		xOffset.setFloat(0.5f);
+		Rendering.renderTypeBlit(graphics, renderType, x, y, 0, 0.0f, 16.0f * frame, 16, 16, 16, 256);
+	}
 
 	public static NativeImage getPaletteTexture() {
 		ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
 		NativeImage image = null;
 
 		try {
-			Resource resource = resourceManager.getResourceOrThrow(PALETTE_TEXTURE);
+			Resource resource = resourceManager.getResourceOrThrow(Textures.PALETTE);
 
 			try(InputStream stream = resource.open()) {
 				image = NativeImage.read(stream);

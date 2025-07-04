@@ -1,8 +1,6 @@
 package wawa.wayfinder.map.tool;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.systems.RenderSystem;
-import foundry.veil.api.client.color.Color;
 import foundry.veil.api.client.render.rendertype.VeilRenderType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -20,7 +18,6 @@ import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.data.PageManager;
 import wawa.wayfinder.map.widgets.MapWidget;
 
-import java.util.Arrays;
 import java.util.function.Consumer;
 
 public class DrawTool extends Tool {
@@ -97,7 +94,7 @@ public class DrawTool extends Tool {
 
     @Override
     public void renderWorld(final GuiGraphics graphics, final int worldX, final int worldY, final int xOff, final int yOff) {
-        RenderType renderType = VeilRenderType.get(Rendering.PALETTE_SWAP_RENDER_TYPE, id);
+        RenderType renderType = VeilRenderType.get(Rendering.RenderTypes.PALETTE_SWAP, id);
         if(renderType == null) return;
 
         final int wh = this.r * 2 + 1;

@@ -1,8 +1,16 @@
 package wawa.wayfinder.map;
 
+import foundry.veil.api.client.render.VeilRenderSystem;
+import foundry.veil.api.client.render.rendertype.VeilRenderType;
+import foundry.veil.api.client.render.shader.program.ShaderProgram;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import org.joml.Vector2d;
+import wawa.wayfinder.Rendering;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
@@ -43,7 +51,11 @@ public class PlayerPositions {
     public void render(final GuiGraphics guiGraphics, final int xOff, final int yOff) {
         if (this.visible) {
             this.positions.forEach(v -> guiGraphics.fill((int) v.x + xOff, (int) v.y + yOff, (int) v.x + 1 + xOff, (int) v.y + 1 + yOff, 0xFFFF00FF));
-            guiGraphics.fill((int) this.current.x - 1 + xOff, (int) this.current.y - 1 + yOff, (int) this.current.x + 2 + xOff, (int) this.current.y + 2 + yOff, 0xFFFF00FF);
+
+            int x = (int) (this.current.x + xOff);
+            int y = (int) (this.current.y + yOff);
+
+            Rendering.renderPlayerIcon(guiGraphics, x - 8, y - 8, Minecraft.getInstance().player);
         }
     }
 }
