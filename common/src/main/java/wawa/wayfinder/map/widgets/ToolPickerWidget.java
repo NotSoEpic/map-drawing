@@ -15,9 +15,9 @@ import java.util.List;
 
 public class ToolPickerWidget extends AbstractWidget {
     private final List<SingleToolWidget> tools = new ArrayList<>();
-    private final DrawTool pencil = new DrawTool(0xFF000000);
+    private final DrawTool pencil = new DrawTool(0xFF000000, 0xFF000000);
     private final SingleToolWidget.Brush brush;
-    private final DrawTool eraser = new DrawTool(0);
+    private final DrawTool eraser = new DrawTool(0, 0);
     public ToolPickerWidget(final int x, final int y) {
         super(x, y, 0, 0, Component.literal("tool picker"));
         this.pencil.icon = WayfinderClient.id("cursor/pencil");
@@ -48,7 +48,7 @@ public class ToolPickerWidget extends AbstractWidget {
     public void pickBrush() {
         if (Tool.get() == this.brush.last) {
             final Vec2 mouse = Helper.preciseMousePos();
-            this.brush.openToMouse((int)mouse.x, (int)mouse.y);
+            this.brush.openToMouse(mouse.x, mouse.y);
         } else {
             Tool.set(this.brush.last);
         }

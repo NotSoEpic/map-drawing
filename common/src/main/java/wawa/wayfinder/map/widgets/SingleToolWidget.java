@@ -68,16 +68,14 @@ public class SingleToolWidget extends AbstractWidget {
         }
 
         public void openToMouse(final double mouseX, final double mouseY) {
-            this.colorPicker.active = true;
-            this.colorPicker.setX((int) (mouseX - this.width /2));
-            this.colorPicker.setY((int) (mouseY - this.height /2));
+            this.colorPicker.openToMouse(mouseX, mouseY);
         }
 
         @Override
         protected void renderWidget(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
             super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
             final float[] rgb = new Color(this.last.getVisualColor()).getRGBColorComponents(null);
-            guiGraphics.blit(this.getX(), this.getY(), 0, 16, 16, mask, rgb[2], rgb[1], rgb[0], 1);
+            guiGraphics.blit(this.getX(), this.getY(), 0, 16, 16, mask, rgb[0], rgb[1], rgb[2], 1);
 
             if (this.isMouseOver(mouseX, mouseY) || (this.colorPicker.isMouseOver(mouseX, mouseY) && this.colorPicker.isActive())) {
                 this.colorPicker.active = true;

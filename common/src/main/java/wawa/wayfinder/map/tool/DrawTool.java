@@ -22,7 +22,8 @@ import java.util.function.Consumer;
 
 public class DrawTool extends Tool {
     public ResourceLocation icon = null;
-    private final int color;
+    private final int internal_color;
+    private final int visual_color;
     private int r = 0;
     private static final ResourceLocation id = WayfinderClient.id("draw");
     private static DynamicTexture preview = new DynamicTexture(1, 1, false);
@@ -33,21 +34,22 @@ public class DrawTool extends Tool {
         Minecraft.getInstance().getTextureManager().register(id, preview);
     }
 
-    public DrawTool(final int color) {
-        this.color = color;
+    public DrawTool(final int color, final int visual_color) {
+        this.internal_color = color;
+        this.visual_color = visual_color;
     }
 
     private void rebuildPixels() {
         preview.close();
         final int wh = this.r * 2 + 1;
         final NativeImage im = new NativeImage(wh, wh, true);
-        if (this.color == 0) { // black hollow rectangle
+        if (this.internal_color == 0) { // black hollow rectangle
             im.fillRect(0, 0, wh, wh, 0xFF000000);
             if (wh >= 3) {
                 im.fillRect(1, 1, wh - 2, wh - 2, 0);
             }
         } else {
-            im.fillRect(0, 0, wh, wh, this.color);
+            im.fillRect(0, 0, wh, wh, this.internal_color);
         }
         preview = new DynamicTexture(im);
         preview.upload();
@@ -60,7 +62,7 @@ public class DrawTool extends Tool {
         switch (mouse) {
             case LEFT -> this.pixelLine(oldWorld.floor(), world.floor(), pos ->  {
                 activePage.startSnapshot();
-                activePage.putSquare(pos.x, pos.y, this.color, this.r);
+                activePage.putSquare(pos.x, pos.y, this.internal_color, this.r);
             });
             case RIGHT -> this.pixelLine(oldWorld.floor(), world.floor(), pos -> {
                 activePage.startSnapshot();
@@ -120,10 +122,10 @@ public class DrawTool extends Tool {
     }
 
     public int getVisualColor() {
-        return this.color;
+        return this.visual_color;
     }
 
     public int getInternalColor() {
-        return this.color;
+        return this.internal_color;
     }
 }

@@ -35,19 +35,26 @@ public class ColorPickerWidget extends AbstractWidget {
             Color color = new Color(n, n, n);
             int pixelRGBA = texture.getPixelRGBA(i, 0);
             Color trueColor = new Color(Integer.reverseBytes(pixelRGBA) >> 8);
-            final int sx = (i % 4) * 10;
-            final int sy = (i / 4) * 10;
+            final int columns = 3;
+            final int sx = (i % columns) * 10;
+            final int sy = (i / columns) * 10;
             this.width = Math.max(this.width, sx + 8);
             this.height = Math.max(this.height, sy + 8);
             this.swabs.add(new PaletteSwabWidget(this, sx, sy, color.argb(), trueColor.argb()));
         }
 
-        this.defaultX = rightAnchor - this.width;
-        this.defaultY = centerY - this.height / 2;
+        this.defaultX = rightAnchor - this.width - 4;
+        this.defaultY = centerY - this.height / 2 + 8;
         this.setX(this.defaultX);
         this.setY(this.defaultY);
 
         brush.last = this.swabs.getFirst().tool;
+    }
+
+    public void openToMouse(final double mouseX, final double mouseY) {
+        this.active = true;
+        this.setX((int) (mouseX - this.width / 2));
+        this.setY((int) (mouseY - this.height / 2));
     }
 
     public void resetPos() {
@@ -75,7 +82,6 @@ public class ColorPickerWidget extends AbstractWidget {
     public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
         for (final PaletteSwabWidget swab : this.swabs) {
             if (swab.mouseClicked(mouseX, mouseY, button)) {
-                this.active = false;
                 return true;
             }
         }
@@ -108,7 +114,7 @@ public class ColorPickerWidget extends AbstractWidget {
             this.relY = y;
             this.color = color;
             this.visualColor = visualColor;
-            this.tool = new PaletteDrawTool(this.getABGR(), parent.brush);
+            this.tool = new PaletteDrawTool(this.getABGR(), this.visualColor, parent.brush);
             this.tool.icon = WayfinderClient.id("cursor/brush");
         }
 
