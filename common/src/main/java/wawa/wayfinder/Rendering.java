@@ -145,8 +145,9 @@ public class Rendering {
 			if (renderType == null) return;
 			final ShaderProgram backgroundProgram = VeilRenderSystem.setShader(Shaders.BACKGROUND);
 			if (backgroundProgram == null) return;
-			backgroundProgram.getOrCreateUniform("translation").setVector((float) backgroundTranslation.x(), (float) backgroundTranslation.y());
-			backgroundProgram.getOrCreateUniform("scale").setFloat(scale);
+			backgroundProgram.getOrCreateUniform("ScreenCenter").setVectorI(x + width / 2, y + height / 2);
+			backgroundProgram.getOrCreateUniform("Translation").setVector((float) backgroundTranslation.x(), (float) backgroundTranslation.y());
+			backgroundProgram.getOrCreateUniform("Scale").setFloat(scale);
 
 			// this is awful...................
 			final int leftWidth = nineslice.border().left();

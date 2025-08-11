@@ -31,7 +31,7 @@ public class ColorPickerWidget extends AbstractWidget {
 
         final int colorCount = Math.min(COLOR_COUNT, texture.getWidth());
         for (int i = 0; i < colorCount; i++) {
-            final float n = (float) (i+1) / COLOR_COUNT;
+            final float n = (float) (i+1) / (COLOR_COUNT + 1);
             final Color color = new Color(n, n, n);
             final int pixelRGBA = texture.getPixelRGBA(i+1, 0);
             final Color trueColor = new Color(Integer.reverseBytes(pixelRGBA) >> 8);

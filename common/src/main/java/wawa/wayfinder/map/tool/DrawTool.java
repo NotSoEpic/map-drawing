@@ -69,12 +69,17 @@ public class DrawTool extends Tool {
                 this.putSquare(activePage, pos, this.internal_color);
             });
             case RIGHT -> this.pixelLine(oldWorld.floor(), world.floor(), pos -> {
-                this.putSquare(activePage, pos, 0);
+                this.removeSquare(activePage, pos, 0);
             });
         }
     }
 
     public void putSquare(final PageManager activePage, final Vector2ic pos, final int targetColor) {
+        activePage.startSnapshot();
+        activePage.putSquare(pos.x(), pos.y(), targetColor, this.r);
+    }
+
+    public void removeSquare(final PageManager activePage, final Vector2ic pos, final int targetColor) {
         activePage.startSnapshot();
         activePage.putSquare(pos.x(), pos.y(), targetColor, this.r);
     }

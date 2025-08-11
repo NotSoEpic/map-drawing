@@ -22,4 +22,10 @@ public class PaletteDrawTool extends DrawTool {
         activePage.startSnapshot();
         activePage.putConditionalSquare(pos.x(), pos.y(), targetColor, this.getRadius(), c -> c != 0xFF000000);
     }
+
+    @Override
+    public void removeSquare(final PageManager activePage, final Vector2ic pos, final int targetColor) {
+        activePage.startSnapshot();
+        activePage.putConditionalSquare(pos.x(), pos.y(), targetColor, this.getRadius(), c -> c != 0xFF000000);
+    }
 }
