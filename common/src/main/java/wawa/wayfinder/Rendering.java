@@ -6,17 +6,18 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import foundry.veil.api.client.render.VeilRenderSystem;
-import foundry.veil.api.client.render.VeilRenderer;
 import foundry.veil.api.client.render.rendertype.VeilRenderType;
+import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.client.render.shader.uniform.ShaderUniform;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.metadata.gui.GuiSpriteScaling;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
 
 import java.io.IOException;
@@ -27,27 +28,31 @@ public class Rendering {
 	public static class RenderTypes {
 		public static final ResourceLocation PALETTE_SWAP = WayfinderClient.id("palette_swap");
 		public static final ResourceLocation UV_REMAP = WayfinderClient.id("uv_remap");
+		public static final ResourceLocation BACKGROUND = WayfinderClient.id("background");
 	}
 
 	public static class Textures {
 		public static final ResourceLocation PALETTE = WayfinderClient.id("textures/gui/palette.png");
 		public static final ResourceLocation HEAD_ICON = WayfinderClient.id("textures/gui/head_icon.png");
+		private static final ResourceLocation BACKGROUND = WayfinderClient.id("background");
+		private static final ResourceLocation BACKGROUND_FULL = WayfinderClient.id("textures/gui/sprites/background.png");
 	}
 
 	public static class Shaders {
 		public static final ResourceLocation PALETTE_SWAP = WayfinderClient.id("palette_swap");
 		public static final ResourceLocation UV_REMAP = WayfinderClient.id("uv_remap");
+		public static final ResourceLocation BACKGROUND = WayfinderClient.id("background");
 	}
 
-	public static void renderPlayerIcon(GuiGraphics graphics, int x, int y, LocalPlayer player) {
-		ResourceLocation skinTexture = player.getSkin().texture();
+	public static void renderPlayerIcon(final GuiGraphics graphics, final int x, final int y, final LocalPlayer player) {
+		final ResourceLocation skinTexture = player.getSkin().texture();
 
-		RenderType renderType = VeilRenderType.get(RenderTypes.UV_REMAP, skinTexture, Textures.HEAD_ICON);
+		final RenderType renderType = VeilRenderType.get(RenderTypes.UV_REMAP, skinTexture, Textures.HEAD_ICON);
 		if(renderType == null) return;
-		ShaderUniform xOffset = VeilRenderSystem.setShader(Shaders.UV_REMAP).getOrCreateUniform("XOffset");
+		final ShaderUniform xOffset = VeilRenderSystem.setShader(Shaders.UV_REMAP).getOrCreateUniform("XOffset");
 
-		float rot = ((player.yRotO + 90) % 360) / 360.0f;
-		int frame = Math.round(rot * 16);
+		final float rot = ((player.yRotO + 90) % 360) / 360.0f;
+		final int frame = Math.round(rot * 16);
 
 		xOffset.setFloat(0.0f);
 		Rendering.renderTypeBlit(graphics, renderType, x, y, 0, 0.0f, 16.0f * frame, 16, 16, 16, 256);
@@ -57,36 +62,120 @@ public class Rendering {
 	}
 
 	public static NativeImage getPaletteTexture() {
-		ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
+		final ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
 		NativeImage image = null;
 
 		try {
-			Resource resource = resourceManager.getResourceOrThrow(Textures.PALETTE);
+			final Resource resource = resourceManager.getResourceOrThrow(Textures.PALETTE);
 
-			try(InputStream stream = resource.open()) {
+			try(final InputStream stream = resource.open()) {
 				image = NativeImage.read(stream);
 			}
 
-		} catch (IOException ignored) {}
+		} catch (final IOException ignored) {}
 
 		return image;
 	}
 
-	public static void renderTypeBlit(GuiGraphics guiGraphics, RenderType renderType, int x, int y, int blitOffset, float uOffset, float vOffset, int uWidth, int vHeight, int textureWidth, int textureHeight) {
+	public static void renderTypeBlit(final GuiGraphics guiGraphics, final RenderType renderType, final int x, final int y, final int blitOffset, final float uOffset, final float vOffset, final int uWidth, final int vHeight, final int textureWidth, final int textureHeight) {
 		renderTypeBlit(guiGraphics, renderType, x, x + uWidth, y, y + vHeight, blitOffset, uWidth, vHeight, uOffset, vOffset, textureWidth, textureHeight);
 	}
 
-	public static void renderTypeBlit(GuiGraphics guiGraphics, RenderType renderType, int x1, int x2, int y1, int y2, int blitOffset, int uWidth, int vHeight, float uOffset, float vOffset, int textureWidth, int textureHeight) {
+	public static void renderTypeBlit(final GuiGraphics guiGraphics, final RenderType renderType, final int x1, final int x2, final int y1, final int y2, final int blitOffset, final int uWidth, final int vHeight, final float uOffset, final float vOffset, final int textureWidth, final int textureHeight) {
 		renderTypeBlit(guiGraphics, renderType, x1, x2, y1, y2, blitOffset, (uOffset + 0.0F) / (float)textureWidth, (uOffset + (float)uWidth) / (float)textureWidth, (vOffset + 0.0F) / (float)textureHeight, (vOffset + (float)vHeight) / (float)textureHeight);
 	}
 
-	public static void renderTypeBlit(GuiGraphics guiGraphics, RenderType renderType, int x1, int x2, int y1, int y2, int blitOffset, float minU, float maxU, float minV, float maxV) {
-		Matrix4f matrix4f = guiGraphics.pose().last().pose();
-		BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+	public static void renderTypeBlit(final GuiGraphics guiGraphics, final RenderType renderType, final int x1, final int x2, final int y1, final int y2, final int blitOffset, final float minU, final float maxU, final float minV, final float maxV) {
+		final Matrix4f matrix4f = guiGraphics.pose().last().pose();
+		final BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
 		bufferBuilder.addVertex(matrix4f, (float)x1, (float)y1, (float)blitOffset).setUv(minU, minV);
 		bufferBuilder.addVertex(matrix4f, (float)x1, (float)y2, (float)blitOffset).setUv(minU, maxV);
 		bufferBuilder.addVertex(matrix4f, (float)x2, (float)y2, (float)blitOffset).setUv(maxU, maxV);
 		bufferBuilder.addVertex(matrix4f, (float)x2, (float)y1, (float)blitOffset).setUv(maxU, minV);
 		renderType.draw(bufferBuilder.buildOrThrow());
+	}
+
+	public static void renderTypeBlitUV1(final GuiGraphics guiGraphics, final RenderType renderType,
+										 final int x, final int y, final int width, final int height,
+										 final int textureWidth, final int textureHeight, final int blitOffset,
+										 final float u, final float v,
+										 final int screenX, final int screenY) {
+		final Matrix4f matrix4f = guiGraphics.pose().last().pose();
+		final BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX); // todo
+		bufferBuilder.addVertex(matrix4f, (float)x, (float)y, (float)blitOffset)
+				.setUv(u / textureWidth, v / textureHeight)
+				.setUv2(screenX, screenY).setColor(-1);
+
+		bufferBuilder.addVertex(matrix4f, (float)x, (float)y + height, (float)blitOffset)
+				.setUv(u / textureWidth, (v + height) / textureHeight)
+				.setUv2(screenX, screenY + height).setColor(-1);
+
+		bufferBuilder.addVertex(matrix4f, (float)x + width, (float)y + height, (float)blitOffset)
+				.setUv((u + width) / textureWidth, (v + height) / textureHeight)
+				.setUv2(screenX + width, screenY + height).setColor(-1);
+
+		bufferBuilder.addVertex(matrix4f, (float)x + width, (float)y, (float)blitOffset)
+				.setUv((u + width) / textureWidth, v / textureHeight)
+				.setUv2(screenX + width, screenY).setColor(-1);
+
+		renderType.draw(bufferBuilder.buildOrThrow());
+	}
+
+	public static void renderTypeBlitUV1Tile(final GuiGraphics guiGraphics, final RenderType renderType,
+											 final int x, final int y, final int width, final int height,
+											 final int sliceWidth, final int sliceHeight,
+											 final int textureWidth, final int textureHeight, final int blitOffset,
+											 final float u, final float v,
+											 final int screenX, final int screenY) {
+		for(int i = 0; i < width; i += sliceWidth) {
+			int j = Math.min(sliceWidth, width - i);
+
+			for(int k = 0; k < height; k += sliceHeight) {
+				int l = Math.min(sliceHeight, height - k);
+				renderTypeBlitUV1(guiGraphics, renderType,
+						x+i, y+k, j, l, textureWidth, textureHeight, blitOffset, u, v, screenX, screenY);
+			}
+		}
+	}
+
+	public static void renderMapNineslice(final GuiGraphics guiGraphics, final int x, final int y, final int screenX, final int screenY, final int width, final int height, final int blitOffset) {
+		final TextureAtlasSprite textureatlassprite = Minecraft.getInstance().getGuiSprites().getSprite(Textures.BACKGROUND);
+		final GuiSpriteScaling guispritescaling = Minecraft.getInstance().getGuiSprites().getSpriteScaling(textureatlassprite);
+		if (guispritescaling instanceof final GuiSpriteScaling.NineSlice nineslice) {
+			final RenderType renderType = VeilRenderType.get(RenderTypes.BACKGROUND, Textures.BACKGROUND_FULL);
+			if (renderType == null) return;
+			final ShaderProgram backgroundProgram = VeilRenderSystem.setShader(Shaders.BACKGROUND);
+			if (backgroundProgram == null) return;
+			backgroundProgram.getOrCreateUniform("translation").setVector(0, 0);
+			backgroundProgram.getOrCreateUniform("scale").setFloat(1);
+
+			// this is awful...................
+			final int leftWidth = nineslice.border().left();
+			final int rightWidth = nineslice.border().right();
+			final int centerWidth = width - leftWidth - rightWidth;
+			final int topHeight = nineslice.border().top();
+			final int bottomHeight = nineslice.border().bottom();
+			final int centerHeight = height - topHeight - bottomHeight;
+
+			final int rightX = x + width - rightWidth;
+
+			final int centerSliceWidth = nineslice.width() - leftWidth - rightWidth;
+			final int centerSliceHeight = nineslice.height() - topHeight - bottomHeight;
+
+			final int sliceU = nineslice.width() - rightWidth;
+
+
+			renderTypeBlitUV1(guiGraphics, renderType, x, y, leftWidth, topHeight,
+					nineslice.width(), nineslice.height(), blitOffset,
+					0, 0, screenX, screenY);
+			renderTypeBlitUV1Tile(guiGraphics, renderType, x + leftWidth, y,
+					centerWidth, topHeight,
+					centerSliceWidth, topHeight,
+					nineslice.width(), nineslice.height(), blitOffset,
+					leftWidth, 0, screenX + leftWidth, screenY);
+			renderTypeBlitUV1(guiGraphics, renderType, rightX, y, rightWidth, topHeight,
+					nineslice.width(), nineslice.height(), blitOffset,
+					sliceU, 0, screenX, screenY);
+		}
 	}
 }

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ColorPickerWidget extends AbstractWidget {
-    public static final int COLOR_COUNT = 9;
+    public static final int COLOR_COUNT = 8;
 
     private final List<PaletteSwabWidget> swabs = new ArrayList<>();
     private final SingleToolWidget.Brush brush;
@@ -27,15 +27,15 @@ public class ColorPickerWidget extends AbstractWidget {
         super(rightAnchor, centerY, 0, 0, Component.literal("color picker"));
         this.brush = brush;
 
-        NativeImage texture = Rendering.getPaletteTexture();
+        final NativeImage texture = Rendering.getPaletteTexture();
 
-        int colorCount = Math.min(COLOR_COUNT, texture.getWidth());
+        final int colorCount = Math.min(COLOR_COUNT, texture.getWidth());
         for (int i = 0; i < colorCount; i++) {
-            float n = (float) i / COLOR_COUNT;
-            Color color = new Color(n, n, n);
-            int pixelRGBA = texture.getPixelRGBA(i, 0);
-            Color trueColor = new Color(Integer.reverseBytes(pixelRGBA) >> 8);
-            final int columns = 3;
+            final float n = (float) (i+1) / COLOR_COUNT;
+            final Color color = new Color(n, n, n);
+            final int pixelRGBA = texture.getPixelRGBA(i+1, 0);
+            final Color trueColor = new Color(Integer.reverseBytes(pixelRGBA) >> 8);
+            final int columns = 4;
             final int sx = (i % columns) * 10;
             final int sy = (i / columns) * 10;
             this.width = Math.max(this.width, sx + 8);

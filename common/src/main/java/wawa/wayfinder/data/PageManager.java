@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
+import java.util.function.Predicate;
 
 /**
  * Handles loading, getting, modifying, and saving {@link AbstractPage} instances
@@ -123,6 +124,16 @@ public class PageManager {
         for (int i = -r + x; i <= r + x; i++) {
             for (int j = -r + y; j <= r + y; j++) {
                 this.putPixel(i, j, RGBA);
+            }
+        }
+    }
+
+    public void putConditionalSquare(final int x, final int y, final int RGBA, final int r, final Predicate<Integer> shouldReplace) {
+        for (int i = -r + x; i <= r + x; i++) {
+            for (int j = -r + y; j <= r + y; j++) {
+                if (shouldReplace.test(this.getPixel(i, j))) {
+                    this.putPixel(i, j, RGBA);
+                }
             }
         }
     }

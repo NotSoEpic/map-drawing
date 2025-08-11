@@ -10,16 +10,17 @@ import org.joml.RoundingMode;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
+import wawa.wayfinder.Rendering;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.map.MapScreen;
 import wawa.wayfinder.map.tool.Tool;
 
 public class MapWidget extends AbstractWidget {
-    private static final int padding = 30;
+    private static final int OUTER_PADDING = 30;
     private final MapScreen parent;
 
     public MapWidget(final MapScreen parent) {
-        super(padding, padding, parent.width - padding * 2, parent.height - padding * 2, Component.literal("Map Display"));
+        super(OUTER_PADDING, OUTER_PADDING, parent.width - OUTER_PADDING * 2, parent.height - OUTER_PADDING * 2, Component.literal("Map Display"));
         this.parent = parent;
     }
 
@@ -32,6 +33,8 @@ public class MapWidget extends AbstractWidget {
 
     @Override
     protected void renderWidget(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
+        Rendering.renderMapNineslice(guiGraphics, this.getX(), this.getY(), this.getX(), this.getY(), this.width, this.height, -1);
+
         final Vector2d panning = this.parent.lerpedPanning.get();
 
         guiGraphics.pose().pushPose();

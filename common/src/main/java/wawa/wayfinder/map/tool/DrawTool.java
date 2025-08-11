@@ -12,6 +12,7 @@ import net.minecraft.world.phys.Vec2;
 import org.joml.RoundingMode;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
+import org.joml.Vector2ic;
 import wawa.wayfinder.Helper;
 import wawa.wayfinder.Rendering;
 import wawa.wayfinder.WayfinderClient;
@@ -22,9 +23,9 @@ import java.util.function.Consumer;
 
 public class DrawTool extends Tool {
     public ResourceLocation icon = null;
-    private final int internal_color;
-    private final int visual_color;
-    private int r = 0;
+    protected final int internal_color;
+    protected final int visual_color;
+    protected int r = 0;
     private static final ResourceLocation id = WayfinderClient.id("draw");
     private static DynamicTexture preview = new DynamicTexture(1, 1, false);
     static {
@@ -37,6 +38,10 @@ public class DrawTool extends Tool {
     public DrawTool(final int color, final int visual_color) {
         this.internal_color = color;
         this.visual_color = visual_color;
+    }
+
+    public int getRadius() {
+        return this.r;
     }
 
     private void rebuildPixels() {
@@ -61,14 +66,17 @@ public class DrawTool extends Tool {
 
         switch (mouse) {
             case LEFT -> this.pixelLine(oldWorld.floor(), world.floor(), pos ->  {
-                activePage.startSnapshot();
-                activePage.putSquare(pos.x, pos.y, this.internal_color, this.r);
+                this.putSquare(activePage, pos, this.internal_color);
             });
             case RIGHT -> this.pixelLine(oldWorld.floor(), world.floor(), pos -> {
-                activePage.startSnapshot();
-                activePage.putSquare(pos.x, pos.y, 0, this.r);
+                this.putSquare(activePage, pos, 0);
             });
         }
+    }
+
+    public void putSquare(final PageManager activePage, final Vector2ic pos, final int targetColor) {
+        activePage.startSnapshot();
+        activePage.putSquare(pos.x(), pos.y(), targetColor, this.r);
     }
 
     @Override
@@ -96,12 +104,12 @@ public class DrawTool extends Tool {
 
     @Override
     public void renderWorld(final GuiGraphics graphics, final int worldX, final int worldY, final int xOff, final int yOff) {
-        RenderType renderType = VeilRenderType.get(Rendering.RenderTypes.PALETTE_SWAP, id);
+        final RenderType renderType = VeilRenderType.get(Rendering.RenderTypes.PALETTE_SWAP, id);
         if(renderType == null) return;
 
         final int wh = this.r * 2 + 1;
-        int x = worldX - this.r + xOff;
-        int y = worldY - this.r + yOff;
+        final int x = worldX - this.r + xOff;
+        final int y = worldY - this.r + yOff;
         Rendering.renderTypeBlit(graphics, renderType, x, y, 0, 0.0f, 0.0f, wh, wh, wh, wh);
     }
 
