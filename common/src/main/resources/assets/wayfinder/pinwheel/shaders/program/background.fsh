@@ -18,7 +18,7 @@ void main() {
         discard;
     }
     if (color == vec4(1.,0.,1.,1.)) {
-        vec2 pos = mod(screenCoord, 100.) / 100.;
+        vec2 pos = mod(screenCoord + translation, 255.) / 255.;
         color = vec4(pos.x,pos.y,1.,1.);
     }
 

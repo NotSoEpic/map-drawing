@@ -19,6 +19,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.joml.Matrix4f;
+import org.joml.Vector2dc;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -98,25 +99,24 @@ public class Rendering {
 	public static void renderTypeBlitUV1(final GuiGraphics guiGraphics, final RenderType renderType,
 										 final int x, final int y, final int width, final int height,
 										 final int textureWidth, final int textureHeight, final int blitOffset,
-										 final float u, final float v,
-										 final int screenX, final int screenY) {
+										 final float u, final float v) {
 		final Matrix4f matrix4f = guiGraphics.pose().last().pose();
-		final BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX); // todo
+		final BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_LIGHTMAP_COLOR);
 		bufferBuilder.addVertex(matrix4f, (float)x, (float)y, (float)blitOffset)
 				.setUv(u / textureWidth, v / textureHeight)
-				.setUv2(screenX, screenY).setColor(-1);
+				.setUv2(x, y).setColor(-1);
 
 		bufferBuilder.addVertex(matrix4f, (float)x, (float)y + height, (float)blitOffset)
 				.setUv(u / textureWidth, (v + height) / textureHeight)
-				.setUv2(screenX, screenY + height).setColor(-1);
+				.setUv2(x, y + height).setColor(-1);
 
 		bufferBuilder.addVertex(matrix4f, (float)x + width, (float)y + height, (float)blitOffset)
 				.setUv((u + width) / textureWidth, (v + height) / textureHeight)
-				.setUv2(screenX + width, screenY + height).setColor(-1);
+				.setUv2(x + width, y + height).setColor(-1);
 
 		bufferBuilder.addVertex(matrix4f, (float)x + width, (float)y, (float)blitOffset)
 				.setUv((u + width) / textureWidth, v / textureHeight)
-				.setUv2(screenX + width, screenY).setColor(-1);
+				.setUv2(x + width, y).setColor(-1);
 
 		renderType.draw(bufferBuilder.buildOrThrow());
 	}
@@ -125,20 +125,19 @@ public class Rendering {
 											 final int x, final int y, final int width, final int height,
 											 final int sliceWidth, final int sliceHeight,
 											 final int textureWidth, final int textureHeight, final int blitOffset,
-											 final float u, final float v,
-											 final int screenX, final int screenY) {
+											 final float u, final float v) {
 		for(int i = 0; i < width; i += sliceWidth) {
 			int j = Math.min(sliceWidth, width - i);
 
 			for(int k = 0; k < height; k += sliceHeight) {
 				int l = Math.min(sliceHeight, height - k);
 				renderTypeBlitUV1(guiGraphics, renderType,
-						x+i, y+k, j, l, textureWidth, textureHeight, blitOffset, u, v, screenX, screenY);
+						x+i, y+k, j, l, textureWidth, textureHeight, blitOffset, u, v);
 			}
 		}
 	}
 
-	public static void renderMapNineslice(final GuiGraphics guiGraphics, final int x, final int y, final int screenX, final int screenY, final int width, final int height, final int blitOffset) {
+	public static void renderMapNineslice(final GuiGraphics guiGraphics, final int x, final int y, final int width, final int height, final int blitOffset, final Vector2dc backgroundTranslation, final float scale) {
 		final TextureAtlasSprite textureatlassprite = Minecraft.getInstance().getGuiSprites().getSprite(Textures.BACKGROUND);
 		final GuiSpriteScaling guispritescaling = Minecraft.getInstance().getGuiSprites().getSpriteScaling(textureatlassprite);
 		if (guispritescaling instanceof final GuiSpriteScaling.NineSlice nineslice) {
@@ -146,8 +145,8 @@ public class Rendering {
 			if (renderType == null) return;
 			final ShaderProgram backgroundProgram = VeilRenderSystem.setShader(Shaders.BACKGROUND);
 			if (backgroundProgram == null) return;
-			backgroundProgram.getOrCreateUniform("translation").setVector(0, 0);
-			backgroundProgram.getOrCreateUniform("scale").setFloat(1);
+			backgroundProgram.getOrCreateUniform("translation").setVector((float) backgroundTranslation.x(), (float) backgroundTranslation.y());
+			backgroundProgram.getOrCreateUniform("scale").setFloat(scale);
 
 			// this is awful...................
 			final int leftWidth = nineslice.border().left();
@@ -158,24 +157,58 @@ public class Rendering {
 			final int centerHeight = height - topHeight - bottomHeight;
 
 			final int rightX = x + width - rightWidth;
+			final int bottomY = y + height - bottomHeight;
 
 			final int centerSliceWidth = nineslice.width() - leftWidth - rightWidth;
 			final int centerSliceHeight = nineslice.height() - topHeight - bottomHeight;
 
 			final int sliceU = nineslice.width() - rightWidth;
+			final int sliceV = nineslice.height() - bottomHeight;
 
 
-			renderTypeBlitUV1(guiGraphics, renderType, x, y, leftWidth, topHeight,
+			renderTypeBlitUV1(guiGraphics, renderType, x, y,
+					leftWidth, topHeight,
 					nineslice.width(), nineslice.height(), blitOffset,
-					0, 0, screenX, screenY);
+					0, 0);
 			renderTypeBlitUV1Tile(guiGraphics, renderType, x + leftWidth, y,
 					centerWidth, topHeight,
 					centerSliceWidth, topHeight,
 					nineslice.width(), nineslice.height(), blitOffset,
-					leftWidth, 0, screenX + leftWidth, screenY);
-			renderTypeBlitUV1(guiGraphics, renderType, rightX, y, rightWidth, topHeight,
+					leftWidth, 0);
+			renderTypeBlitUV1(guiGraphics, renderType, rightX, y,
+					rightWidth, topHeight,
 					nineslice.width(), nineslice.height(), blitOffset,
-					sliceU, 0, screenX, screenY);
+					sliceU, 0);
+
+			renderTypeBlitUV1Tile(guiGraphics, renderType, x, y + topHeight,
+					leftWidth, centerHeight,
+					leftWidth, centerSliceHeight,
+					nineslice.width(), nineslice.height(), blitOffset,
+					0, topHeight);
+			renderTypeBlitUV1Tile(guiGraphics, renderType, x + leftWidth, y + topHeight,
+					centerWidth, centerHeight,
+					centerSliceWidth, centerSliceHeight,
+					nineslice.width(), nineslice.height(), blitOffset,
+					leftWidth, topHeight);
+			renderTypeBlitUV1Tile(guiGraphics, renderType, rightX, y + topHeight,
+					rightWidth, centerHeight,
+					rightWidth, centerSliceHeight,
+					nineslice.width(), nineslice.height(), blitOffset,
+					sliceU, topHeight);
+
+			renderTypeBlitUV1(guiGraphics, renderType, x, bottomY,
+					leftWidth, bottomHeight,
+					nineslice.width(), nineslice.height(), blitOffset,
+					0, sliceV);
+			renderTypeBlitUV1Tile(guiGraphics, renderType, x + leftWidth, bottomY,
+					centerWidth, bottomHeight,
+					centerSliceWidth, bottomHeight,
+					nineslice.width(), nineslice.height(), blitOffset,
+					leftWidth, sliceV);
+			renderTypeBlitUV1(guiGraphics, renderType, rightX, bottomY,
+					rightWidth, bottomHeight,
+					nineslice.width(), nineslice.height(), blitOffset,
+					sliceU, sliceV);
 		}
 	}
 }

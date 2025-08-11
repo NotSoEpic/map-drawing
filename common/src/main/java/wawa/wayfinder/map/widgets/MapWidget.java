@@ -33,9 +33,10 @@ public class MapWidget extends AbstractWidget {
 
     @Override
     protected void renderWidget(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
-        Rendering.renderMapNineslice(guiGraphics, this.getX(), this.getY(), this.getX(), this.getY(), this.width, this.height, -1);
-
         final Vector2d panning = this.parent.lerpedPanning.get();
+
+        Rendering.renderMapNineslice(guiGraphics, this.getX(), this.getY(), this.width, this.height, -1, panning, this.parent.getZoom());
+
 
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(this.getX() + this.width / 2f, this.getY() + this.height / 2f, 0);
