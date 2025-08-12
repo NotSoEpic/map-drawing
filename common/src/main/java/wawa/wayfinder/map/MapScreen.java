@@ -109,6 +109,10 @@ public class MapScreen extends Screen {
             WayfinderClient.PAGE_MANAGER.undoChanges();
         }
 
+        if (Services.KEY_MAPPINGS.matches(IKeyMappings.Normal.REDO, keyCode, scanCode, modifiers)) {
+            //WayfinderClient.PAGE_MANAGER.redoChanges();
+        }
+
         switch (Services.KEY_MAPPINGS.getToolSwap(keyCode, scanCode, modifiers)) {
             case BRUSH -> this.toolPicker.pickBrush();
             case PENCIL -> this.toolPicker.pickPencil();

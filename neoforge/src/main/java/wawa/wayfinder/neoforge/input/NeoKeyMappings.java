@@ -22,21 +22,24 @@ public class NeoKeyMappings implements IKeyMappings {
     }
 
     public static final Lazy<KeyMapping>
-        OPEN_MAP = Lazy.of(() -> create(
-            "map", KeyConflictContext.UNIVERSAL, KeyModifier.NONE, GLFW.GLFW_KEY_M
-    )),
-        UNDO = Lazy.of(() -> create(
-            "undo", KeyConflictContext.GUI, KeyModifier.CONTROL, GLFW.GLFW_KEY_Z
-    )),
-        SWAP = Lazy.of(() -> create(
-            "swap", KeyConflictContext.GUI, KeyModifier.NONE, GLFW.GLFW_KEY_X
-    ));
+            OPEN_MAP = Lazy.of(() -> create(
+            "map", KeyConflictContext.UNIVERSAL, KeyModifier.NONE, GLFW.GLFW_KEY_M)),
+
+            UNDO = Lazy.of(() -> create(
+                    "undo", KeyConflictContext.GUI, KeyModifier.CONTROL, GLFW.GLFW_KEY_Z)),
+
+            REDO = Lazy.of(() -> create(
+                    "redo", KeyConflictContext.GUI, KeyModifier.CONTROL, GLFW.GLFW_KEY_Y)),
+
+            SWAP = Lazy.of(() -> create(
+                    "swap", KeyConflictContext.GUI, KeyModifier.NONE, GLFW.GLFW_KEY_X));
 
     @Override
     public boolean consume(final Normal bind) {
         final Lazy<KeyMapping> mapping = switch (bind) {
             case OPEN_MAP -> OPEN_MAP;
             case UNDO -> UNDO;
+            case REDO -> REDO;
             case SWAP -> SWAP;
         };
         return mapping.get().consumeClick();
@@ -47,18 +50,19 @@ public class NeoKeyMappings implements IKeyMappings {
         final Lazy<KeyMapping> mapping = switch (bind) {
             case OPEN_MAP -> OPEN_MAP;
             case UNDO -> UNDO;
+            case REDO -> REDO;
             case SWAP -> SWAP;
         };
         return mapping.get().isActiveAndMatches(InputConstants.getKey(keysym, scancode));
     }
 
     public static final Lazy<KeyMapping>
-        PENCIL = Lazy.of(() -> create(
+            PENCIL = Lazy.of(() -> create(
             "pencil", KeyConflictContext.GUI, KeyModifier.NONE, GLFW.GLFW_KEY_N
     )),
-        BRUSH = Lazy.of(() -> create(
-            "brush", KeyConflictContext.GUI, KeyModifier.NONE, GLFW.GLFW_KEY_B
-    ));
+            BRUSH = Lazy.of(() -> create(
+                    "brush", KeyConflictContext.GUI, KeyModifier.NONE, GLFW.GLFW_KEY_B
+            ));
 
     @Override
     public ToolSwap getToolSwap(final int keysym, final int scancode, final int modifier) {

@@ -17,6 +17,7 @@ public class ClientEventsStartup {
     public static void registerBindings(final RegisterKeyMappingsEvent event) {
         event.register(NeoKeyMappings.OPEN_MAP.get());
         event.register(NeoKeyMappings.UNDO.get());
+        event.register(NeoKeyMappings.REDO.get());
         event.register(NeoKeyMappings.PENCIL.get());
         event.register(NeoKeyMappings.BRUSH.get());
         event.register(NeoKeyMappings.SWAP.get());

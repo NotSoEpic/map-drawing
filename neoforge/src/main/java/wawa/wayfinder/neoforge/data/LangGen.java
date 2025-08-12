@@ -18,6 +18,7 @@ public class LangGen extends LanguageProvider {
         this.add(NeoKeyMappings.OPEN_MAP, "Open Map");
         this.add(NeoKeyMappings.SWAP, "Swap to Previous Tool");
         this.add(NeoKeyMappings.UNDO, "Undo");
+        this.add(NeoKeyMappings.REDO, "Redo");
         this.add(NeoKeyMappings.PENCIL, "Pick Pencil");
         this.add(NeoKeyMappings.BRUSH, "Pick BrushWidget");
     }

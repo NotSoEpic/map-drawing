@@ -2,6 +2,7 @@ package wawa.wayfinder.input;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
@@ -23,7 +24,8 @@ public class InputListener {
     private static Vector2d getEndingPosition(final LocalPlayer player) {
         final int distance = Minecraft.getInstance().options.getEffectiveRenderDistance();
 
-        if (player.getMainHandItem().is(Items.SPYGLASS) || player.getOffhandItem().is(Items.SPYGLASS)) {
+        if (player.isUsingItem() && ((player.getMainHandItem().is(Items.SPYGLASS) && player.getUsedItemHand().equals(InteractionHand.MAIN_HAND))
+                || (player.getOffhandItem().is(Items.SPYGLASS) && player.getUsedItemHand().equals(InteractionHand.OFF_HAND)))) {
             final BlockHitResult result = player.level().clip(new ClipContext(
                     player.getEyePosition(),
                     player.getEyePosition().add(player.getLookAngle().scale(distance * 16)),

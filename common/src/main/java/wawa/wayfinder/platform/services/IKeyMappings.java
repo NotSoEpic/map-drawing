@@ -6,7 +6,8 @@ public interface IKeyMappings {
     enum Normal {
         OPEN_MAP,
         UNDO,
-        SWAP
+        SWAP,
+        REDO
     }
 
     boolean consume(Normal bind);
