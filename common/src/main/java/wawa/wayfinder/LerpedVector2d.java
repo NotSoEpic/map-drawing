@@ -36,6 +36,12 @@ public class LerpedVector2d {
         this.progress = Math.clamp(this.progress + delta, 0, 1);
     }
 
+    public void tickProgress(final double delta, final Vector2d diffTracker) {
+        diffTracker.sub(this.get());
+        this.progress = Math.clamp(this.progress + delta, 0, 1);
+        diffTracker.add(this.get());
+    }
+
     /**
      * Uses a <a href="https://math.stackexchange.com/questions/121720/ease-in-out-function/121755#121755"> parametrized function</a>
      * @return fractional interpolation between start and end

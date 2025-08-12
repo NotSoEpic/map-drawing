@@ -24,6 +24,7 @@ public class MapScreen extends Screen {
     private int zoomNum = 0;
     private float zoom = 1f; // gui pixels per block (>1 zoom in, <1 zoom out)
     public LerpedVector2d lerpedPanning; // world space coordinate to center on
+    public Vector2d backgroundPanning = new Vector2d(); // panning irrespective of zoom
     private MapWidget mapWidget;
     public ToolPickerWidget toolPicker;
 
@@ -52,7 +53,9 @@ public class MapScreen extends Screen {
 
     @Override
     public void render(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
-        this.lerpedPanning.tickProgress(0.05 * Minecraft.getInstance().getTimer().getRealtimeDeltaTicks());
+        final Vector2d diffTracker = new Vector2d();
+        this.lerpedPanning.tickProgress(0.05 * Minecraft.getInstance().getTimer().getRealtimeDeltaTicks(), diffTracker);
+        this.backgroundPanning.add(diffTracker.mul(this.zoom));
 
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 

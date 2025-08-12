@@ -19,5 +19,6 @@ void main() {
     gl_Position = ProjMat * ModelViewMat * vec4(Position, 1.0);
 
     texCoord0 = UV0;
-    noiseCoord = vec2(UV2 - ScreenCenter) / Scale + Translation;
+//    noiseCoord = vec2(UV2 - ScreenCenter) / Scale + Translation;
+    noiseCoord = vec2(UV2 - ScreenCenter) + Translation;
 }

@@ -35,7 +35,7 @@ public class MapWidget extends AbstractWidget {
     protected void renderWidget(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
         final Vector2d panning = this.parent.lerpedPanning.get();
 
-        Rendering.renderMapNineslice(guiGraphics, this.getX(), this.getY(), this.width, this.height, -1, panning, this.parent.getZoom());
+        Rendering.renderMapNineslice(guiGraphics, this.getX(), this.getY(), this.width, this.height, -1, this.parent.backgroundPanning, this.parent.getZoom());
 
 
         guiGraphics.pose().pushPose();
@@ -106,6 +106,7 @@ public class MapWidget extends AbstractWidget {
         final Vector2d oldWorld = this.parent.screenToWorld(new Vector2d(this.oldMouseX, this.oldMouseY));
         if (this.mouse == Mouse.MIDDLE) {
             this.parent.lerpedPanning.set(this.parent.lerpedPanning.get().add(oldWorld).sub(world));
+            this.parent.backgroundPanning.add(this.oldMouseX, this.oldMouseY).sub(mouseX, mouseY);
         } else if (!this.isMouseOver(mouseX, mouseY)) {
             this.mouse = Mouse.NONE;
             return;
