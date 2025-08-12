@@ -45,7 +45,7 @@ public class Rendering {
 		public static final ResourceLocation BACKGROUND = WayfinderClient.id("background");
 	}
 
-	public static void renderPlayerIcon(final GuiGraphics graphics, final int x, final int y, final LocalPlayer player) {
+	public static void renderPlayerIcon(final GuiGraphics graphics, final double x, final double y, final LocalPlayer player) {
 		final ResourceLocation skinTexture = player.getSkin().texture();
 
 		final RenderType renderType = VeilRenderType.get(RenderTypes.UV_REMAP, skinTexture, Textures.HEAD_ICON);

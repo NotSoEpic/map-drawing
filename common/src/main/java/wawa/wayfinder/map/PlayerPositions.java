@@ -4,6 +4,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.entity.player.Player;
 import org.joml.Vector2d;
+import org.joml.Vector4dc;
+import wawa.wayfinder.Helper;
 import wawa.wayfinder.Rendering;
 
 import java.util.ArrayDeque;
@@ -42,14 +44,24 @@ public class PlayerPositions {
         this.newest = this.current;
     }
 
-    public void render(final GuiGraphics guiGraphics, final double xOff, final double yOff) {
+    public void renderPositions(final GuiGraphics guiGraphics, final double xOff, final double yOff) {
         if (this.visible) {
-            this.positions.forEach(v -> guiGraphics.fill((int) (v.x + xOff), (int) (v.y + yOff), (int) (v.x + 1 + xOff), (int) (v.y + 1 + yOff), 0xFFFF00FF));
+            this.positions.forEach(v -> {
+                final int x = (int) (v.x + xOff);
+                final int y = (int) (v.y + yOff);
+                guiGraphics.pose().pushPose();
+                guiGraphics.pose().translate((v.x + xOff) - x, (v.y + yOff) - y, 0); // evil evil minecraft >:(
+                guiGraphics.fill(x, y, x + 1, y + 1, 0xFFFF00FF);
+                guiGraphics.pose().popPose();
+            });
+        }
+    }
 
-            int x = (int) (this.current.x + xOff);
-            int y = (int) (this.current.y + yOff);
-
-            Rendering.renderPlayerIcon(guiGraphics, x - 8, y - 8, Minecraft.getInstance().player);
+    public void renderHead(final GuiGraphics guiGraphics, final double xOff, final double yOff, final Vector4dc worldBounds) {
+        if (this.visible) {
+            final Vector2d pos = new Vector2d(this.current).add(xOff, yOff);
+            Helper.clampWithin(pos, worldBounds);
+            Rendering.renderPlayerIcon(guiGraphics, pos.x - 8, pos.y - 8, Minecraft.getInstance().player);
         }
     }
 }

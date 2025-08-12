@@ -5,6 +5,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector2d;
 import org.joml.Vector2dc;
+import org.joml.Vector4dc;
+import wawa.wayfinder.Helper;
 import wawa.wayfinder.WayfinderClient;
 
 import java.awt.*;
@@ -41,9 +43,11 @@ public class Pin {
         return this.position;
     }
 
-    public void draw(final GuiGraphics guiGraphics, final double xOff, final double yOff, final boolean highlight) {
+    public void draw(final GuiGraphics guiGraphics, final double xOff, final double yOff, final boolean highlight, final Vector4dc worldBounds) {
         if (this.position != null) {
-            this.type.draw(guiGraphics, (int) (this.position.x + xOff), (int) (this.position.y + yOff), highlight, true);
+            final Vector2d pos = new Vector2d(this.position).add(xOff, yOff);
+            Helper.clampWithin(pos, worldBounds);
+            this.type.draw(guiGraphics, pos.x, pos.y, highlight, true);
         }
     }
 
@@ -53,11 +57,15 @@ public class Pin {
             return this.id.hashCode();
         }
 
-        public void draw(final GuiGraphics guiGraphics, int x, int y, final boolean highlight, final boolean onPoint) {
+        public void draw(final GuiGraphics guiGraphics, double dx, double dy, final boolean highlight, final boolean onPoint) {
             if (onPoint) {
-                x -= 7;
-                y -= 15;
+                dx -= 7;
+                dy -= 15;
             }
+            final int x = (int) dx;
+            final int y = (int) dy;
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(dx - x, dy - y, 0); // grrrrah minecraft unecessarily uses ints for all its gui rendering and im too lazy to rewrite it all using doubles
             guiGraphics.blitSprite(TEXTURE, x, y, 16, 16);
             final float[] rgb = this.color.getRGBColorComponents(null);
             guiGraphics.blit(x, y, 0, 16, 16,
@@ -66,6 +74,7 @@ public class Pin {
             if (highlight) {
                 guiGraphics.blitSprite(TEXTURE_HIGHLIGHT, x-1, y-1, 18, 18);
             }
+            guiGraphics.pose().popPose();
         }
     }
 }

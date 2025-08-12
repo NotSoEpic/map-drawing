@@ -6,9 +6,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
-import org.joml.RoundingMode;
-import org.joml.Vector2d;
-import org.joml.Vector2i;
+import org.joml.*;
 import org.lwjgl.glfw.GLFW;
 import wawa.wayfinder.Rendering;
 import wawa.wayfinder.WayfinderClient;
@@ -19,6 +17,7 @@ import wawa.wayfinder.map.tool.Tool;
 
 public class MapWidget extends AbstractWidget {
     private static final int OUTER_PADDING = 30;
+    private static final int INNER_PADDING = 10;
     private final MapScreen parent;
 
     public MapWidget(final MapScreen parent) {
@@ -40,15 +39,23 @@ public class MapWidget extends AbstractWidget {
         Rendering.renderMapNineslice(guiGraphics, this.getX(), this.getY(), this.width, this.height, -1, this.parent.backgroundPanning, this.parent.getZoom());
 
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(this.getX() + this.width / 2f, this.getY() + this.height / 2f, 0);
+        final double hw = this.width / 2d;
+        final double hh = this.height / 2d;
+        guiGraphics.pose().translate(this.getX() + hw, this.getY() + hh, 0);
         guiGraphics.pose().scale(this.parent.getZoom(), this.parent.getZoom(), 1);
         // offset for rendering elements relative to the world, prevents floating point imprecision at extreme values
         final double xOff = -panning.x;
         final double yOff = -panning.y;
-        guiGraphics.enableScissor(this.getX(), this.getY(), this.getRight(), this.getBottom());
+        guiGraphics.enableScissor(this.getX() + INNER_PADDING, this.getY() + INNER_PADDING, this.getRight() - INNER_PADDING, this.getBottom() - INNER_PADDING);
 
-        final Vector2i topLeft = new Vector2i(this.parent.screenToWorld(new Vector2d(this.getX(), this.getY())).div(512), RoundingMode.FLOOR);
-        final Vector2i bottomRight = new Vector2i(this.parent.screenToWorld(new Vector2d(this.getRight(), this.getBottom())).div(512), RoundingMode.CEILING);
+        final Vector2d topLeftWorld = this.parent.screenToWorld(new Vector2d(this.getX(), this.getY()));
+        final Vector2d bottomRightWorld = this.parent.screenToWorld(new Vector2d(this.getRight(), this.getBottom()));
+        final Vector2i topLeft = new Vector2i(topLeftWorld.x / 512, topLeftWorld.y / 512, RoundingMode.FLOOR);
+        final Vector2i bottomRight = new Vector2i(bottomRightWorld.x / 512, bottomRightWorld.y / 512, RoundingMode.CEILING);
+
+        final Vector4dc transformedScreenBounds = new Vector4d(
+                -hw + INNER_PADDING, -hh + INNER_PADDING, this.width - hw - INNER_PADDING, this.height - hh - INNER_PADDING
+        ).div(this.parent.getZoom());
 
         for (int x = topLeft.x; x < bottomRight.x; x++) {
             for (int y = topLeft.y; y < bottomRight.y; y++) {
@@ -57,22 +64,24 @@ public class MapWidget extends AbstractWidget {
         }
         final Vector2d world = this.parent.screenToWorld(new Vector2d(mouseX, mouseY));
 
-        WayfinderClient.POSITION_HISTORY.render(guiGraphics, xOff, yOff);
+        WayfinderClient.POSITION_HISTORY.renderPositions(guiGraphics, xOff, yOff);
 
         if (Tool.get() != null) {
             Tool.get().renderWorld(guiGraphics, Mth.floor(world.x), Mth.floor(world.y), xOff, yOff);
         }
+
+        guiGraphics.disableScissor();
 
         for (final Pin pin : WayfinderClient.PAGE_MANAGER.getPins()) {
             boolean highlight = false;
             if (Tool.get() instanceof final PinTool pinTool) {
                 highlight = pinTool.currentPin == pin.type;
             }
-            pin.draw(guiGraphics, xOff, yOff, highlight);
+            pin.draw(guiGraphics, xOff, yOff, highlight, transformedScreenBounds);
         }
+        WayfinderClient.POSITION_HISTORY.renderHead(guiGraphics, xOff, yOff, transformedScreenBounds);
 
         guiGraphics.pose().popPose();
-        guiGraphics.disableScissor();
     }
 
     @Override
