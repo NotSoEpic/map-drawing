@@ -18,6 +18,7 @@ public class PageManager {
     public PageIO pageIO;
     private final Map<Vector2i, AbstractPage> pages = new HashMap<>();
     private final Map<Pin.Type, Pin> pins = new HashMap<>();
+    private final List<Pin> ephemeralPins = new ArrayList<>();
 
     private int emptyCount = 0;
     private int loadedCount = 0;
@@ -143,6 +144,22 @@ public class PageManager {
 
     public void putPin(final Pin.Type type, final Vector2d pos) {
         this.pins.computeIfAbsent(type, Pin::new).setPosition(pos);
+    }
+
+    public void removePin(final Pin.Type type) {
+        this.pins.remove(type);
+    }
+
+    public Collection<Pin> getEphemeralPins() {
+        return this.ephemeralPins;
+    }
+
+    public void addEphemeralPin(final Pin pin) {
+        this.ephemeralPins.add(pin);
+    }
+
+    public void clearEphemeralPins() {
+        this.ephemeralPins.clear();
     }
 
     public void replacePage(final int rx, final int ry, final AbstractPage replacement) {

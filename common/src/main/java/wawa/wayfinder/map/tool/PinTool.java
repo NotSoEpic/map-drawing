@@ -24,6 +24,12 @@ public class PinTool extends Tool {
 
                 activePage.putPin(this.currentPin, world);
             }
+        } else if (mouse == MapWidget.Mouse.RIGHT) {
+            if (!this.isHeld) {
+                this.isHeld = true;
+
+                activePage.removePin(this.currentPin);
+            }
         }
     }
 

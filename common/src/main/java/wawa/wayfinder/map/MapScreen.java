@@ -123,6 +123,12 @@ public class MapScreen extends Screen {
     }
 
     @Override
+    public void onClose() {
+        super.onClose();
+        WayfinderClient.PAGE_MANAGER.clearEphemeralPins();
+    }
+
+    @Override
     public boolean isPauseScreen() {
         return false;
     }

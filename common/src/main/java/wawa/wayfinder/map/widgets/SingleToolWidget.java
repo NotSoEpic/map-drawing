@@ -107,7 +107,7 @@ public class SingleToolWidget extends AbstractWidget {
         private final PinPickerWidget pinPicker;
 
         public PinWidget(final int x, final int y, final Function<SingleToolWidget, Tool> toolFunction, final Component message) {
-            super(x, y, Pin.TEXTURE, Pin.TEXTURE_HIGHLIGHT, toolFunction, message);
+            super(x, y, null, null, toolFunction, message);
             this.last = this.getTool().currentPin;
             this.pinPicker = new PinPickerWidget(this.getX() - 5, this.getY(), this);
             this.pinPicker.active = false;

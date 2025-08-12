@@ -82,6 +82,9 @@ public class MapWidget extends AbstractWidget {
             }
             pin.draw(guiGraphics, xOff, yOff, scale, highlight, transformedScreenBounds);
         }
+        for (final Pin pin : WayfinderClient.PAGE_MANAGER.getEphemeralPins()) {
+            pin.draw(guiGraphics, xOff, yOff, scale, false, transformedScreenBounds);
+        }
         WayfinderClient.POSITION_HISTORY.renderHead(guiGraphics, xOff, yOff, scale, transformedScreenBounds);
 
         guiGraphics.pose().popPose();
