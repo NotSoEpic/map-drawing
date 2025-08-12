@@ -8,6 +8,7 @@ import net.minecraft.world.phys.Vec2;
 import wawa.wayfinder.Helper;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.map.tool.DrawTool;
+import wawa.wayfinder.map.tool.PinTool;
 import wawa.wayfinder.map.tool.Tool;
 
 import java.util.ArrayList;
@@ -16,8 +17,9 @@ import java.util.List;
 public class ToolPickerWidget extends AbstractWidget {
     private final List<SingleToolWidget> tools = new ArrayList<>();
     private final DrawTool pencil = new DrawTool(0xFF000000, 0xFF000000);
-    private final SingleToolWidget.Brush brush;
+    private final SingleToolWidget.BrushWidget brushWidget;
     private final DrawTool eraser = new DrawTool(0, 0);
+    private final PinTool pin = new PinTool();
     public ToolPickerWidget(final int x, final int y) {
         super(x, y, 0, 0, Component.literal("tool picker"));
         this.pencil.icon = WayfinderClient.id("cursor/pencil");
@@ -28,8 +30,8 @@ public class ToolPickerWidget extends AbstractWidget {
                 (w) -> this.pencil,
                 Component.literal("pencil")
         ));
-        this.brush = new SingleToolWidget.Brush(this.getX(), this.getY() + 20);
-        this.tools.add(this.brush);
+        this.brushWidget = new SingleToolWidget.BrushWidget(this.getX(), this.getY() + 20);
+        this.tools.add(this.brushWidget);
         this.eraser.icon = WayfinderClient.id("cursor/eraser");
         this.tools.add(new SingleToolWidget(
                 this.getX(), this.getY() + 40,
@@ -37,6 +39,11 @@ public class ToolPickerWidget extends AbstractWidget {
                 WayfinderClient.id("tool/eraser_highlight"),
                 (w) -> this.eraser,
                 Component.literal("eraser")
+        ));
+        this.tools.add(new SingleToolWidget.PinWidget(
+                this.getX(), this.getY() + 60,
+                (w) -> this.pin,
+                Component.literal("pin")
         ));
         this.updateBounds();
     }
@@ -46,11 +53,11 @@ public class ToolPickerWidget extends AbstractWidget {
     }
 
     public void pickBrush() {
-        if (Tool.get() == this.brush.last) {
+        if (Tool.get() == this.brushWidget.last) {
             final Vec2 mouse = Helper.preciseMousePos();
-            this.brush.openToMouse(mouse.x, mouse.y);
+            this.brushWidget.openToMouse(mouse.x, mouse.y);
         } else {
-            Tool.set(this.brush.last);
+            Tool.set(this.brushWidget.last);
         }
     }
 
@@ -58,7 +65,7 @@ public class ToolPickerWidget extends AbstractWidget {
         if (color == 0xFF000000) {
             Tool.set(this.pencil);
         } else {
-            for (final DrawTool tool : this.brush.getBrushes()) {
+            for (final DrawTool tool : this.brushWidget.getBrushes()) {
                 if (tool.getInternalColor() == color) {
                     Tool.set(tool);
                     return;

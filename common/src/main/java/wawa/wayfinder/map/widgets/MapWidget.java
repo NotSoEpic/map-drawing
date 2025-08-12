@@ -12,7 +12,9 @@ import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
 import wawa.wayfinder.Rendering;
 import wawa.wayfinder.WayfinderClient;
+import wawa.wayfinder.data.Pin;
 import wawa.wayfinder.map.MapScreen;
+import wawa.wayfinder.map.tool.PinTool;
 import wawa.wayfinder.map.tool.Tool;
 
 public class MapWidget extends AbstractWidget {
@@ -37,7 +39,6 @@ public class MapWidget extends AbstractWidget {
 
         Rendering.renderMapNineslice(guiGraphics, this.getX(), this.getY(), this.width, this.height, -1, this.parent.backgroundPanning, this.parent.getZoom());
 
-
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(this.getX() + this.width / 2f, this.getY() + this.height / 2f, 0);
         guiGraphics.pose().scale(this.parent.getZoom(), this.parent.getZoom(), 1);
@@ -61,6 +62,14 @@ public class MapWidget extends AbstractWidget {
 
         if (Tool.get() != null) {
             Tool.get().renderWorld(guiGraphics, Mth.floor(world.x), Mth.floor(world.y), xOff, yOff);
+        }
+
+        for (final Pin pin : WayfinderClient.PAGE_MANAGER.getPins()) {
+            boolean highlight = false;
+            if (Tool.get() instanceof final PinTool pinTool) {
+                highlight = pinTool.currentPin == pin.type;
+            }
+            pin.draw(guiGraphics, xOff, yOff, highlight);
         }
 
         guiGraphics.pose().popPose();

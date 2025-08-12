@@ -4,13 +4,11 @@ import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.Level;
+import org.joml.Vector2d;
 import org.joml.Vector2i;
 import wawa.wayfinder.data.history.OperationHistory;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 import java.util.function.Predicate;
 
 /**
@@ -19,6 +17,7 @@ import java.util.function.Predicate;
 public class PageManager {
     public PageIO pageIO;
     private final Map<Vector2i, AbstractPage> pages = new HashMap<>();
+    private final Map<Pin.Type, Pin> pins = new HashMap<>();
 
     private int emptyCount = 0;
     private int loadedCount = 0;
@@ -138,6 +137,14 @@ public class PageManager {
         }
     }
 
+    public Collection<Pin> getPins() {
+        return this.pins.values();
+    }
+
+    public void putPin(final Pin.Type type, final Vector2d pos) {
+        this.pins.computeIfAbsent(type, Pin::new).setPosition(pos);
+    }
+
     public void replacePage(final int rx, final int ry, final AbstractPage replacement) {
         this.deltaCount(this.pages.get(new Vector2i(rx, ry)), -1);
         this.pages.put(new Vector2i(rx, ry), replacement);
@@ -147,6 +154,8 @@ public class PageManager {
     public void reloadPageIO(final Level level, final Minecraft client) {
         this.saveAndClear();
         this.pageIO = new PageIO(level, client);
+        this.pins.clear();
+        this.pins.putAll(this.pageIO.readPins());
     }
 
     private int cleanupTimer = 0;
@@ -174,8 +183,11 @@ public class PageManager {
     }
 
     public void save(final boolean close) {
-        for (final AbstractPage page : this.pages.values()) {
-            page.save(this.pageIO, close);
+        if (this.pageIO != null) {
+            for (final AbstractPage page : this.pages.values()) {
+                page.save(this.pageIO, close);
+            }
+            this.pageIO.savePins(this.pins);
         }
     }
 

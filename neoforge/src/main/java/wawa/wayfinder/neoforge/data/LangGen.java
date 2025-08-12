@@ -19,7 +19,7 @@ public class LangGen extends LanguageProvider {
         this.add(NeoKeyMappings.SWAP, "Swap to Previous Tool");
         this.add(NeoKeyMappings.UNDO, "Undo");
         this.add(NeoKeyMappings.PENCIL, "Pick Pencil");
-        this.add(NeoKeyMappings.BRUSH, "Pick Brush");
+        this.add(NeoKeyMappings.BRUSH, "Pick BrushWidget");
     }
 
     private void add(final Lazy<KeyMapping> key, final String value) {

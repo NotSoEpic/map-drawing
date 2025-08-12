@@ -8,7 +8,9 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import wawa.wayfinder.WayfinderClient;
+import wawa.wayfinder.data.Pin;
 import wawa.wayfinder.map.tool.PaletteDrawTool;
+import wawa.wayfinder.map.tool.PinTool;
 import wawa.wayfinder.map.tool.Tool;
 
 import java.awt.*;
@@ -47,16 +49,16 @@ public class SingleToolWidget extends AbstractWidget {
     @Override
     protected void updateWidgetNarration(final NarrationElementOutput narrationElementOutput) {}
 
-    public static class Brush extends SingleToolWidget {
+    public static class BrushWidget extends SingleToolWidget {
         public PaletteDrawTool last;
         private static final TextureAtlasSprite mask = Minecraft.getInstance().getGuiSprites().getSprite(WayfinderClient.id("tool/brush_mask"));
         private final ColorPickerWidget colorPicker;
 
-        public Brush(final int x, final int y) {
+        public BrushWidget(final int x, final int y) {
             super(x, y,
                     WayfinderClient.id("tool/brush"),
                     WayfinderClient.id("tool/brush_highlight"),
-                    w -> ((Brush)w).last,
+                    w -> ((BrushWidget)w).last,
                     Component.literal("brush")
             );
             this.colorPicker = new ColorPickerWidget(this.getX() - 5, this.getY(), this);
@@ -100,6 +102,20 @@ public class SingleToolWidget extends AbstractWidget {
                 return this.colorPicker.mouseClicked(mouseX, mouseY, button);
             }
             return false;
+        }
+    }
+
+    public static class PinWidget extends SingleToolWidget {
+        private Pin.Type last;
+
+        public PinWidget(final int x, final int y, final Function<SingleToolWidget, Tool> toolFunction, final Component message) {
+            super(x, y, Pin.TEXTURE, Pin.TEXTURE_HIGHLIGHT, toolFunction, message);
+            this.last = ((PinTool)toolFunction.apply(this)).currentPin;
+        }
+
+        @Override
+        protected void renderWidget(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
+            this.last.draw(guiGraphics, this.getX(), this.getY(), this.isMouseOver(mouseX, mouseY), false);
         }
     }
 }

@@ -1,20 +1,23 @@
 package wawa.wayfinder.data;
 
+import com.google.gson.*;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector2d;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.mixin.BiomeManagerAccessor;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -91,5 +94,61 @@ public class PageIO {
         } catch (final IOException e) {
             WayfinderClient.LOGGER.error("Failed to save region {} {} to {}\n{}", rx, ry, path, e);
         }
+    }
+
+    // todo: codec this please ....
+    public void savePins(final Map<Pin.Type, Pin> pins) {
+        final Gson gson = new Gson();
+        final JsonObject pinsObject = new JsonObject();
+
+        for (final Map.Entry<Pin.Type, Pin> entry : pins.entrySet()) {
+            final JsonArray position = new JsonArray();
+            position.add(entry.getValue().getPosition().x());
+            position.add(entry.getValue().getPosition().y());
+
+            final JsonObject pinObject = new JsonObject();
+            pinObject.add("position", position);
+            pinsObject.add(entry.getKey().id().toString(), pinObject);
+        }
+
+        try (final FileWriter writer = new FileWriter(this.pagePath.resolve("pins.json").toFile(), false)) {
+            gson.toJson(pinsObject, writer);
+        } catch (final IOException e) {
+            WayfinderClient.LOGGER.error("Error saving pin data", e);
+        }
+    }
+
+    public Map<Pin.Type, Pin> readPins() {
+        final Gson gson = new Gson();
+        final File file = this.pagePath.resolve("pins.json").toFile();
+        if (file.exists() && file.isFile()) {
+            try (final FileReader reader = new FileReader(file)) {
+                final JsonObject pinsObject = JsonParser.parseReader(reader).getAsJsonObject();
+                final Map<Pin.Type, Pin> pins = new HashMap<>();
+                for (final Map.Entry<String, JsonElement> entry : pinsObject.entrySet()) {
+                    final ResourceLocation id = ResourceLocation.tryParse(entry.getKey());
+                    final Pin.Type type = Pin.TYPES.get(id);
+                    if (type == null) {
+                        WayfinderClient.LOGGER.warn("Unknown pin type {}", id);
+                    } else {
+                        if (entry.getValue().isJsonObject()) {
+                            final JsonElement position = entry.getValue().getAsJsonObject().get("position");
+                            if (position.isJsonArray() && position.getAsJsonArray().size() >= 2) {
+                                final Pin pin = new Pin(type);
+                                pin.setPosition(
+                                        new Vector2d(position.getAsJsonArray().get(0).getAsDouble(),
+                                        position.getAsJsonArray().get(1).getAsDouble())
+                                );
+                                pins.put(type, pin);
+                            }
+                        }
+                    }
+                }
+                return pins;
+            } catch (final IOException e) {
+                WayfinderClient.LOGGER.error("Error reading pin data", e);
+            }
+        }
+        return new HashMap<>();
     }
 }

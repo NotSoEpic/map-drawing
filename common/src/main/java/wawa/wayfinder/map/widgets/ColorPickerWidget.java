@@ -20,12 +20,12 @@ public class ColorPickerWidget extends AbstractWidget {
     public static final int COLOR_COUNT = 8;
 
     private final List<PaletteSwabWidget> swabs = new ArrayList<>();
-    private final SingleToolWidget.Brush brush;
+    private final SingleToolWidget.BrushWidget brushWidget;
     private final int defaultX;
     private final int defaultY;
-    public ColorPickerWidget(final int rightAnchor, final int centerY, final SingleToolWidget.Brush brush) {
+    public ColorPickerWidget(final int rightAnchor, final int centerY, final SingleToolWidget.BrushWidget brushWidget) {
         super(rightAnchor, centerY, 0, 0, Component.literal("color picker"));
-        this.brush = brush;
+        this.brushWidget = brushWidget;
 
         final NativeImage texture = Rendering.getPaletteTexture();
 
@@ -48,7 +48,7 @@ public class ColorPickerWidget extends AbstractWidget {
         this.setX(this.defaultX);
         this.setY(this.defaultY);
 
-        brush.last = this.swabs.getFirst().tool;
+        brushWidget.last = this.swabs.getFirst().tool;
     }
 
     public void openToMouse(final double mouseX, final double mouseY) {
@@ -114,7 +114,7 @@ public class ColorPickerWidget extends AbstractWidget {
             this.relY = y;
             this.color = color;
             this.visualColor = visualColor;
-            this.tool = new PaletteDrawTool(this.getABGR(), this.visualColor, parent.brush);
+            this.tool = new PaletteDrawTool(this.getABGR(), this.visualColor, parent.brushWidget);
             this.tool.icon = WayfinderClient.id("cursor/brush");
         }
 
@@ -143,7 +143,7 @@ public class ColorPickerWidget extends AbstractWidget {
         @Override
         public void onClick(final double mouseX, final double mouseY) {
             Tool.set(this.tool);
-            this.parent.brush.last = this.tool;
+            this.parent.brushWidget.last = this.tool;
         }
 
         public int getABGR() {
