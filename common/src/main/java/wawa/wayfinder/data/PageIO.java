@@ -127,7 +127,7 @@ public class PageIO {
                 final Map<Pin.Type, Pin> pins = new HashMap<>();
                 for (final Map.Entry<String, JsonElement> entry : pinsObject.entrySet()) {
                     final ResourceLocation id = ResourceLocation.tryParse(entry.getKey());
-                    final Pin.Type type = Pin.TYPES.get(id);
+                    final Pin.Type type = Pin.getType(id);
                     if (type == null) {
                         WayfinderClient.LOGGER.warn("Unknown pin type {}", id);
                     } else {

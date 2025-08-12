@@ -123,7 +123,7 @@ public class MapScreen extends Screen {
         return false;
     }
 
-    public float getZoom() {
+    public float getScale() {
         return this.zoom;
     }
 }

@@ -57,9 +57,9 @@ public class PlayerPositions {
         }
     }
 
-    public void renderHead(final GuiGraphics guiGraphics, final double xOff, final double yOff, final Vector4dc worldBounds) {
+    public void renderHead(final GuiGraphics guiGraphics, final double xOff, final double yOff, final float scale, final Vector4dc worldBounds) {
         if (this.visible) {
-            final Vector2d pos = new Vector2d(this.current).add(xOff, yOff);
+            final Vector2d pos = new Vector2d(this.current).add(xOff, yOff).mul(scale);
             Helper.clampWithin(pos, worldBounds);
             Rendering.renderPlayerIcon(guiGraphics, pos.x - 8, pos.y - 8, Minecraft.getInstance().player);
         }

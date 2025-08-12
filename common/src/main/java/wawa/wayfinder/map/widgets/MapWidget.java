@@ -35,14 +35,16 @@ public class MapWidget extends AbstractWidget {
     @Override
     protected void renderWidget(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
         final Vector2d panning = this.parent.lerpedPanning.get();
+        final float scale = this.parent.getScale();
 
-        Rendering.renderMapNineslice(guiGraphics, this.getX(), this.getY(), this.width, this.height, -1, this.parent.backgroundPanning, this.parent.getZoom());
+        Rendering.renderMapNineslice(guiGraphics, this.getX(), this.getY(), this.width, this.height, -1, this.parent.backgroundPanning, scale);
 
         guiGraphics.pose().pushPose();
         final double hw = this.width / 2d;
         final double hh = this.height / 2d;
         guiGraphics.pose().translate(this.getX() + hw, this.getY() + hh, 0);
-        guiGraphics.pose().scale(this.parent.getZoom(), this.parent.getZoom(), 1);
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().scale(scale, scale, 1);
         // offset for rendering elements relative to the world, prevents floating point imprecision at extreme values
         final double xOff = -panning.x;
         final double yOff = -panning.y;
@@ -52,10 +54,6 @@ public class MapWidget extends AbstractWidget {
         final Vector2d bottomRightWorld = this.parent.screenToWorld(new Vector2d(this.getRight(), this.getBottom()));
         final Vector2i topLeft = new Vector2i(topLeftWorld.x / 512, topLeftWorld.y / 512, RoundingMode.FLOOR);
         final Vector2i bottomRight = new Vector2i(bottomRightWorld.x / 512, bottomRightWorld.y / 512, RoundingMode.CEILING);
-
-        final Vector4dc transformedScreenBounds = new Vector4d(
-                -hw + INNER_PADDING, -hh + INNER_PADDING, this.width - hw - INNER_PADDING, this.height - hh - INNER_PADDING
-        ).div(this.parent.getZoom());
 
         for (int x = topLeft.x; x < bottomRight.x; x++) {
             for (int y = topLeft.y; y < bottomRight.y; y++) {
@@ -72,14 +70,19 @@ public class MapWidget extends AbstractWidget {
 
         guiGraphics.disableScissor();
 
+        guiGraphics.pose().popPose();
+
+        final Vector4dc transformedScreenBounds = new Vector4d(
+                -hw + INNER_PADDING, -hh + INNER_PADDING, this.width - hw - INNER_PADDING, this.height - hh - INNER_PADDING
+        );
         for (final Pin pin : WayfinderClient.PAGE_MANAGER.getPins()) {
             boolean highlight = false;
             if (Tool.get() instanceof final PinTool pinTool) {
                 highlight = pinTool.currentPin == pin.type;
             }
-            pin.draw(guiGraphics, xOff, yOff, highlight, transformedScreenBounds);
+            pin.draw(guiGraphics, xOff, yOff, scale, highlight, transformedScreenBounds);
         }
-        WayfinderClient.POSITION_HISTORY.renderHead(guiGraphics, xOff, yOff, transformedScreenBounds);
+        WayfinderClient.POSITION_HISTORY.renderHead(guiGraphics, xOff, yOff, scale, transformedScreenBounds);
 
         guiGraphics.pose().popPose();
     }

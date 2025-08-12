@@ -3,6 +3,7 @@ package wawa.wayfinder.data;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
 import org.joml.Vector2dc;
 import org.joml.Vector4dc;
@@ -10,7 +11,9 @@ import wawa.wayfinder.Helper;
 import wawa.wayfinder.WayfinderClient;
 
 import java.awt.*;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Waypoints to mark positions
@@ -19,9 +22,32 @@ public class Pin {
     public final Type type;
     private Vector2d position = null;
 
-    public static Map<ResourceLocation, Type> TYPES = Map.of(
-            WayfinderClient.id("red"), new Type(WayfinderClient.id("red"), new Color(255, 0, 0))
-    );
+    public static Type DEFAULT = new Type(WayfinderClient.id("red"), new Color(255, 0, 0));
+    private static final List<Type> TYPES = new ArrayList<>();
+
+    static {
+        addPinType(DEFAULT);
+        addPinType(new Type(WayfinderClient.id("green"), new Color(0, 255, 0)));
+        addPinType(new Type(WayfinderClient.id("blue"), new Color(0, 0, 255)));
+    }
+
+    private static void addPinType(final Type type) {
+        TYPES.add(type);
+    }
+
+    @Nullable
+    public static Type getType(final ResourceLocation id) {
+        for (final Type type : TYPES) {
+            if (type.id.equals(id)) {
+                return type;
+            }
+        }
+        return null;
+    }
+
+    public static Collection<Type> getTypes() {
+        return TYPES;
+    }
 
     public static ResourceLocation TEXTURE = WayfinderClient.id("tool/pin");
     public static ResourceLocation TEXTURE_MASK = WayfinderClient.id("tool/pin_mask");
@@ -43,9 +69,9 @@ public class Pin {
         return this.position;
     }
 
-    public void draw(final GuiGraphics guiGraphics, final double xOff, final double yOff, final boolean highlight, final Vector4dc worldBounds) {
+    public void draw(final GuiGraphics guiGraphics, final double xOff, final double yOff, final float scale, final boolean highlight, final Vector4dc worldBounds) {
         if (this.position != null) {
-            final Vector2d pos = new Vector2d(this.position).add(xOff, yOff);
+            final Vector2d pos = new Vector2d(this.position).add(xOff, yOff).mul(scale);
             Helper.clampWithin(pos, worldBounds);
             this.type.draw(guiGraphics, pos.x, pos.y, highlight, true);
         }

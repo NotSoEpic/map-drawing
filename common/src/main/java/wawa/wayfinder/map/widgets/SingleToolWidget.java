@@ -20,7 +20,7 @@ import java.util.function.Function;
 public class SingleToolWidget extends AbstractWidget {
     private final ResourceLocation sprite;
     private final ResourceLocation highlight;
-    private final Function<SingleToolWidget, Tool> toolFunction;
+    protected final Function<SingleToolWidget, Tool> toolFunction;
     public SingleToolWidget(final int x, final int y, final ResourceLocation sprite, final ResourceLocation highlight,
                             final Function<SingleToolWidget, Tool> toolFunction, final Component message) {
         super(x, y, 16, 16, message);
@@ -79,21 +79,18 @@ public class SingleToolWidget extends AbstractWidget {
             final float[] rgb = new Color(this.last.getVisualColor()).getRGBColorComponents(null);
             guiGraphics.blit(this.getX(), this.getY(), 0, 16, 16, mask, rgb[0], rgb[1], rgb[2], 1);
 
-            if (this.isMouseOver(mouseX, mouseY) || (this.colorPicker.isMouseOver(mouseX, mouseY) && this.colorPicker.isActive())) {
+            if (this.isMouseOver(mouseX, mouseY)) {
                 this.colorPicker.active = true;
+                this.colorPicker.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
             } else {
                 this.colorPicker.active = false;
                 this.colorPicker.resetPos();
-            }
-
-            if (this.colorPicker.isActive()) {
-                this.colorPicker.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
             }
         }
 
         @Override
         public boolean isMouseOver(final double mouseX, final double mouseY) {
-            return super.isMouseOver(mouseX, mouseY) || this.colorPicker.isMouseOver(mouseX, mouseY);
+            return super.isMouseOver(mouseX, mouseY) || (this.colorPicker.isMouseOver(mouseX, mouseY) && this.colorPicker.isActive());
         }
 
         @Override
@@ -106,16 +103,43 @@ public class SingleToolWidget extends AbstractWidget {
     }
 
     public static class PinWidget extends SingleToolWidget {
-        private Pin.Type last;
+        public Pin.Type last;
+        private final PinPickerWidget pinPicker;
 
         public PinWidget(final int x, final int y, final Function<SingleToolWidget, Tool> toolFunction, final Component message) {
             super(x, y, Pin.TEXTURE, Pin.TEXTURE_HIGHLIGHT, toolFunction, message);
-            this.last = ((PinTool)toolFunction.apply(this)).currentPin;
+            this.last = this.getTool().currentPin;
+            this.pinPicker = new PinPickerWidget(this.getX() - 5, this.getY(), this);
+            this.pinPicker.active = false;
+        }
+
+        public PinTool getTool() {
+            return ((PinTool)this.toolFunction.apply(this));
         }
 
         @Override
         protected void renderWidget(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
             this.last.draw(guiGraphics, this.getX(), this.getY(), this.isMouseOver(mouseX, mouseY), false);
+
+            if (this.isMouseOver(mouseX, mouseY)) {
+                this.pinPicker.active = true;
+                this.pinPicker.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+            } else {
+                this.pinPicker.active = false;
+            }
+        }
+
+        @Override
+        public boolean isMouseOver(final double mouseX, final double mouseY) {
+            return super.isMouseOver(mouseX, mouseY) || (this.pinPicker.isMouseOver(mouseX, mouseY) && this.pinPicker.isActive());
+        }
+
+        @Override
+        public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
+            if (!super.mouseClicked(mouseX, mouseY, button)) {
+                return this.pinPicker.mouseClicked(mouseX, mouseY, button);
+            }
+            return false;
         }
     }
 }

@@ -1,14 +1,16 @@
 package wawa.wayfinder.map.tool;
 
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.world.phys.Vec2;
 import org.joml.Vector2d;
+import wawa.wayfinder.Helper;
 import wawa.wayfinder.data.PageManager;
 import wawa.wayfinder.data.Pin;
 import wawa.wayfinder.map.widgets.MapWidget;
 
 public class PinTool extends Tool {
     private boolean isHeld;
-    public Pin.Type currentPin = Pin.TYPES.entrySet().stream().findFirst().get().getValue();
+    public Pin.Type currentPin = Pin.DEFAULT;
 
     public void setPinType(final Pin.Type newPin) {
         this.currentPin = newPin;
@@ -33,7 +35,8 @@ public class PinTool extends Tool {
     @Override
     public void renderScreen(final GuiGraphics graphics, final double mouseX, final double mouseY) {
         if (this.currentPin != null) {
-            this.currentPin.draw(graphics, (int) mouseX, (int) mouseY, false, true);
+            final Vec2 mouse = Helper.preciseMousePos();
+            this.currentPin.draw(graphics, mouse.x, mouse.y, false, true);
         }
     }
 }
