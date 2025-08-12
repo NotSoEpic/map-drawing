@@ -103,7 +103,7 @@ public class DrawTool extends Tool {
 
     @Override
     public void controlScroll(final PageManager activePage, final double mouseX, final double mouseY, final double scrollY) {
-        this.r = Mth.clamp(this.r + (int)scrollY, 0, 4);
+        this.r = Mth.clamp(this.r + (int)scrollY, 0, this.internal_color == 0 ? 8 : 4);
         this.rebuildPixels();
     }
 
