@@ -54,7 +54,7 @@ public abstract class Tool {
      * @param worldX position of mouse cursor in world
      * @param worldY position of mouse cursor in world
      */
-    public void renderWorld(final GuiGraphics graphics, final int worldX, final int worldY, final int xOff, final int yOff) {}
+    public void renderWorld(final GuiGraphics graphics, final int worldX, final int worldY, final double xOff, final double yOff) {}
 
     /**
      * Renders tool components relative to the screen, after transform pop

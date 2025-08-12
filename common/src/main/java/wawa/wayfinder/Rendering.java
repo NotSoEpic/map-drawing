@@ -78,15 +78,15 @@ public class Rendering {
 		return image;
 	}
 
-	public static void renderTypeBlit(final GuiGraphics guiGraphics, final RenderType renderType, final int x, final int y, final int blitOffset, final float uOffset, final float vOffset, final int uWidth, final int vHeight, final int textureWidth, final int textureHeight) {
+	public static void renderTypeBlit(final GuiGraphics guiGraphics, final RenderType renderType, final double x, final double y, final int blitOffset, final float uOffset, final float vOffset, final int uWidth, final int vHeight, final int textureWidth, final int textureHeight) {
 		renderTypeBlit(guiGraphics, renderType, x, x + uWidth, y, y + vHeight, blitOffset, uWidth, vHeight, uOffset, vOffset, textureWidth, textureHeight);
 	}
 
-	public static void renderTypeBlit(final GuiGraphics guiGraphics, final RenderType renderType, final int x1, final int x2, final int y1, final int y2, final int blitOffset, final int uWidth, final int vHeight, final float uOffset, final float vOffset, final int textureWidth, final int textureHeight) {
+	public static void renderTypeBlit(final GuiGraphics guiGraphics, final RenderType renderType, final double x1, final double x2, final double y1, final double y2, final int blitOffset, final int uWidth, final int vHeight, final float uOffset, final float vOffset, final int textureWidth, final int textureHeight) {
 		renderTypeBlit(guiGraphics, renderType, x1, x2, y1, y2, blitOffset, (uOffset + 0.0F) / (float)textureWidth, (uOffset + (float)uWidth) / (float)textureWidth, (vOffset + 0.0F) / (float)textureHeight, (vOffset + (float)vHeight) / (float)textureHeight);
 	}
 
-	public static void renderTypeBlit(final GuiGraphics guiGraphics, final RenderType renderType, final int x1, final int x2, final int y1, final int y2, final int blitOffset, final float minU, final float maxU, final float minV, final float maxV) {
+	public static void renderTypeBlit(final GuiGraphics guiGraphics, final RenderType renderType, final double x1, final double x2, final double y1, final double y2, final int blitOffset, final float minU, final float maxU, final float minV, final float maxV) {
 		final Matrix4f matrix4f = guiGraphics.pose().last().pose();
 		final BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
 		bufferBuilder.addVertex(matrix4f, (float)x1, (float)y1, (float)blitOffset).setUv(minU, minV);

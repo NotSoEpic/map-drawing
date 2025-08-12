@@ -108,13 +108,13 @@ public class DrawTool extends Tool {
     }
 
     @Override
-    public void renderWorld(final GuiGraphics graphics, final int worldX, final int worldY, final int xOff, final int yOff) {
+    public void renderWorld(final GuiGraphics graphics, final int worldX, final int worldY, final double xOff, final double yOff) {
         final RenderType renderType = VeilRenderType.get(Rendering.RenderTypes.PALETTE_SWAP, id);
         if(renderType == null) return;
 
         final int wh = this.r * 2 + 1;
-        final int x = worldX - this.r + xOff;
-        final int y = worldY - this.r + yOff;
+        final double x = worldX - this.r + xOff;
+        final double y = worldY - this.r + yOff;
         Rendering.renderTypeBlit(graphics, renderType, x, y, 0, 0.0f, 0.0f, wh, wh, wh, wh);
     }
 

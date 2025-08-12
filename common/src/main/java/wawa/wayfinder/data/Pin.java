@@ -41,9 +41,9 @@ public class Pin {
         return this.position;
     }
 
-    public void draw(final GuiGraphics guiGraphics, final int xOff, final int yOff, final boolean highlight) {
+    public void draw(final GuiGraphics guiGraphics, final double xOff, final double yOff, final boolean highlight) {
         if (this.position != null) {
-            this.type.draw(guiGraphics, (int) this.position.x + xOff, (int) this.position.y + yOff, highlight, true);
+            this.type.draw(guiGraphics, (int) (this.position.x + xOff), (int) (this.position.y + yOff), highlight, true);
         }
     }
 

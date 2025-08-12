@@ -1,13 +1,7 @@
 package wawa.wayfinder.map;
 
-import foundry.veil.api.client.render.VeilRenderSystem;
-import foundry.veil.api.client.render.rendertype.VeilRenderType;
-import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import org.joml.Vector2d;
 import wawa.wayfinder.Rendering;
@@ -48,9 +42,9 @@ public class PlayerPositions {
         this.newest = this.current;
     }
 
-    public void render(final GuiGraphics guiGraphics, final int xOff, final int yOff) {
+    public void render(final GuiGraphics guiGraphics, final double xOff, final double yOff) {
         if (this.visible) {
-            this.positions.forEach(v -> guiGraphics.fill((int) v.x + xOff, (int) v.y + yOff, (int) v.x + 1 + xOff, (int) v.y + 1 + yOff, 0xFFFF00FF));
+            this.positions.forEach(v -> guiGraphics.fill((int) (v.x + xOff), (int) (v.y + yOff), (int) (v.x + 1 + xOff), (int) (v.y + 1 + yOff), 0xFFFF00FF));
 
             int x = (int) (this.current.x + xOff);
             int y = (int) (this.current.y + yOff);

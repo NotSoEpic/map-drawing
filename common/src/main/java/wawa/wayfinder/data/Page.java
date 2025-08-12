@@ -60,9 +60,9 @@ public class Page extends AbstractPage {
     }
 
     @Override
-    public void render(final GuiGraphics guiGraphics, final int xOff, final int yOff) {
+    public void render(final GuiGraphics guiGraphics, final double xOff, final double yOff) {
         super.render(guiGraphics, xOff, yOff);
-        RenderType renderType = VeilRenderType.get(Rendering.RenderTypes.PALETTE_SWAP, this.textureID);
+        final RenderType renderType = VeilRenderType.get(Rendering.RenderTypes.PALETTE_SWAP, this.textureID);
         if(renderType == null) return;
 
         if (this.uploadDirty) {

@@ -43,9 +43,8 @@ public class MapWidget extends AbstractWidget {
         guiGraphics.pose().translate(this.getX() + this.width / 2f, this.getY() + this.height / 2f, 0);
         guiGraphics.pose().scale(this.parent.getZoom(), this.parent.getZoom(), 1);
         // offset for rendering elements relative to the world, prevents floating point imprecision at extreme values
-        final int xOff = -Math.floorDiv(Mth.floor(panning.x), 512) * 512;
-        final int yOff = -Math.floorDiv(Mth.floor(panning.y), 512) * 512;
-        guiGraphics.pose().translate(-panning.x - xOff, -panning.y - yOff, 0);
+        final double xOff = -panning.x;
+        final double yOff = -panning.y;
         guiGraphics.enableScissor(this.getX(), this.getY(), this.getRight(), this.getBottom());
 
         final Vector2i topLeft = new Vector2i(this.parent.screenToWorld(new Vector2d(this.getX(), this.getY())).div(512), RoundingMode.FLOOR);

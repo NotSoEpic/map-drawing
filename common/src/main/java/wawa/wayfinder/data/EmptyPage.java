@@ -72,7 +72,7 @@ public class EmptyPage extends AbstractPage {
     }
 
     @Override
-    public void render(final GuiGraphics guiGraphics, final int xOff, final int yOff) {
+    public void render(final GuiGraphics guiGraphics, final double xOff, final double yOff) {
         super.render(guiGraphics, xOff, yOff);
         if (this.loadedImage != null) {
             this.parent.replacePage(this.rx, this.ry, new Page(this.rx, this.ry, new DynamicTexture(this.loadedImage)));
