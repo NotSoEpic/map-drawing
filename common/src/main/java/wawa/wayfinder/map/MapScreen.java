@@ -5,16 +5,15 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import org.joml.Vector2d;
 import org.lwjgl.glfw.GLFW;
 import wawa.wayfinder.LerpedVector2d;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.map.tool.Tool;
-import wawa.wayfinder.map.widgets.DebugTextRenderable;
-import wawa.wayfinder.map.widgets.MapWidget;
-import wawa.wayfinder.map.widgets.SideTabWidget;
-import wawa.wayfinder.map.widgets.ToolPickerWidget;
+import wawa.wayfinder.map.widgets.*;
 import wawa.wayfinder.platform.Services;
 import wawa.wayfinder.platform.services.IKeyMappings;
 
@@ -27,6 +26,7 @@ public class MapScreen extends Screen {
     public Vector2d backgroundPanning = new Vector2d(); // panning irrespective of zoom
     private MapWidget mapWidget;
     public ToolPickerWidget toolPicker;
+    public CompassRoseWidget compassRose;
 
     public MapScreen(final Vector2d openingPos, final Vector2d endingPos) {
         super(Component.literal("Wayfinder Map"));
@@ -40,6 +40,8 @@ public class MapScreen extends Screen {
         this.addRenderableWidget(this.mapWidget);
         this.toolPicker = new ToolPickerWidget(this.width - 15 - 16/2, 30);
         this.addRenderableWidget(this.toolPicker);
+        this.compassRose = new CompassRoseWidget(this.width - 40, this.height - 40);
+        this.addRenderableWidget(this.compassRose);
         this.addRenderableOnly(new DebugTextRenderable(this));
         this.addRenderableWidget(new SideTabWidget(30 - 16, 30 + 8, "Toggle player",
                 () -> WayfinderClient.id(WayfinderClient.POSITION_HISTORY.visible ? "tabs/player_visible" : "tabs/player_hidden"),
@@ -125,6 +127,7 @@ public class MapScreen extends Screen {
     @Override
     public void onClose() {
         super.onClose();
+        minecraft.level.playLocalSound(minecraft.getInstance().player, SoundEvents.BOOK_PUT, SoundSource.MASTER, 1f, 0.5f);
         WayfinderClient.PAGE_MANAGER.getSpyglassPins().clear();
     }
 
