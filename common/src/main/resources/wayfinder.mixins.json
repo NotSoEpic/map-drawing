@@ -8,6 +8,7 @@
     "BiomeManagerAccessor",
     "KeyBindingAccessor",
     "MinecraftMixin",
+    "NativeImageAccessor",
     "VeilImGuiImplMixin",
     "VeilRenderSystemMixin"
   ],

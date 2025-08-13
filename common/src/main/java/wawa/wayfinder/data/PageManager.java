@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.Level;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
+import wawa.wayfinder.NativeImageTracker;
 import wawa.wayfinder.data.history.OperationHistory;
 
 import java.util.*;
@@ -128,7 +129,7 @@ public class PageManager {
 
             final Vector2i key = new Vector2i(rx, ry);
             if (history.get(key) == null) {
-                final NativeImage image = new NativeImage(512, 512, true);
+                final NativeImage image = NativeImageTracker.newImage(512, 512, true);
                 final NativeImage pageImg = newPage.getImage();
                 if (pageImg != null) {
                     image.copyFrom(pageImg);
@@ -246,5 +247,7 @@ public class PageManager {
         this.pastHistories.clear();
         this.futureHistories.forEach(OperationHistory::clear);
         this.futureHistories.clear();
+
+        NativeImageTracker.checkAllocationAndClose();
     }
 }

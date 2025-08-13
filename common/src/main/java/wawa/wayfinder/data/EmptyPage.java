@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import wawa.wayfinder.NativeImageTracker;
 
 /**
  * A 512x512 pixel/block area with no associated texture, asynchronously attempting to load a texture when first created
@@ -42,7 +43,7 @@ public class EmptyPage extends AbstractPage {
         // if the file loading is not complete, then either the loaded image or any edits made before will be lost if it does load
         if (!this.isLoading()) {
             if (this.loadedImage == null) {
-                this.loadedImage = new NativeImage(512, 512, true);
+                this.loadedImage = NativeImageTracker.newImage(512, 512, true);
             }
             this.loadedImage.setPixelRGBA(x, y, RGBA);
         }
@@ -64,11 +65,11 @@ public class EmptyPage extends AbstractPage {
             replacement.close();
             this.undoImage = null;
             this.redoImage = null;
-            return new NativeImage(512, 512, true);
+            return NativeImageTracker.newImage(512, 512, true);
         } else {
             this.attemptedUndo = true;
             this.undoImage = replacement;
-            this.redoImage = new NativeImage(512, 512, true);
+            this.redoImage = NativeImageTracker.newImage(512, 512, true);
             return this.redoImage; // will be modified once the page actually loads
         }
 

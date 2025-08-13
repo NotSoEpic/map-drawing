@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
+import wawa.wayfinder.NativeImageTracker;
 import wawa.wayfinder.Rendering;
 import wawa.wayfinder.WayfinderClient;
 
@@ -47,7 +48,7 @@ public class Page extends AbstractPage {
 
     @Override
     public NativeImage unboChanges(final NativeImage replacement) {
-        final NativeImage previous = new NativeImage(512, 512, false);
+        final NativeImage previous = NativeImageTracker.newImage(512, 512, false);
         previous.copyFrom(this.texture.getPixels());
         this.texture.getPixels().copyFrom(replacement);
         replacement.close();
