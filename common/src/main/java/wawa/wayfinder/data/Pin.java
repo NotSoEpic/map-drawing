@@ -1,5 +1,6 @@
 package wawa.wayfinder.data;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
@@ -68,11 +69,12 @@ public class Pin {
         return this.position;
     }
 
-    public void draw(final GuiGraphics guiGraphics, final double xOff, final double yOff, final float scale, final boolean highlight, final Vector4dc worldBounds) {
+    public void draw(final GuiGraphics guiGraphics, final Vector2dc mouseScreen, final double xOff, final double yOff, final float scale, final boolean highlight, final Vector4dc worldBounds) {
         if (this.position != null) {
-            final Vector2d pos = new Vector2d(this.position).add(xOff, yOff).mul(scale);
+            final Vector2d pos = new Vector2d(this.position).add(xOff, yOff).mul(scale); // world position to screen position
+            final float alpha = Helper.getMouseProximityFade(mouseScreen, pos);
             Helper.clampWithin(pos, worldBounds);
-            this.type.draw(guiGraphics, pos.x, pos.y, highlight, true);
+            this.type.draw(guiGraphics, pos.x, pos.y, highlight, true, alpha);
         }
     }
 
@@ -82,7 +84,7 @@ public class Pin {
             return this.id.hashCode();
         }
 
-        public void draw(final GuiGraphics guiGraphics, double dx, double dy, final boolean highlight, final boolean onPoint) {
+        public void draw(final GuiGraphics guiGraphics, double dx, double dy, final boolean highlight, final boolean onPoint, final float alpha) {
             if (onPoint) {
                 dx -= this.pointOffset.x();
                 dy -= this.pointOffset.y();
@@ -91,9 +93,9 @@ public class Pin {
             final int y = (int) dy;
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate(dx - x, dy - y, 0); // grrrrah minecraft unecessarily uses ints for all its gui rendering and im too lazy to rewrite it all using doubles
-            guiGraphics.blitSprite(this.texture, x, y, 16, 16);
+            guiGraphics.blit(x, y, 0, 16, 16, Minecraft.getInstance().getGuiSprites().getSprite(this.texture), 1f, 1f, 1f, alpha);
             if (highlight) {
-                guiGraphics.blitSprite(this.highlight, x-1, y-1, 18, 18);
+                guiGraphics.blit(x-1, y-1, 0, 18, 18, Minecraft.getInstance().getGuiSprites().getSprite(this.highlight), 1f, 1f, 1f, alpha);
             }
             guiGraphics.pose().popPose();
         }

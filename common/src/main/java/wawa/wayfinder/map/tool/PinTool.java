@@ -42,7 +42,7 @@ public class PinTool extends Tool {
     public void renderScreen(final GuiGraphics graphics, final double mouseX, final double mouseY) {
         if (this.currentPin != null) {
             final Vec2 mouse = Helper.preciseMousePos();
-            this.currentPin.draw(graphics, mouse.x, mouse.y, false, true);
+            this.currentPin.draw(graphics, mouse.x, mouse.y, false, true, 1);
         }
     }
 }

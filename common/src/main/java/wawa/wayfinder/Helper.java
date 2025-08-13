@@ -3,8 +3,10 @@ package wawa.wayfinder;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
 import org.joml.Vector2d;
+import org.joml.Vector2dc;
 import org.joml.Vector4dc;
 
 public class Helper {
@@ -27,5 +29,14 @@ public class Helper {
         value.x = Math.clamp(value.x, bounds.x(), bounds.z());
         value.y = Math.clamp(value.y, bounds.y(), bounds.w());
         return value;
+    }
+
+    public static float getMouseProximityFade(final Vector2dc mouseScreen, final Vector2dc posScreen) {
+        final double dist = mouseScreen.distance(posScreen);
+        if (dist < 35) {
+            return Mth.clamp(1.5f * (float) (dist / 35) - 0.5f, 0.11f, 1);
+        } else {
+            return  1;
+        }
     }
 }

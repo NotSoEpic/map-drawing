@@ -5,6 +5,7 @@ uniform sampler2D Sampler1;
 uniform float XOffset;
 
 in vec2 texCoord0;
+in vec4 vertexColor;
 
 out vec4 fragColor;
 
@@ -15,7 +16,7 @@ void main() {
     }
 
     vec2 samplePos = color.rg + vec2(XOffset, 0.0);
-    vec4 outColor = texture(Sampler0, samplePos);
+    vec4 outColor = texture(Sampler0, samplePos) * vertexColor;
     if(outColor.a == 0) {
         discard;
     }

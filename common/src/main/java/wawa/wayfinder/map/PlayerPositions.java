@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.entity.player.Player;
 import org.joml.Vector2d;
+import org.joml.Vector2dc;
 import org.joml.Vector4dc;
 import wawa.wayfinder.Helper;
 import wawa.wayfinder.Rendering;
@@ -57,11 +58,12 @@ public class PlayerPositions {
         }
     }
 
-    public void renderHead(final GuiGraphics guiGraphics, final double xOff, final double yOff, final float scale, final Vector4dc worldBounds) {
+    public void renderHead(final GuiGraphics guiGraphics, final Vector2dc mouseScreen, final double xOff, final double yOff, final float scale, final Vector4dc worldBounds) {
         if (this.visible) {
-            final Vector2d pos = new Vector2d(this.current).add(xOff, yOff).mul(scale);
+            final Vector2d pos = new Vector2d(this.current).add(xOff, yOff).mul(scale); // world position to screen position
+            final float alpha = Helper.getMouseProximityFade(mouseScreen, pos);
             Helper.clampWithin(pos, worldBounds);
-            Rendering.renderPlayerIcon(guiGraphics, pos.x - 8, pos.y - 8, Minecraft.getInstance().player);
+            Rendering.renderPlayerIcon(guiGraphics, pos.x - 8, pos.y - 8, Minecraft.getInstance().player, alpha);
         }
     }
 }

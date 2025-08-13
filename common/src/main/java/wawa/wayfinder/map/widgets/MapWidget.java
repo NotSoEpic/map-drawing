@@ -72,6 +72,7 @@ public class MapWidget extends AbstractWidget {
 
         guiGraphics.pose().popPose();
 
+        final Vector2dc mouseScreen = new Vector2d(mouseX - this.getX() - hw, mouseY - this.getY() - hh);
         final Vector4dc transformedScreenBounds = new Vector4d(
                 -hw + INNER_PADDING, -hh + INNER_PADDING, this.width - hw - INNER_PADDING, this.height - hh - INNER_PADDING
         );
@@ -80,12 +81,12 @@ public class MapWidget extends AbstractWidget {
             if (Tool.get() instanceof final PinTool pinTool) {
                 highlight = pinTool.currentPin == pin.type;
             }
-            pin.draw(guiGraphics, xOff, yOff, scale, highlight, transformedScreenBounds);
+            pin.draw(guiGraphics, mouseScreen, xOff, yOff, scale, highlight, transformedScreenBounds);
         }
         for (final Pin pin : WayfinderClient.PAGE_MANAGER.getEphemeralPins()) {
-            pin.draw(guiGraphics, xOff, yOff, scale, false, transformedScreenBounds);
+            pin.draw(guiGraphics, mouseScreen, xOff, yOff, scale, false, transformedScreenBounds);
         }
-        WayfinderClient.POSITION_HISTORY.renderHead(guiGraphics, xOff, yOff, scale, transformedScreenBounds);
+        WayfinderClient.POSITION_HISTORY.renderHead(guiGraphics, mouseScreen, xOff, yOff, scale, transformedScreenBounds);
 
         guiGraphics.pose().popPose();
     }

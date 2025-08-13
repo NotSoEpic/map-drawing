@@ -116,7 +116,7 @@ public class DrawTool extends Tool {
         final int wh = this.r * 2 + 1;
         final double x = worldX - this.r + xOff;
         final double y = worldY - this.r + yOff;
-        Rendering.renderTypeBlit(graphics, renderType, x, y, 0, 0.0f, 0.0f, wh, wh, wh, wh);
+        Rendering.renderTypeBlit(graphics, renderType, x, y, 0, 0.0f, 0.0f, wh, wh, wh, wh, 1);
     }
 
     @Override

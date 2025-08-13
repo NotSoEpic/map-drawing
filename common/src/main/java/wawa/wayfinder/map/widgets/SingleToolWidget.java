@@ -119,7 +119,7 @@ public class SingleToolWidget extends AbstractWidget {
 
         @Override
         protected void renderWidget(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
-            this.last.draw(guiGraphics, this.getX(), this.getY(), this.isMouseOver(mouseX, mouseY), false);
+            this.last.draw(guiGraphics, this.getX(), this.getY(), this.isMouseOver(mouseX, mouseY), false, 1);
 
             if (this.isMouseOver(mouseX, mouseY)) {
                 this.pinPicker.active = true;

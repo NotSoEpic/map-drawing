@@ -75,7 +75,7 @@ public class Page extends AbstractPage {
         }
 
         Rendering.renderTypeBlit(guiGraphics, renderType,
-                this.left() + xOff, this.top() + yOff, 0, 0.0f, 0.0f, 512, 512, 512, 512);
+                this.left() + xOff, this.top() + yOff, 0, 0.0f, 0.0f, 512, 512, 512, 512, 1);
     }
 
     /**
