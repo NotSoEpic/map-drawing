@@ -1,4 +1,5 @@
 {
+  "item.wayfinder.spyglass.use_tooltip": "Attack while scoped in to place a temporary pin",
   "key.categories.wayfinder": "Wayfinder",
   "key.wayfinder.brush": "Pick BrushWidget",
   "key.wayfinder.map": "Open Map",

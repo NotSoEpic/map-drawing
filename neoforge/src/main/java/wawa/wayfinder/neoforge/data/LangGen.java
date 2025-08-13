@@ -21,6 +21,8 @@ public class LangGen extends LanguageProvider {
         this.add(NeoKeyMappings.REDO, "Redo");
         this.add(NeoKeyMappings.PENCIL, "Pick Pencil");
         this.add(NeoKeyMappings.BRUSH, "Pick BrushWidget");
+
+        this.add("item.wayfinder.spyglass.use_tooltip", "Attack while scoped in to place a temporary pin");
     }
 
     private void add(final Lazy<KeyMapping> key, final String value) {
