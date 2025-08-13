@@ -26,7 +26,7 @@ public class NativeImageTracker {
             if (((NativeImageAccessor)(Object)image.image).getPixels() != 0) {
                 WayfinderClient.LOGGER.warn("Native image was not closed. Initialised at: {}", Arrays.toString(image.stackTrace));
                 unclosed++;
-                image.image.close();
+//                image.image.close(); // oops... race error
             } else {
                 closed++;
             }

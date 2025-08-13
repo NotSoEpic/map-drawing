@@ -74,7 +74,7 @@ public class PageManager {
             this.state = SnapshotState.IDLE;
             this.pastHistories.push(this.currentHistory);
             while (this.pastHistories.size() > MAX_HISTORY) {
-                this.pastHistories.removeFirst();
+                this.pastHistories.removeFirst().clear();
             }
         }
     }

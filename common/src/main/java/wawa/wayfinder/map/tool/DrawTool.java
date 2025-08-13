@@ -14,7 +14,6 @@ import org.joml.Vector2d;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
 import wawa.wayfinder.Helper;
-import wawa.wayfinder.NativeImageTracker;
 import wawa.wayfinder.Rendering;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.data.PageManager;
@@ -48,7 +47,8 @@ public class DrawTool extends Tool {
     private void rebuildPixels() {
         preview.close();
         final int wh = this.r * 2 + 1;
-        final NativeImage im = NativeImageTracker.newImage(wh, wh, true);
+        // final NativeImage im = NativeImageTracker.newImage(wh, wh, false); // intentional memory leak :3
+        final NativeImage im = new NativeImage(wh, wh, false);
         if (this.internal_color == 0) { // black hollow rectangle
             im.fillRect(0, 0, wh, wh, 0xFF000000);
             if (wh >= 3) {
