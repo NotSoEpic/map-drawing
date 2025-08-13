@@ -110,7 +110,7 @@ public class MapScreen extends Screen {
         }
 
         if (Services.KEY_MAPPINGS.matches(IKeyMappings.Normal.REDO, keyCode, scanCode, modifiers)) {
-            //WayfinderClient.PAGE_MANAGER.redoChanges();
+            WayfinderClient.PAGE_MANAGER.redoChanges();
         }
 
         switch (Services.KEY_MAPPINGS.getToolSwap(keyCode, scanCode, modifiers)) {

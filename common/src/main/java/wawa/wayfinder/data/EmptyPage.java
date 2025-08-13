@@ -19,6 +19,7 @@ public class EmptyPage extends AbstractPage {
 
     boolean attemptedUndo = false;
     NativeImage undoImage = null;
+    NativeImage redoImage = null;
 
     public EmptyPage(final int rx, final int ry, final PageManager parent, final PageIO pageIO) {
         super(rx, ry);
@@ -53,7 +54,7 @@ public class EmptyPage extends AbstractPage {
     }
 
     @Override
-    public void unboChanges(final NativeImage replacement) {
+    public NativeImage unboChanges(final NativeImage replacement) {
         if (!this.isLoading()) {
             final DynamicTexture texture = new DynamicTexture(512, 512, false);
             texture.getPixels().copyFrom(replacement);
@@ -62,9 +63,13 @@ public class EmptyPage extends AbstractPage {
             this.attemptedUndo = false;
             replacement.close();
             this.undoImage = null;
+            this.redoImage = null;
+            return new NativeImage(512, 512, true);
         } else {
             this.attemptedUndo = true;
             this.undoImage = replacement;
+            this.redoImage = new NativeImage(512, 512, true);
+            return this.redoImage; // will be modified once the page actually loads
         }
 
         //replace this empty page with a new one if an undo is requested and we are currently empty

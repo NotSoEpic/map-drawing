@@ -5,4 +5,11 @@ import org.joml.Vector2i;
 
 import java.util.Map;
 
-public record OperationHistory(Map<Vector2i, NativeImage> pagesModified) {}
+public record OperationHistory(Map<Vector2i, NativeImage> pagesModified) {
+    public void clear() {
+        pagesModified.forEach((key, value) -> {
+            value.close();
+        });
+        pagesModified.clear();
+    }
+}

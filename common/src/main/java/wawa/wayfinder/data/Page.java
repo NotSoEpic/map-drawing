@@ -46,12 +46,16 @@ public class Page extends AbstractPage {
     }
 
     @Override
-    public void unboChanges(final NativeImage replacement) {
+    public NativeImage unboChanges(final NativeImage replacement) {
+        final NativeImage previous = new NativeImage(512, 512, false);
+        previous.copyFrom(this.texture.getPixels());
         this.texture.getPixels().copyFrom(replacement);
         replacement.close();
 
         this.diskDirty = true;
         this.uploadDirty = true;
+
+        return previous;
     }
 
     @Override

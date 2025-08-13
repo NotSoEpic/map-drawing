@@ -41,7 +41,11 @@ public abstract class AbstractPage {
     @Nullable
     public abstract NativeImage getImage();
 
-    public abstract void unboChanges(NativeImage replacement);
+    /**
+     * @param replacement Reference data. Must be closed to prevent a memory leak.
+     * @return previous image data
+     */
+    public abstract NativeImage unboChanges(NativeImage replacement); // unbo
 
     /**
      * @param x relative x coordinate (0-511)

@@ -24,7 +24,9 @@ public class PageManager {
     private int loadedCount = 0;
 
     private SnapshotState state = SnapshotState.IDLE;
+    private static final int MAX_HISTORY = 16;
     private final Stack<OperationHistory> pastHistories = new Stack<>();
+    private final Stack<OperationHistory> futureHistories = new Stack<>();
     private OperationHistory currentHistory;
 
     public enum SnapshotState {
@@ -60,6 +62,9 @@ public class PageManager {
         if (this.state != SnapshotState.SNAPSHOTTING) {
             this.state = SnapshotState.SNAPSHOTTING;
             this.currentHistory = new OperationHistory(new HashMap<>());
+
+            this.futureHistories.forEach(OperationHistory::clear);
+            this.futureHistories.clear();
         }
     }
 
@@ -67,19 +72,41 @@ public class PageManager {
         if (this.state != SnapshotState.IDLE && this.currentHistory != null) {
             this.state = SnapshotState.IDLE;
             this.pastHistories.push(this.currentHistory);
+            while (this.pastHistories.size() > MAX_HISTORY) {
+                this.pastHistories.removeFirst();
+            }
         }
     }
 
     public void undoChanges() {
-        if (!this.pastHistories.empty() && this.state == SnapshotState.IDLE) { //make sure we can't undo while we are currently modifying pages) {
+        if (!this.pastHistories.empty() && this.state == SnapshotState.IDLE) { //make sure we can't undo while we are currently modifying pages)
             final OperationHistory recentHistory = this.pastHistories.pop();
+            final OperationHistory redoHistory = new OperationHistory(new HashMap<>());
 
             for (final Map.Entry<Vector2i, NativeImage> entry : recentHistory.pagesModified().entrySet()) {
                 final AbstractPage page = this.getOrCreatePage(entry.getKey().x, entry.getKey().y);
-                page.unboChanges(entry.getValue());
+                 redoHistory.pagesModified().put(entry.getKey(), page.unboChanges(entry.getValue()));
             }
 
-            recentHistory.pagesModified().clear();
+            this.futureHistories.push(redoHistory);
+
+            recentHistory.clear();
+        }
+    }
+
+    public void redoChanges() {
+        if (!this.futureHistories.empty() && this.state == SnapshotState.IDLE) {
+            final OperationHistory recentHistory = this.futureHistories.pop();
+            final OperationHistory undoHistory = new OperationHistory(new HashMap<>());
+
+            for (final Map.Entry<Vector2i, NativeImage> entry : recentHistory.pagesModified().entrySet()) {
+                final AbstractPage page = this.getOrCreatePage(entry.getKey().x, entry.getKey().y);
+                undoHistory.pagesModified().put(entry.getKey(), page.unboChanges(entry.getValue()));
+            }
+
+            this.pastHistories.push(undoHistory);
+
+            recentHistory.clear();
         }
     }
 
@@ -193,6 +220,7 @@ public class PageManager {
                 }
 
                 if (page instanceof final EmptyPage ep && ep.attemptedUndo && !ep.isLoading()) {
+                    ep.redoImage.copyFrom(ep.getImage());
                     ep.unboChanges(ep.undoImage);
                 }
             }
@@ -214,14 +242,9 @@ public class PageManager {
         this.emptyCount = 0;
         this.loadedCount = 0;
 
-        for (final OperationHistory history : this.pastHistories) {
-            for (final NativeImage value : history.pagesModified().values()) {
-                value.close();
-            }
-
-            history.pagesModified().clear();
-        }
-
+        this.pastHistories.forEach(OperationHistory::clear);
         this.pastHistories.clear();
+        this.futureHistories.forEach(OperationHistory::clear);
+        this.futureHistories.clear();
     }
 }
