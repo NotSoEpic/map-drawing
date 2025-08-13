@@ -125,7 +125,7 @@ public class MapScreen extends Screen {
     @Override
     public void onClose() {
         super.onClose();
-        WayfinderClient.PAGE_MANAGER.clearEphemeralPins();
+        WayfinderClient.PAGE_MANAGER.getSpyglassPins().clear();
     }
 
     @Override

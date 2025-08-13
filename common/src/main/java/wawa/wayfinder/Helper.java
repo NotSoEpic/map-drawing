@@ -4,6 +4,8 @@ import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec2;
 import org.joml.Vector2d;
 import org.joml.Vector2dc;
@@ -29,6 +31,10 @@ public class Helper {
         value.x = Math.clamp(value.x, bounds.x(), bounds.z());
         value.y = Math.clamp(value.y, bounds.y(), bounds.w());
         return value;
+    }
+
+    public static boolean isUsingSpyglass(Player player) {
+        return player.isUsingItem() && player.getItemInHand(player.getUsedItemHand()).is(Items.SPYGLASS);
     }
 
     public static float getMouseProximityFade(final Vector2dc mouseScreen, final Vector2dc posScreen) {

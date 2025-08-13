@@ -19,7 +19,7 @@ public class PageManager {
     public PageIO pageIO;
     private final Map<Vector2i, AbstractPage> pages = new HashMap<>();
     private final Map<Pin.Type, Pin> pins = new HashMap<>();
-    private final List<Pin> ephemeralPins = new ArrayList<>();
+    private final SpyglassPins spyglassPins = new SpyglassPins();
 
     private int emptyCount = 0;
     private int loadedCount = 0;
@@ -178,16 +178,8 @@ public class PageManager {
         this.pins.remove(type);
     }
 
-    public Collection<Pin> getEphemeralPins() {
-        return this.ephemeralPins;
-    }
-
-    public void addEphemeralPin(final Pin pin) {
-        this.ephemeralPins.add(pin);
-    }
-
-    public void clearEphemeralPins() {
-        this.ephemeralPins.clear();
+    public SpyglassPins getSpyglassPins() {
+        return this.spyglassPins;
     }
 
     public void replacePage(final int rx, final int ry, final AbstractPage replacement) {
@@ -226,6 +218,7 @@ public class PageManager {
                 }
             }
         }
+        this.spyglassPins.tick();
     }
 
     public void save(final boolean close) {

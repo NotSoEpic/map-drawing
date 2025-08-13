@@ -7,8 +7,10 @@
   "client": [
     "BiomeManagerAccessor",
     "KeyBindingAccessor",
+    "LevelRendererAccessor",
     "MinecraftMixin",
     "NativeImageAccessor",
+    "SpyglassItemMixin",
     "VeilImGuiImplMixin",
     "VeilRenderSystemMixin"
   ],

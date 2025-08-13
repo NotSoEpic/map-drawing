@@ -11,6 +11,7 @@ import org.lwjgl.glfw.GLFW;
 import wawa.wayfinder.Rendering;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.data.Pin;
+import wawa.wayfinder.data.SpyglassPins;
 import wawa.wayfinder.map.MapScreen;
 import wawa.wayfinder.map.tool.PinTool;
 import wawa.wayfinder.map.tool.Tool;
@@ -83,8 +84,8 @@ public class MapWidget extends AbstractWidget {
             }
             pin.draw(guiGraphics, mouseScreen, xOff, yOff, scale, highlight, transformedScreenBounds);
         }
-        for (final Pin pin : WayfinderClient.PAGE_MANAGER.getEphemeralPins()) {
-            pin.draw(guiGraphics, mouseScreen, xOff, yOff, scale, false, transformedScreenBounds);
+        for (final SpyglassPins.PinData pin : WayfinderClient.PAGE_MANAGER.getSpyglassPins().getPins()) {
+            pin.pin().draw(guiGraphics, mouseScreen, xOff, yOff, scale, false, transformedScreenBounds);
         }
         WayfinderClient.POSITION_HISTORY.renderHead(guiGraphics, mouseScreen, xOff, yOff, scale, transformedScreenBounds);
 

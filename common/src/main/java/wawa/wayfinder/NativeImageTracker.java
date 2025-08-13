@@ -32,6 +32,7 @@ public class NativeImageTracker {
             }
         }
         WayfinderClient.LOGGER.debug("{} unclosed images, {} closed images", unclosed, closed);
+        images.clear();
     }
 
     public record ImageAllocation(StackTraceElement[] stackTrace, NativeImage image) {}
