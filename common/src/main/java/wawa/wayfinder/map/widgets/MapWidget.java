@@ -112,7 +112,7 @@ public class MapWidget extends AbstractWidget {
                 default -> Mouse.NONE;
             };
             final Vector2d world = this.parent.screenToWorld(new Vector2d(mouseX, mouseY));
-            if ((this.mouse == Mouse.LEFT || this.mouse == Mouse.RIGHT) && Tool.get() != null && !Screen.hasAltDown()) {
+            if ((this.mouse == Mouse.LEFT || this.mouse == Mouse.RIGHT) && Tool.get() != null && !Screen.hasAltDown() && !Screen.hasControlDown()) {
                 Tool.get().hold(WayfinderClient.PAGE_MANAGER, this.mouse, world, world);
             } else if (Screen.hasAltDown()) {
                 final int color = WayfinderClient.PAGE_MANAGER.getPixel(Mth.floor(world.x), Mth.floor(world.y));
@@ -127,14 +127,14 @@ public class MapWidget extends AbstractWidget {
     public void mouseMoved(final double mouseX, final double mouseY) {
         final Vector2d world = this.parent.screenToWorld(new Vector2d(mouseX, mouseY));
         final Vector2d oldWorld = this.parent.screenToWorld(new Vector2d(this.oldMouseX, this.oldMouseY));
-        if (this.mouse == Mouse.MIDDLE) {
+        if (this.mouse == Mouse.MIDDLE || (this.mouse == Mouse.LEFT && Screen.hasControlDown())) {
             this.parent.lerpedPanning.set(this.parent.lerpedPanning.get().add(oldWorld).sub(world));
             this.parent.backgroundPanning.add(this.oldMouseX, this.oldMouseY).sub(mouseX, mouseY);
         } else if (!this.isMouseOver(mouseX, mouseY)) {
             this.mouse = Mouse.NONE;
             return;
         }
-        if (Tool.get() != null && !Screen.hasAltDown()) {
+        if (Tool.get() != null && !Screen.hasAltDown() && !Screen.hasControlDown()) {
             Tool.get().hold(WayfinderClient.PAGE_MANAGER, this.mouse, oldWorld, world);
         }
         this.oldMouseX = mouseX;
