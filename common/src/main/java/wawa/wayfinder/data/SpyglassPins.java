@@ -6,7 +6,11 @@ import foundry.veil.api.client.render.rendertype.VeilRenderType;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.level.block.Blocks;
 import org.joml.*;
 import wawa.wayfinder.Helper;
 import wawa.wayfinder.WayfinderClient;
@@ -31,11 +35,22 @@ public class SpyglassPins {
     public void add(final Vector3dc position) {
         if (this.pins.size() < MAX_PINS) {
             this.pins.add(new PinData(position));
+            Minecraft.getInstance().player.playSound(SoundEvents.AMETHYST_BLOCK_FALL, 0.25f, 1);
+            for (int i = 0; i < 20; i++) {
+                Minecraft.getInstance().particleEngine.createParticle(
+                        new BlockParticleOption(ParticleTypes.BLOCK, Blocks.COPPER_BLOCK.defaultBlockState()),
+                        position.x(), position.y(), position.z(),
+                        0, 0.1, 0
+                );
+            }
         }
     }
 
     public void clear() {
-        this.pins.clear();
+        if (!this.pins.isEmpty()) {
+            Minecraft.getInstance().player.playSound(SoundEvents.AMETHYST_BLOCK_RESONATE, 0.25f, 1f);
+            this.pins.clear();
+        }
     }
 
     public void tick() {
@@ -44,7 +59,7 @@ public class SpyglassPins {
                 this.zoomlessTimer = 0;
             } else {
                 this.zoomlessTimer++;
-                if (this.zoomlessTimer > 15*20) {
+                if (this.zoomlessTimer > 10 * 20) {
                     this.clear();
                 }
             }
