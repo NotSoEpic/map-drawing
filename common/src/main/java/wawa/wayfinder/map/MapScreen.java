@@ -1,5 +1,6 @@
 package wawa.wayfinder.map;
 
+import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -27,10 +28,12 @@ public class MapScreen extends Screen {
     private MapWidget mapWidget;
     public ToolPickerWidget toolPicker;
     public CompassRoseWidget compassRose;
+    public static boolean cursorAdjusted;
 
     public MapScreen(final Vector2d openingPos, final Vector2d endingPos) {
         super(Component.literal("Wayfinder Map"));
         this.lerpedPanning = new LerpedVector2d(openingPos, endingPos);
+        cursorAdjusted = false;
     }
 
     @Override
@@ -38,9 +41,9 @@ public class MapScreen extends Screen {
         super.init();
         this.mapWidget = new MapWidget(this);
         this.addRenderableWidget(this.mapWidget);
-        this.toolPicker = new ToolPickerWidget(this.width - 15 - 16/2, 30);
+        this.toolPicker = new ToolPickerWidget(this.width - 15 - 16 / 2, 30);
         this.addRenderableWidget(this.toolPicker);
-        this.compassRose = new CompassRoseWidget(this.width - 40, this.height - 40);
+        this.compassRose = new CompassRoseWidget(this.width - 45, this.height - 45);
         this.addRenderableWidget(this.compassRose);
         this.addRenderableOnly(new DebugTextRenderable(this));
         this.addRenderableWidget(new SideTabWidget(30 - 16, 30 + 8, "Toggle player",
@@ -50,6 +53,11 @@ public class MapScreen extends Screen {
                 () -> WayfinderClient.id("tabs/clear_history"), () -> WayfinderClient.POSITION_HISTORY.clear()));
         if (Tool.get() != null) {
             GLFW.glfwSetInputMode(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
+        }
+        if (!cursorAdjusted) { // Init is run whenever the screen is resized & the cursor is set in the super of the constructor. its evil but it works
+            Window window = Minecraft.getInstance().getWindow();
+            GLFW.glfwSetCursorPos(window.getWindow(), window.getScreenWidth() / 2f, window.getScreenHeight() / 2.75f);
+            cursorAdjusted = true;
         }
     }
 
@@ -118,7 +126,8 @@ public class MapScreen extends Screen {
         switch (Services.KEY_MAPPINGS.getToolSwap(keyCode, scanCode, modifiers)) {
             case BRUSH -> this.toolPicker.pickBrush();
             case PENCIL -> this.toolPicker.pickPencil();
-            case null -> {}
+            case null -> {
+            }
         }
 
         return super.keyPressed(keyCode, scanCode, modifiers);
