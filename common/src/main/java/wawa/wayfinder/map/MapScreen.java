@@ -14,7 +14,10 @@ import org.lwjgl.glfw.GLFW;
 import wawa.wayfinder.LerpedVector2d;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.map.tool.Tool;
-import wawa.wayfinder.map.widgets.*;
+import wawa.wayfinder.map.widgets.CompassRoseWidget;
+import wawa.wayfinder.map.widgets.DebugTextRenderable;
+import wawa.wayfinder.map.widgets.MapWidget;
+import wawa.wayfinder.map.widgets.ToolPickerWidget;
 import wawa.wayfinder.platform.Services;
 import wawa.wayfinder.platform.services.IKeyMappings;
 
@@ -46,11 +49,6 @@ public class MapScreen extends Screen {
         this.compassRose = new CompassRoseWidget(this.width - 45, this.height - 45);
         this.addRenderableWidget(this.compassRose);
         this.addRenderableOnly(new DebugTextRenderable(this));
-        this.addRenderableWidget(new SideTabWidget(30 - 16, 30 + 8, "Toggle player",
-                () -> WayfinderClient.id(WayfinderClient.POSITION_HISTORY.visible ? "tabs/player_visible" : "tabs/player_hidden"),
-                () -> WayfinderClient.POSITION_HISTORY.visible = !WayfinderClient.POSITION_HISTORY.visible));
-        this.addRenderableWidget(new SideTabWidget(30 - 16, 30 + 8 + 28, "Clear history",
-                () -> WayfinderClient.id("tabs/clear_history"), () -> WayfinderClient.POSITION_HISTORY.clear()));
         if (Tool.get() != null) {
             GLFW.glfwSetInputMode(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
         }

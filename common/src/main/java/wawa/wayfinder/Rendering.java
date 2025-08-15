@@ -19,7 +19,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.joml.Matrix4f;
+import org.joml.Vector2d;
 import org.joml.Vector2dc;
+import org.joml.Vector4dc;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -211,5 +213,12 @@ public class Rendering {
 					nineslice.width(), nineslice.height(), blitOffset,
 					sliceU, sliceV);
 		}
+	}
+
+	public static void renderHead(final GuiGraphics guiGraphics, final Vector2dc playerPosition, final Vector2dc mouseScreen, final double xOff, final double yOff, final float scale, final Vector4dc worldBounds) {
+		final Vector2d pos = new Vector2d(playerPosition).add(xOff, yOff).mul(scale); // world position to screen position
+		final float alpha = Helper.getMouseProximityFade(mouseScreen, pos);
+		Helper.clampWithin(pos, worldBounds);
+		Rendering.renderPlayerIcon(guiGraphics, pos.x - 8, pos.y - 8, Minecraft.getInstance().player, alpha);
 	}
 }

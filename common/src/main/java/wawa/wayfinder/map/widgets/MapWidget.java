@@ -1,11 +1,13 @@
 package wawa.wayfinder.map.widgets;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 import org.joml.*;
 import org.lwjgl.glfw.GLFW;
 import wawa.wayfinder.Rendering;
@@ -63,8 +65,6 @@ public class MapWidget extends AbstractWidget {
         }
         final Vector2d world = this.parent.screenToWorld(new Vector2d(mouseX, mouseY));
 
-        WayfinderClient.POSITION_HISTORY.renderPositions(guiGraphics, xOff, yOff);
-
         if (Tool.get() != null) {
             Tool.get().renderWorld(guiGraphics, Mth.floor(world.x), Mth.floor(world.y), xOff, yOff);
         }
@@ -87,7 +87,9 @@ public class MapWidget extends AbstractWidget {
         for (final SpyglassPins.PinData pin : WayfinderClient.PAGE_MANAGER.getSpyglassPins().getPins()) {
             pin.pin().draw(guiGraphics, mouseScreen, xOff, yOff, scale, false, transformedScreenBounds);
         }
-        WayfinderClient.POSITION_HISTORY.renderHead(guiGraphics, mouseScreen, xOff, yOff, scale, transformedScreenBounds);
+
+        final Vec3 playerPos = Minecraft.getInstance().player.position();
+        Rendering.renderHead(guiGraphics, new Vector2d(playerPos.x, playerPos.z), mouseScreen, xOff, yOff, scale, transformedScreenBounds);
 
         guiGraphics.pose().popPose();
     }
