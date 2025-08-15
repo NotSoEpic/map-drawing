@@ -28,6 +28,9 @@ public class Helper {
      * @return value for chaining
      */
     public static Vector2d clampWithin(final Vector2d value, final Vector4dc bounds) {
+        if (bounds.x() > bounds.z() || bounds.y() > bounds.w()) {
+            return new Vector2d(bounds.x(), bounds.y());
+        }
         value.x = Math.clamp(value.x, bounds.x(), bounds.z());
         value.y = Math.clamp(value.y, bounds.y(), bounds.w());
         return value;
