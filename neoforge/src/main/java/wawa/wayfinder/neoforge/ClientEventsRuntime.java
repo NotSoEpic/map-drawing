@@ -40,7 +40,7 @@ public class ClientEventsRuntime {
 
     @SubscribeEvent
     public static void postWorldRender(final RenderLevelStageEvent event) {
-        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_CUTOUT_BLOCKS) {
+        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_ENTITIES) {
             final MultiBufferSource bufferSource = ((LevelRendererAccessor)event.getLevelRenderer()).getRenderBuffers().bufferSource();
             ClientEvents.postWorldRender(bufferSource, event.getPoseStack(), event.getPartialTick().getRealtimeDeltaTicks());
         }
