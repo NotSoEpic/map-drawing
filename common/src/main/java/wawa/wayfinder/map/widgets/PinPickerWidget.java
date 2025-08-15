@@ -5,9 +5,9 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import net.minecraft.network.chat.Component;
+import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.data.Pin;
 import wawa.wayfinder.map.tool.PinTool;
-import wawa.wayfinder.map.tool.Tool;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,7 +101,7 @@ public class PinPickerWidget extends AbstractWidget {
             final PinTool tool = this.parent.pinWidget.getTool();
             this.parent.pinWidget.last = this.type;
             tool.setPinType(this.type);
-            Tool.set(tool);
+            WayfinderClient.TOOL_MANAGER.set(tool);
         }
 
         @Override

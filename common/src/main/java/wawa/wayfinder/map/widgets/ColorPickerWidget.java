@@ -10,7 +10,6 @@ import net.minecraft.network.chat.Component;
 import wawa.wayfinder.Rendering;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.map.tool.PaletteDrawTool;
-import wawa.wayfinder.map.tool.Tool;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -114,8 +113,7 @@ public class ColorPickerWidget extends AbstractWidget {
             this.relY = y;
             this.color = color;
             this.visualColor = visualColor;
-            this.tool = new PaletteDrawTool(this.getABGR(), this.visualColor, parent.brushWidget);
-            this.tool.icon = WayfinderClient.id("cursor/brush");
+            this.tool = new PaletteDrawTool(WayfinderClient.id("cursor/brush"), this.getABGR(), this.visualColor, parent.brushWidget);
         }
 
         @Override
@@ -142,7 +140,7 @@ public class ColorPickerWidget extends AbstractWidget {
 
         @Override
         public void onClick(final double mouseX, final double mouseY) {
-            Tool.set(this.tool);
+            WayfinderClient.TOOL_MANAGER.set(this.tool);
             this.parent.brushWidget.last = this.tool;
         }
 

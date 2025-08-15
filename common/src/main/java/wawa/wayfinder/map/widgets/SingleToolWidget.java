@@ -40,7 +40,7 @@ public class SingleToolWidget extends AbstractWidget {
     @Override
     public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
         if (super.mouseClicked(mouseX, mouseY, button)) {
-            Tool.set(this.toolFunction.apply(this));
+            WayfinderClient.TOOL_MANAGER.set(this.toolFunction.apply(this));
             return true;
         }
         return false;

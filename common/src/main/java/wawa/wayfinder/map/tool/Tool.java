@@ -1,44 +1,11 @@
 package wawa.wayfinder.map.tool;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
-import org.lwjgl.glfw.GLFW;
 import wawa.wayfinder.data.PageManager;
 import wawa.wayfinder.map.widgets.MapWidget;
 
 public abstract class Tool {
-    private static Tool tool;
-    private static Tool previous;
-
-    public static void set(@Nullable final Tool tool) {
-        if (Tool.tool != null) {
-            Tool.tool.onDeselect();
-        }
-        Tool.previous = Tool.tool;
-        Tool.tool = tool;
-        if (tool != null) {
-            tool.onSelect();
-            GLFW.glfwSetInputMode(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
-        }
-    }
-
-    @Nullable
-    public static Tool get() {
-        return tool;
-    }
-
-    public static void swap() {
-        if (Tool.previous != null) {
-            final Tool temp = Tool.tool;
-            Tool.tool.onDeselect();
-            Tool.tool = Tool.previous;
-            Tool.tool.onSelect();
-            Tool.previous = temp;
-        }
-    }
-
     public void onSelect() {}
 
     public void onDeselect() {}

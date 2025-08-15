@@ -1,7 +1,9 @@
 {
   "item.wayfinder.spyglass.use_tooltip": "Attack while scoped in to place a temporary pin",
   "key.categories.wayfinder": "Wayfinder",
-  "key.wayfinder.brush": "Pick BrushWidget",
+  "key.wayfinder.brush": "Pick Brush",
+  "key.wayfinder.eraser": "Pick Eraser",
+  "key.wayfinder.hand": "Pick Hand",
   "key.wayfinder.map": "Open Map",
   "key.wayfinder.pencil": "Pick Pencil",
   "key.wayfinder.redo": "Redo",

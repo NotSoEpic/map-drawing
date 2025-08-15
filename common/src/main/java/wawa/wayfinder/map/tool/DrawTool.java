@@ -22,7 +22,7 @@ import wawa.wayfinder.map.widgets.MapWidget;
 import java.util.function.Consumer;
 
 public class DrawTool extends Tool {
-    public ResourceLocation icon = null;
+    private final ResourceLocation icon;
     protected final int internal_color;
     protected final int visual_color;
     protected int r = 0;
@@ -35,7 +35,8 @@ public class DrawTool extends Tool {
         Minecraft.getInstance().getTextureManager().register(id, preview);
     }
 
-    public DrawTool(final int color, final int visual_color) {
+    public DrawTool(final ResourceLocation icon, final int color, final int visual_color) {
+        this.icon = icon;
         this.internal_color = color;
         this.visual_color = visual_color;
     }
@@ -121,13 +122,11 @@ public class DrawTool extends Tool {
 
     @Override
     public void renderScreen(final GuiGraphics graphics, final double mouseX, final double mouseY) {
-        if (this.icon != null) {
-            final Vec2 mouse = Helper.preciseMousePos();
-            graphics.pose().pushPose();
-            graphics.pose().translate(mouse.x % 1, mouse.y % 1, 0);
-            graphics.blitSprite(this.icon, (int)mouse.x - 16, (int)mouse.y - 16, 32, 32);
-            graphics.pose().popPose();
-        }
+        final Vec2 mouse = Helper.preciseMousePos();
+        graphics.pose().pushPose();
+        graphics.pose().translate(mouse.x % 1, mouse.y % 1, 0);
+        graphics.blitSprite(this.icon, (int)mouse.x - 16, (int)mouse.y - 16, 32, 32);
+        graphics.pose().popPose();
     }
 
     @Override

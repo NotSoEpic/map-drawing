@@ -13,7 +13,6 @@ import org.joml.Vector2d;
 import org.lwjgl.glfw.GLFW;
 import wawa.wayfinder.LerpedVector2d;
 import wawa.wayfinder.WayfinderClient;
-import wawa.wayfinder.map.tool.Tool;
 import wawa.wayfinder.map.widgets.CompassRoseWidget;
 import wawa.wayfinder.map.widgets.DebugTextRenderable;
 import wawa.wayfinder.map.widgets.MapWidget;
@@ -49,9 +48,7 @@ public class MapScreen extends Screen {
         this.compassRose = new CompassRoseWidget(this.width - 45, this.height - 45);
         this.addRenderableWidget(this.compassRose);
         this.addRenderableOnly(new DebugTextRenderable(this));
-        if (Tool.get() != null) {
-            GLFW.glfwSetInputMode(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
-        }
+        GLFW.glfwSetInputMode(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
         if (!cursorAdjusted) { // Init is run whenever the screen is resized & the cursor is set in the super of the constructor. its evil but it works
             Window window = Minecraft.getInstance().getWindow();
             GLFW.glfwSetCursorPos(window.getWindow(), window.getScreenWidth() / 2f, window.getScreenHeight() / 2.75f);
@@ -67,9 +64,7 @@ public class MapScreen extends Screen {
 
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
-        if (Tool.get() != null) {
-            Tool.get().renderScreen(guiGraphics, mouseX, mouseY);
-        }
+        WayfinderClient.TOOL_MANAGER.get().renderScreen(guiGraphics, mouseX, mouseY);
     }
 
     // widgets that are rendered last (on top) have the highest interaction priority
@@ -110,7 +105,7 @@ public class MapScreen extends Screen {
         }
 
         if (Services.KEY_MAPPINGS.matches(IKeyMappings.Normal.SWAP, keyCode, scanCode, modifiers)) {
-            Tool.swap();
+            WayfinderClient.TOOL_MANAGER.swap();
         }
 
         if (Services.KEY_MAPPINGS.matches(IKeyMappings.Normal.UNDO, keyCode, scanCode, modifiers)) {
@@ -122,10 +117,11 @@ public class MapScreen extends Screen {
         }
 
         switch (Services.KEY_MAPPINGS.getToolSwap(keyCode, scanCode, modifiers)) {
+            case HAND -> this.toolPicker.pickHand();
             case BRUSH -> this.toolPicker.pickBrush();
             case PENCIL -> this.toolPicker.pickPencil();
-            case null -> {
-            }
+            case ERASER -> this.toolPicker.pickEraser();
+            case null -> {}
         }
 
         return super.keyPressed(keyCode, scanCode, modifiers);

@@ -41,12 +41,20 @@ public class FabricKeyMappings implements IKeyMappings {
                     "redo", GLFW.GLFW_KEY_Y)
             .setKeyModifier(GLFW.GLFW_MOD_CONTROL)),
 
+            HAND = KeyBindingHelper.registerKeyBinding(createNonBlocking(
+                    "hand", GLFW.GLFW_KEY_H
+            )),
+
             PENCIL = KeyBindingHelper.registerKeyBinding(createNonBlocking(
                     "pencil", GLFW.GLFW_KEY_N
             )),
 
             BRUSH = KeyBindingHelper.registerKeyBinding(createNonBlocking(
                     "brush", GLFW.GLFW_KEY_B
+            )),
+
+            ERASER = KeyBindingHelper.registerKeyBinding(createNonBlocking(
+                    "eraser", GLFW.GLFW_KEY_E
             )),
 
             SWAP = KeyBindingHelper.registerKeyBinding(createNonBlocking(
@@ -81,11 +89,17 @@ public class FabricKeyMappings implements IKeyMappings {
 
     @Override
     public @Nullable ToolSwap getToolSwap(final int keysym, final int scancode, final int modifier) {
+        if (HAND.matches(keysym, scancode)) {
+            return ToolSwap.HAND;
+        }
         if (PENCIL.matches(keysym, scancode)) {
             return ToolSwap.PENCIL;
         }
         if (BRUSH.matches(keysym, scancode)) {
             return ToolSwap.BRUSH;
+        }
+        if (ERASER.matches(keysym, scancode)) {
+            return ToolSwap.ERASER;
         }
         return null;
     }

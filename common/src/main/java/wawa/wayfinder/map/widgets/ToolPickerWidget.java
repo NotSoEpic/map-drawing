@@ -8,66 +8,79 @@ import net.minecraft.world.phys.Vec2;
 import wawa.wayfinder.Helper;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.map.tool.DrawTool;
+import wawa.wayfinder.map.tool.PanTool;
 import wawa.wayfinder.map.tool.PinTool;
-import wawa.wayfinder.map.tool.Tool;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ToolPickerWidget extends AbstractWidget {
     private final List<SingleToolWidget> tools = new ArrayList<>();
-    private final DrawTool pencil = new DrawTool(0xFF000000, 0xFF000000);
+    private final DrawTool pencil = new DrawTool(WayfinderClient.id("cursor/pencil"), 0xFF000000, 0xFF000000);
     private final SingleToolWidget.BrushWidget brushWidget;
-    private final DrawTool eraser = new DrawTool(0, 0);
+    private final DrawTool eraser = new DrawTool(WayfinderClient.id("cursor/eraser"), 0, 0);
     private final PinTool pin = new PinTool();
     public ToolPickerWidget(final int x, final int y) {
         super(x, y, 0, 0, Component.literal("tool picker"));
-        this.pencil.icon = WayfinderClient.id("cursor/pencil");
         this.tools.add(new SingleToolWidget(
                 this.getX(), this.getY(),
+                WayfinderClient.id("tool/paw"),
+                WayfinderClient.id("tool/paw_highlight"),
+                (w) -> PanTool.INSTANCE,
+                Component.literal("paw")
+        ));
+        this.tools.add(new SingleToolWidget(
+                this.getX(), this.getY() + 20,
                 WayfinderClient.id("tool/pencil"),
                 WayfinderClient.id("tool/pencil_highlight"),
                 (w) -> this.pencil,
                 Component.literal("pencil")
         ));
-        this.brushWidget = new SingleToolWidget.BrushWidget(this.getX(), this.getY() + 20);
+        this.brushWidget = new SingleToolWidget.BrushWidget(this.getX(), this.getY() + 40);
         this.tools.add(this.brushWidget);
-        this.eraser.icon = WayfinderClient.id("cursor/eraser");
         this.tools.add(new SingleToolWidget(
-                this.getX(), this.getY() + 40,
+                this.getX(), this.getY() + 60,
                 WayfinderClient.id("tool/eraser"),
                 WayfinderClient.id("tool/eraser_highlight"),
                 (w) -> this.eraser,
                 Component.literal("eraser")
         ));
         this.tools.add(new SingleToolWidget.PinWidget(
-                this.getX(), this.getY() + 60,
+                this.getX(), this.getY() + 80,
                 (w) -> this.pin,
                 Component.literal("pin")
         ));
         this.updateBounds();
     }
 
+    public void pickHand() {
+        WayfinderClient.TOOL_MANAGER.set(PanTool.INSTANCE);
+    }
+
     public void pickPencil() {
-        Tool.set(this.pencil);
+        WayfinderClient.TOOL_MANAGER.set(this.pencil);
     }
 
     public void pickBrush() {
-        if (Tool.get() == this.brushWidget.last) {
+        if (WayfinderClient.TOOL_MANAGER.get() == this.brushWidget.last) {
             final Vec2 mouse = Helper.preciseMousePos();
             this.brushWidget.openToMouse(mouse.x, mouse.y);
         } else {
-            Tool.set(this.brushWidget.last);
+            WayfinderClient.TOOL_MANAGER.set(this.brushWidget.last);
         }
+    }
+
+    public void pickEraser() {
+        WayfinderClient.TOOL_MANAGER.set(this.eraser);
     }
 
     public void pickColor(final int color) {
         if (color == 0xFF000000) {
-            Tool.set(this.pencil);
+            WayfinderClient.TOOL_MANAGER.set(this.pencil);
         } else {
             for (final DrawTool tool : this.brushWidget.getBrushes()) {
                 if (tool.getInternalColor() == color) {
-                    Tool.set(tool);
+                    WayfinderClient.TOOL_MANAGER.set(tool);
                     return;
                 }
             }

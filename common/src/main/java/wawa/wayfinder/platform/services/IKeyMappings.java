@@ -14,8 +14,10 @@ public interface IKeyMappings {
     boolean matches(Normal bind, final int keysym, final int scancode, final int modifier);
 
     enum ToolSwap {
+        HAND,
         BRUSH,
-        PENCIL
+        PENCIL,
+        ERASER
     }
 
     @Nullable
