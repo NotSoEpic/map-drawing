@@ -2,10 +2,12 @@ package wawa.wayfinder.data;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import foundry.veil.api.client.render.rendertype.VeilRenderType;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
@@ -71,7 +73,7 @@ public class SpyglassPins {
         final Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
         // billboarded rotating around Y
         final Quaternionf quaternion = new Quaternionf(0, camera.rotation().y, 0, camera.rotation().w);
-        final VertexConsumer consumer = bufferSource.getBuffer(VeilRenderType.get(PING_RENDERTYPE, PING_TEXTURE));
+        final VertexConsumer consumer = bufferSource.getBuffer(RenderType.entityCutout(PING_TEXTURE));
         poseStack.pushPose();
         poseStack.translate(-camera.getPosition().x(), -camera.getPosition().y(), -camera.getPosition().z());
         for (final PinData ping : this.pins) {
@@ -92,7 +94,12 @@ public class SpyglassPins {
 
     private static void vertex(final VertexConsumer consumer, final PoseStack.Pose pose, final float x, final float y, final float z, final float u, final float v, final Quaternionfc quaternion) {
         final Vector3f vec = new Vector3f(x, y, z).rotate(quaternion);
-        consumer.addVertex(pose, vec.x, vec.y, vec.z).setUv(u, v).setColor(-1);
+        consumer.addVertex(pose, vec.x, vec.y, vec.z)
+                .setNormal(0, 1, 0)
+                .setUv(u, v)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setLight(LightTexture.FULL_BRIGHT)
+                .setColor(-1);
     }
 
     public record PinData(Pin pin, Vector3dc position) {

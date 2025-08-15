@@ -47,6 +47,13 @@ public class Rendering {
 		public static final ResourceLocation BACKGROUND = WayfinderClient.id("background");
 	}
 
+	public static void renderHead(final GuiGraphics guiGraphics, final Vector2dc playerPosition, final Vector2dc mouseScreen, final double xOff, final double yOff, final float scale, final Vector4dc worldBounds) {
+		final Vector2d pos = new Vector2d(playerPosition).add(xOff, yOff).mul(scale); // world position to screen position
+		final float alpha = Helper.getMouseProximityFade(mouseScreen, pos);
+		Helper.clampWithin(pos, worldBounds);
+		Rendering.renderPlayerIcon(guiGraphics, pos.x - 8, pos.y - 8, Minecraft.getInstance().player, alpha);
+	}
+
 	public static void renderPlayerIcon(final GuiGraphics graphics, final double x, final double y, final LocalPlayer player, final float alpha) {
 		final ResourceLocation skinTexture = player.getSkin().texture();
 
@@ -213,12 +220,5 @@ public class Rendering {
 					nineslice.width(), nineslice.height(), blitOffset,
 					sliceU, sliceV);
 		}
-	}
-
-	public static void renderHead(final GuiGraphics guiGraphics, final Vector2dc playerPosition, final Vector2dc mouseScreen, final double xOff, final double yOff, final float scale, final Vector4dc worldBounds) {
-		final Vector2d pos = new Vector2d(playerPosition).add(xOff, yOff).mul(scale); // world position to screen position
-		final float alpha = Helper.getMouseProximityFade(mouseScreen, pos);
-		Helper.clampWithin(pos, worldBounds);
-		Rendering.renderPlayerIcon(guiGraphics, pos.x - 8, pos.y - 8, Minecraft.getInstance().player, alpha);
 	}
 }
