@@ -57,7 +57,7 @@ public class SpyglassPins {
         if (Minecraft.getInstance().player != null) {
             if (Helper.isUsingSpyglass(Minecraft.getInstance().player) || Minecraft.getInstance().screen instanceof MapScreen) {
                 this.zoomlessTimer = 0;
-            } else {
+            } else if (!Minecraft.getInstance().isPaused()) {
                 this.zoomlessTimer++;
                 if (this.zoomlessTimer > 10 * 20) {
                     this.clear();
@@ -65,6 +65,7 @@ public class SpyglassPins {
             }
         }
     }
+
 
     public void render(final MultiBufferSource bufferSource, final PoseStack poseStack, final float partialTick) {
         final Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
@@ -84,9 +85,9 @@ public class SpyglassPins {
 
     private static void renderPing(final VertexConsumer consumer, final PoseStack.Pose pose, final float partialTick, final Quaternionfc quaternion) {
         vertex(consumer, pose, -0.5f, 0f, 0.25f, 0, 1, quaternion);
-        vertex(consumer, pose,  0.5f, 0f, 0.25f, 1, 1, quaternion);
-        vertex(consumer, pose,  0.5f,  1f, 0.25f, 1, 0, quaternion);
-        vertex(consumer, pose, -0.5f,  1f, 0.25f, 0, 0, quaternion);
+        vertex(consumer, pose, 0.5f, 0f, 0.25f, 1, 1, quaternion);
+        vertex(consumer, pose, 0.5f, 1f, 0.25f, 1, 0, quaternion);
+        vertex(consumer, pose, -0.5f, 1f, 0.25f, 0, 0, quaternion);
     }
 
     private static void vertex(final VertexConsumer consumer, final PoseStack.Pose pose, final float x, final float y, final float z, final float u, final float v, final Quaternionfc quaternion) {
