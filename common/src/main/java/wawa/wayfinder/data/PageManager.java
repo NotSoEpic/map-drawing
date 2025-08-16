@@ -111,6 +111,23 @@ public class PageManager {
         }
     }
 
+    public void snapshotPage(AbstractPage page) {
+        if (this.state == SnapshotState.SNAPSHOTTING) {
+            final Map<Vector2i, NativeImage> history = this.currentHistory.pagesModified();
+
+            final Vector2i key = new Vector2i(page.rx, page.ry);
+            if (history.get(key) == null) {
+                final NativeImage image = NativeImageTracker.newImage(512, 512, true);
+                final NativeImage pageImg = page.getImage();
+                if (pageImg != null) {
+                    image.copyFrom(pageImg);
+                }
+
+                history.put(key, image);
+            }
+        }
+    }
+
     /**
      * Absolute world coordinates
      */
@@ -124,20 +141,7 @@ public class PageManager {
             return;
         }
 
-        if (this.state == SnapshotState.SNAPSHOTTING) {
-            final Map<Vector2i, NativeImage> history = this.currentHistory.pagesModified();
-
-            final Vector2i key = new Vector2i(rx, ry);
-            if (history.get(key) == null) {
-                final NativeImage image = NativeImageTracker.newImage(512, 512, true);
-                final NativeImage pageImg = newPage.getImage();
-                if (pageImg != null) {
-                    image.copyFrom(pageImg);
-                }
-
-                history.put(key, image);
-            }
-        }
+        this.snapshotPage(newPage);
 
         newPage.setPixel(x - rx * 512, y - ry * 512, RGBA);
     }
@@ -199,6 +203,7 @@ public class PageManager {
         for (int i = rx1; i <= rx2; i++) { // current region x
             for (int j = ry1; j <= ry2; j++) { // current region y
                 final AbstractPage page = this.getOrCreatePage(i, j);
+                this.snapshotPage(page);
                 final int dx1 = i == rx1 ? x - rx1 * 512 : 0; // leftmost relative pixel in region (0-511)
                 final int dy1 = j == ry1 ? y - ry1 * 512 : 0; // topmost relative pixel in region (0-511)
                 final int dx2 = i == rx2 ? x - rx2 * 512 + w : 512; // rightmost relative pixel in region (1-512)
