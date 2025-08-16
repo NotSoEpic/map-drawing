@@ -146,7 +146,7 @@ public class PageManager {
         newPage.setPixel(x - rx * 512, y - ry * 512, RGBA);
     }
 
-    public int getPixel(final int x, final int y) {
+    public int getPixelARGB(final int x, final int y) {
         final int rx = Math.floorDiv(x, 512);
         final int ry = Math.floorDiv(y, 512);
         return this.getOrCreatePage(rx, ry).getPixel(x - rx * 512, y - ry * 512);
@@ -196,6 +196,7 @@ public class PageManager {
     }
 
     public void putRegion(final int x, final int y, final int w, final int h, final RegionMapping regionMapping) {
+        startSnapshot();
         final int rx1 = Math.floorDiv(x, 512); // leftmost region
         final int ry1 = Math.floorDiv(y, 512); // upmost region
         final int rx2 = Math.floorDiv(x + w, 512); // rightmost region
@@ -219,12 +220,13 @@ public class PageManager {
                 }
             }
         }
+        endSnapshot();
     }
 
     public void putConditionalSquare(final int x, final int y, final int RGBA, final int r, final Predicate<Integer> shouldReplace) {
         for (int i = -r + x; i <= r + x; i++) {
             for (int j = -r + y; j <= r + y; j++) {
-                if (shouldReplace.test(this.getPixel(i, j))) {
+                if (shouldReplace.test(this.getPixelARGB(i, j))) {
                     this.putPixel(i, j, RGBA);
                 }
             }

@@ -39,8 +39,15 @@ public class CopyTool extends Tool {
                     this.start = new Vector2i(world, RoundingMode.FLOOR);
                 }
             } else {
-                activePage.putRegion(end.x(), end.y(), this.clipboard.getWidth(), this.clipboard.getHeight(),
-                    (dx, dy, old) -> this.clipboard.getPixelRGBA(dx, dy)
+                activePage.putRegion(end.x() - this.clipboard.getWidth() / 2, end.y() - this.clipboard.getHeight() / 2, this.clipboard.getWidth(), this.clipboard.getHeight(),
+                        (dx, dy, old) -> {
+                            int pixelColor = this.clipboard.getPixelRGBA(dx, dy);
+                            if (pixelColor == 0) {
+                                return activePage.getPixelARGB((end.x() - this.clipboard.getWidth() / 2) + dx, (end.y() - this.clipboard.getHeight() / 2) + dy);
+                            } else {
+                                return this.clipboard.getPixelRGBA(dx, dy);
+                            }
+                        }
                 );
             }
         }
@@ -87,18 +94,27 @@ public class CopyTool extends Tool {
         final Vec2 mouse = Helper.preciseMousePos();
         graphics.pose().pushPose();
         graphics.pose().translate(mouse.x % 1, mouse.y % 1, 0);
-        graphics.blitSprite(WayfinderClient.id("cursor/pencil"), (int)mouse.x - 16, (int)mouse.y - 16, 32, 32);
+        graphics.blitSprite(WayfinderClient.id("cursor/scissors"), (int) mouse.x - 8, (int) mouse.y - 10, 16, 16);
         graphics.pose().popPose();
     }
 
     @Override
     public void renderWorld(final GuiGraphics graphics, final int worldX, final int worldY, final double xOff, final double yOff) {
+        if (this.start != null) {
+            graphics.renderOutline((int) (this.start.x() + xOff), (int) (this.start.y() + yOff),
+                    worldX - this.start.x(), worldY - this.start.y(),
+                    0xff000000);
+        }
+
         if (this.clipboard != null) {
             final RenderType renderType = VeilRenderType.get(Rendering.RenderTypes.PALETTE_SWAP, this.textureID);
-            if(renderType == null) return;
+            if (renderType == null) return;
 
-            Rendering.renderTypeBlit(graphics, renderType, worldX + xOff, worldY + yOff, 0, 0f, 0f,
-                    this.clipboard.getWidth(), this.clipboard.getHeight(), this.clipboard.getWidth(), this.clipboard.getHeight(),1);
+            graphics.renderOutline((int) (worldX + xOff - (double) this.clipboard.getWidth() / 2), (int) (worldY + yOff - (double) this.clipboard.getHeight() / 2),
+                    this.clipboard.getWidth(), this.clipboard.getHeight(),
+                    0xff000000);
+            Rendering.renderTypeBlit(graphics, renderType, worldX + xOff - (double) this.clipboard.getWidth() / 2, worldY + yOff - (double) this.clipboard.getHeight() / 2, 0, 0f, 0f,
+                    this.clipboard.getWidth(), this.clipboard.getHeight(), this.clipboard.getWidth(), this.clipboard.getHeight(), 1);
         }
     }
 }

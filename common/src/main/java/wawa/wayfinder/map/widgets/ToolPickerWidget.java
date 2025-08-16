@@ -7,6 +7,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec2;
 import wawa.wayfinder.Helper;
 import wawa.wayfinder.WayfinderClient;
+import wawa.wayfinder.map.tool.CopyTool;
 import wawa.wayfinder.map.tool.DrawTool;
 import wawa.wayfinder.map.tool.PanTool;
 import wawa.wayfinder.map.tool.PinTool;
@@ -20,6 +21,7 @@ public class ToolPickerWidget extends AbstractWidget {
     private final SingleToolWidget.BrushWidget brushWidget;
     private final DrawTool eraser = new DrawTool(WayfinderClient.id("cursor/eraser"), 0, 0);
     private final PinTool pin = new PinTool();
+    private final CopyTool copy = new CopyTool(WayfinderClient.id("cursor/scissors"));
     public ToolPickerWidget(final int x, final int y) {
         super(x, y, 0, 0, Component.literal("tool picker"));
         this.tools.add(new SingleToolWidget(
@@ -50,6 +52,13 @@ public class ToolPickerWidget extends AbstractWidget {
                 (w) -> this.pin,
                 Component.literal("pin")
         ));
+        this.tools.add(new SingleToolWidget(
+                this.getX(), this.getY() + 100,
+                WayfinderClient.id("tool/scissors"),
+                WayfinderClient.id("tool/scissors_highlight"),
+                (w) -> this.copy,
+                Component.literal("copy")
+        ));
         this.updateBounds();
     }
 
@@ -72,6 +81,10 @@ public class ToolPickerWidget extends AbstractWidget {
 
     public void pickEraser() {
         WayfinderClient.TOOL_MANAGER.set(this.eraser);
+    }
+
+    public void pickCopy() {
+        WayfinderClient.TOOL_MANAGER.set(this.copy);
     }
 
     public void pickColor(final int color) {

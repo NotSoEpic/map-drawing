@@ -18,6 +18,7 @@ import net.minecraft.client.resources.metadata.gui.GuiSpriteScaling;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.phys.Vec2;
 import org.joml.Matrix4f;
 import org.joml.Vector2d;
 import org.joml.Vector2dc;

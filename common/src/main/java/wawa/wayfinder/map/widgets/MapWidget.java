@@ -117,7 +117,7 @@ public class MapWidget extends AbstractWidget {
             if ((this.mouse == Mouse.LEFT || this.mouse == Mouse.RIGHT) && !Screen.hasAltDown() && !Screen.hasControlDown()) {
                 WayfinderClient.TOOL_MANAGER.get().hold(WayfinderClient.PAGE_MANAGER, this.mouse, world, world);
             } else if (Screen.hasAltDown()) {
-                final int color = WayfinderClient.PAGE_MANAGER.getPixel(Mth.floor(world.x), Mth.floor(world.y));
+                final int color = WayfinderClient.PAGE_MANAGER.getPixelARGB(Mth.floor(world.x), Mth.floor(world.y));
                 this.parent.toolPicker.pickColor(color);
             }
             return true;
