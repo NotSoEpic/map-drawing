@@ -15,11 +15,16 @@ void main() {
         discard;
     }
 
-    vec2 samplePos = color.rg + vec2(XOffset, 0.0);
-    vec4 outColor = texture(Sampler0, samplePos) * vertexColor;
-    if(outColor.a == 0) {
-        discard;
-    }
+    if(color == vec4(0.0, 0.0, 0.0, 1.0)) {
+        fragColor = color * vertexColor;
+    } else {
+        vec2 samplePos = color.rg + vec2(XOffset, 0.0);
+        color = texture(Sampler0, samplePos) * vertexColor;
 
-    fragColor = outColor;
+        if(color.a == 0) {
+            discard;
+        }
+
+        fragColor = color;
+    }
 }
