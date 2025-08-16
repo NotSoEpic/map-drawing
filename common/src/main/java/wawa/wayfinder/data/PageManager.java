@@ -156,6 +156,66 @@ public class PageManager {
         }
     }
 
+    @FunctionalInterface
+    public interface RegionGetter {
+        void of(int dx, int dy, int value);
+    }
+
+    public void forEachInRegion(final int x, final int y, final int w, final int h, final RegionGetter forEach) {
+        final int rx1 = Math.floorDiv(x, 512); // leftmost region
+        final int ry1 = Math.floorDiv(y, 512); // upmost region
+        final int rx2 = Math.floorDiv(x + w, 512); // rightmost region
+        final int ry2 = Math.floorDiv(y + h, 512); // bottommost region
+        for (int i = rx1; i <= rx2; i++) { // current region x
+            for (int j = ry1; j <= ry2; j++) { // current region y
+                final AbstractPage page = this.getOrCreatePage(i, j);
+                final int dx1 = i == rx1 ? x - rx1 * 512 : 0; // leftmost relative pixel in region (0-511)
+                final int dy1 = j == ry1 ? y - ry1 * 512 : 0; // topmost relative pixel in region (0-511)
+                final int dx2 = i == rx2 ? x - rx2 * 512 + w : 512; // rightmost relative pixel in region (1-512)
+                final int dy2 = j == ry2 ? y - ry2 * 512 + h : 512; // bottommost relative pixel in region (1-512)
+                for (int k = dx1; k < dx2; k++) { // current relative pixel x
+                    for (int l = dy1; l < dy2; l++) { // current relative pixel y
+                        forEach.of(
+                                k + i * 512 - x,
+                                l + j * 512 - y,
+                                page.getPixel(k, l)
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    @FunctionalInterface
+    public interface RegionMapping {
+        int apply(int dx, int dy, int previousValue);
+    }
+
+    public void putRegion(final int x, final int y, final int w, final int h, final RegionMapping regionMapping) {
+        final int rx1 = Math.floorDiv(x, 512); // leftmost region
+        final int ry1 = Math.floorDiv(y, 512); // upmost region
+        final int rx2 = Math.floorDiv(x + w, 512); // rightmost region
+        final int ry2 = Math.floorDiv(y + h, 512); // bottommost region
+        for (int i = rx1; i <= rx2; i++) { // current region x
+            for (int j = ry1; j <= ry2; j++) { // current region y
+                final AbstractPage page = this.getOrCreatePage(i, j);
+                final int dx1 = i == rx1 ? x - rx1 * 512 : 0; // leftmost relative pixel in region (0-511)
+                final int dy1 = j == ry1 ? y - ry1 * 512 : 0; // topmost relative pixel in region (0-511)
+                final int dx2 = i == rx2 ? x - rx2 * 512 + w : 512; // rightmost relative pixel in region (1-512)
+                final int dy2 = j == ry2 ? y - ry2 * 512 + h : 512; // bottommost relative pixel in region (1-512)
+                for (int k = dx1; k < dx2; k++) { // current relative pixel x
+                    for (int l = dy1; l < dy2; l++) { // current relative pixel y
+                        page.setPixel(k, l, regionMapping.apply(
+                                k + i * 512 - x,
+                                l + j * 512 - y,
+                                page.getPixel(k, l)
+                        ));
+                    }
+                }
+            }
+        }
+    }
+
     public void putConditionalSquare(final int x, final int y, final int RGBA, final int r, final Predicate<Integer> shouldReplace) {
         for (int i = -r + x; i <= r + x; i++) {
             for (int j = -r + y; j <= r + y; j++) {
