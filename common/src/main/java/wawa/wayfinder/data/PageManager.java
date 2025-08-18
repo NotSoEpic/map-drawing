@@ -4,7 +4,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.Level;
-import org.joml.Vector2d;
+import org.joml.Vector2dc;
 import org.joml.Vector2i;
 import wawa.wayfinder.NativeImageTracker;
 import wawa.wayfinder.data.history.OperationHistory;
@@ -237,7 +237,7 @@ public class PageManager {
         return this.pins.values();
     }
 
-    public void putPin(final Pin.Type type, final Vector2d pos) {
+    public void putPin(final Pin.Type type, final Vector2dc pos) {
         this.pins.computeIfAbsent(type, Pin::new).setPosition(pos);
     }
 

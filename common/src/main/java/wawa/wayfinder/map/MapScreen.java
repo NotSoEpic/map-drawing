@@ -9,8 +9,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec2;
 import org.joml.Vector2d;
 import org.lwjgl.glfw.GLFW;
+import wawa.wayfinder.Helper;
 import wawa.wayfinder.LerpedVector2d;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.map.widgets.CompassRoseWidget;
@@ -63,8 +65,11 @@ public class MapScreen extends Screen {
         this.backgroundPanning.add(diffTracker.mul(this.zoom));
 
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-
+        final Vec2 mouse = Helper.preciseMousePos();
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(mouse.x % 1, mouse.y % 1, 0);
         WayfinderClient.TOOL_MANAGER.get().renderScreen(guiGraphics, mouseX, mouseY);
+        guiGraphics.pose().popPose();
     }
 
     // widgets that are rendered last (on top) have the highest interaction priority
@@ -93,7 +98,7 @@ public class MapScreen extends Screen {
 
     @Override
     public boolean mouseReleased(final double mouseX, final double mouseY, final int button) {
-        this.mapWidget.mouse = MapWidget.Mouse.NONE;
+        this.mapWidget.mouseType = MapWidget.MouseType.NONE;
         return super.mouseReleased(mouseX, mouseY, button);
     }
 

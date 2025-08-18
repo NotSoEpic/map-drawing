@@ -8,17 +8,13 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.phys.Vec2;
-import org.joml.RoundingMode;
-import org.joml.Vector2d;
-import org.joml.Vector2i;
-import org.joml.Vector2ic;
-import wawa.wayfinder.Helper;
+import org.joml.*;
 import wawa.wayfinder.Rendering;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.data.PageManager;
 import wawa.wayfinder.map.widgets.MapWidget;
 
+import java.lang.Math;
 import java.util.function.Consumer;
 
 public class DrawTool extends Tool {
@@ -64,13 +60,13 @@ public class DrawTool extends Tool {
     }
 
     @Override
-    public void hold(final PageManager activePage, final MapWidget.Mouse mouse, final Vector2d oldWorld, final Vector2d world) {
+    public void mouseMove(final PageManager activePage, final MapWidget.MouseType mouseType, final Vector2dc oldWorld, final Vector2dc world) {
 
-        switch (mouse) {
-            case LEFT -> this.pixelLine(oldWorld.floor(), world.floor(), pos ->  {
+        switch (mouseType) {
+            case LEFT -> this.pixelLine(oldWorld.floor(new Vector2d()), world.floor(new Vector2d()), pos ->  {
                 this.putSquare(activePage, pos, this.internal_color);
             });
-            case RIGHT -> this.pixelLine(oldWorld.floor(), world.floor(), pos -> {
+            case RIGHT -> this.pixelLine(oldWorld.floor(new Vector2d()), world.floor(new Vector2d()), pos -> {
                 this.removeSquare(activePage, pos, 0);
             });
         }
@@ -87,9 +83,8 @@ public class DrawTool extends Tool {
     }
 
     @Override
-    public void release(final PageManager activePage) {
+    public void mouseRelease(final PageManager activePage, final Vector2d world) {
         activePage.endSnapshot();
-        super.release(activePage);
     }
 
     private void pixelLine(final Vector2d point1, final Vector2d point2, final Consumer<Vector2i> perPixel) {
@@ -122,11 +117,7 @@ public class DrawTool extends Tool {
 
     @Override
     public void renderScreen(final GuiGraphics graphics, final double mouseX, final double mouseY) {
-        final Vec2 mouse = Helper.preciseMousePos();
-        graphics.pose().pushPose();
-        graphics.pose().translate(mouse.x % 1, mouse.y % 1, 0);
-        graphics.blitSprite(this.icon, (int)mouse.x - 16, (int)mouse.y - 16, 32, 32);
-        graphics.pose().popPose();
+        graphics.blitSprite(this.icon, (int)mouseX - 16, (int)mouseY - 16, 32, 32);
     }
 
     @Override

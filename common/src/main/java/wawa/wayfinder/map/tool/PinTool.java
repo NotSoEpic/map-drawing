@@ -1,15 +1,12 @@
 package wawa.wayfinder.map.tool;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.world.phys.Vec2;
 import org.joml.Vector2d;
-import wawa.wayfinder.Helper;
 import wawa.wayfinder.data.PageManager;
 import wawa.wayfinder.data.Pin;
 import wawa.wayfinder.map.widgets.MapWidget;
 
 public class PinTool extends Tool {
-    private boolean isHeld;
     public Pin.Type currentPin = Pin.DEFAULT;
 
     public void setPinType(final Pin.Type newPin) {
@@ -17,32 +14,18 @@ public class PinTool extends Tool {
     }
 
     @Override
-    public void hold(final PageManager activePage, final MapWidget.Mouse mouse, final Vector2d oldWorld, final Vector2d world) {
-        if (mouse == MapWidget.Mouse.LEFT) {
-            if (!this.isHeld) {
-                this.isHeld = true;
-
-                activePage.putPin(this.currentPin, world);
-            }
-        } else if (mouse == MapWidget.Mouse.RIGHT) {
-            if (!this.isHeld) {
-                this.isHeld = true;
-
-                activePage.removePin(this.currentPin);
-            }
+    public void mouseDown(final PageManager activePage, final MapWidget.MouseType mouseType, final Vector2d world) {
+        if (mouseType == MapWidget.MouseType.LEFT) {
+            activePage.putPin(this.currentPin, world);
+        } else if (mouseType == MapWidget.MouseType.RIGHT) {
+            activePage.removePin(this.currentPin);
         }
-    }
-
-    @Override
-    public void release(final PageManager activePage) {
-        this.isHeld = false;
     }
 
     @Override
     public void renderScreen(final GuiGraphics graphics, final double mouseX, final double mouseY) {
         if (this.currentPin != null) {
-            final Vec2 mouse = Helper.preciseMousePos();
-            this.currentPin.draw(graphics, mouse.x, mouse.y, false, true, 1);
+            this.currentPin.draw(graphics, mouseX, mouseY, false, true, 1);
         }
     }
 }

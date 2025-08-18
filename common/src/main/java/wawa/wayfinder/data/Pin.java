@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class Pin {
     public final Type type;
-    private Vector2d position = null;
+    private Vector2dc position = null;
 
     public static Type DEFAULT = new Type(WayfinderClient.id("red"),
             WayfinderClient.id("pin/red"), WayfinderClient.id("pin/red_highlight"), new Vector2i(0, 15));
@@ -61,7 +61,7 @@ public class Pin {
         this.position = position;
     }
 
-    public void setPosition(final Vector2d position) {
+    public void setPosition(final Vector2dc position) {
         this.position = position;
     }
 

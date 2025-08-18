@@ -7,12 +7,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.phys.Vec2;
 import org.joml.RoundingMode;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
-import wawa.wayfinder.Helper;
 import wawa.wayfinder.NativeImageTracker;
 import wawa.wayfinder.Rendering;
 import wawa.wayfinder.WayfinderClient;
@@ -21,19 +19,19 @@ import wawa.wayfinder.map.widgets.MapWidget;
 
 public class CopyTool extends Tool {
     public static CopyTool INSTANCE = new CopyTool(WayfinderClient.id("copy_tool"));
+    private static final ResourceLocation TEXTURE = WayfinderClient.id("cursor/scissors");
     private final ResourceLocation textureID;
     private NativeImage clipboard = null;
     private Vector2ic start = null;
-    private boolean initialClick = true;
 
     public CopyTool(final ResourceLocation textureID) {
         this.textureID = textureID;
     }
 
     @Override
-    public void hold(final PageManager activePage, final MapWidget.Mouse mouse, final Vector2d oldWorld, final Vector2d world) {
+    public void mouseDown(final PageManager activePage, final MapWidget.MouseType mouseType, final Vector2d world) {
         final Vector2ic end = new Vector2i(world, RoundingMode.FLOOR);
-        if (mouse == MapWidget.Mouse.LEFT && this.initialClick) {
+        if (mouseType == MapWidget.MouseType.LEFT) {
             if (this.clipboard == null) {
                 if (this.start == null) {
                     this.start = new Vector2i(world, RoundingMode.FLOOR);
@@ -50,18 +48,20 @@ public class CopyTool extends Tool {
                         }
                 );
             }
-        }
-
-        if (mouse == MapWidget.Mouse.RIGHT) {
+        } else if (mouseType == MapWidget.MouseType.RIGHT) {
             if (this.clipboard != null) {
                 this.clipboard.close();
                 Minecraft.getInstance().getTextureManager().release(this.textureID);
                 this.clipboard = null;
             }
         }
+    }
 
-        if (mouse == MapWidget.Mouse.NONE && this.start != null) {
+    @Override
+    public void mouseRelease(final PageManager activePage, final Vector2d world) {
+        final Vector2ic end = new Vector2i(world, RoundingMode.FLOOR);
 
+        if (this.start != null) {
             final Vector2ic upper_left = this.start.min(end, new Vector2i());
             final Vector2ic size = this.start.max(end, new Vector2i()).sub(upper_left);
 
@@ -80,22 +80,11 @@ public class CopyTool extends Tool {
 
             this.start = null;
         }
-
-        this.initialClick = mouse == MapWidget.Mouse.NONE;
-    }
-
-    @Override
-    public void release(final PageManager activePage) {
-        this.initialClick = true;
     }
 
     @Override
     public void renderScreen(final GuiGraphics graphics, final double mouseX, final double mouseY) {
-        final Vec2 mouse = Helper.preciseMousePos();
-        graphics.pose().pushPose();
-        graphics.pose().translate(mouse.x % 1, mouse.y % 1, 0);
-        graphics.blitSprite(WayfinderClient.id("cursor/scissors"), (int) mouse.x - 8, (int) mouse.y - 10, 16, 16);
-        graphics.pose().popPose();
+        graphics.blitSprite(TEXTURE, (int) mouseX - 2, (int) mouseY - 10, 16, 16);
     }
 
     @Override
@@ -110,10 +99,7 @@ public class CopyTool extends Tool {
             final RenderType renderType = VeilRenderType.get(Rendering.RenderTypes.PALETTE_SWAP, this.textureID);
             if (renderType == null) return;
 
-            graphics.renderOutline((int) (worldX + xOff - (double) this.clipboard.getWidth() / 2), (int) (worldY + yOff - (double) this.clipboard.getHeight() / 2),
-                    this.clipboard.getWidth(), this.clipboard.getHeight(),
-                    0xff000000);
-            Rendering.renderTypeBlit(graphics, renderType, worldX + xOff - (double) this.clipboard.getWidth() / 2, worldY + yOff - (double) this.clipboard.getHeight() / 2, 0, 0f, 0f,
+            Rendering.renderTypeBlit(graphics, renderType, worldX + xOff - (double) (this.clipboard.getWidth() / 2), worldY + yOff - (double) (this.clipboard.getHeight() / 2), 0, 0f, 0f,
                     this.clipboard.getWidth(), this.clipboard.getHeight(), this.clipboard.getWidth(), this.clipboard.getHeight(), 1);
         }
     }

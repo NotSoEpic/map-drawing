@@ -28,10 +28,10 @@ public class MapWidget extends AbstractWidget {
         this.parent = parent;
     }
 
-    public Mouse mouse = Mouse.NONE;
+    public MouseType mouseType = MouseType.NONE;
     public double oldMouseX;
     public double oldMouseY;
-    public enum Mouse {
+    public enum MouseType {
         NONE, LEFT, RIGHT, MIDDLE
     }
 
@@ -107,18 +107,25 @@ public class MapWidget extends AbstractWidget {
         if (this.isMouseOver(mouseX, mouseY)) {
             this.oldMouseX = mouseX;
             this.oldMouseY = mouseY;
-            this.mouse = switch (button) {
-                case GLFW.GLFW_MOUSE_BUTTON_LEFT -> Mouse.LEFT;
-                case GLFW.GLFW_MOUSE_BUTTON_RIGHT -> Mouse.RIGHT;
-                case GLFW.GLFW_MOUSE_BUTTON_MIDDLE -> Mouse.MIDDLE;
-                default -> Mouse.NONE;
+            MouseType newType = switch (button) {
+                case GLFW.GLFW_MOUSE_BUTTON_LEFT -> MouseType.LEFT;
+                case GLFW.GLFW_MOUSE_BUTTON_RIGHT -> MouseType.RIGHT;
+                case GLFW.GLFW_MOUSE_BUTTON_MIDDLE -> MouseType.MIDDLE;
+                default -> MouseType.NONE;
             };
             final Vector2d world = this.parent.screenToWorld(new Vector2d(mouseX, mouseY));
-            if ((this.mouse == Mouse.LEFT || this.mouse == Mouse.RIGHT) && !Screen.hasAltDown() && !Screen.hasControlDown()) {
-                WayfinderClient.TOOL_MANAGER.get().hold(WayfinderClient.PAGE_MANAGER, this.mouse, world, world);
-            } else if (Screen.hasAltDown()) {
+            if (newType != this.mouseType) {
+                WayfinderClient.TOOL_MANAGER.get().mouseRelease(WayfinderClient.PAGE_MANAGER, world);
+            }
+            this.mouseType = newType;
+            if (Screen.hasControlDown()) {
+                // noop
+            } else if (Screen.hasControlDown()) {
                 final int color = WayfinderClient.PAGE_MANAGER.getPixelARGB(Mth.floor(world.x), Mth.floor(world.y));
                 this.parent.toolPicker.pickColor(color);
+            } else if (this.mouseType == MouseType.LEFT || this.mouseType == MouseType.RIGHT) {
+                WayfinderClient.TOOL_MANAGER.get().mouseDown(WayfinderClient.PAGE_MANAGER, this.mouseType, world);
+                WayfinderClient.TOOL_MANAGER.get().mouseMove(WayfinderClient.PAGE_MANAGER, this.mouseType, world, world);
             }
             return true;
         }
@@ -126,10 +133,10 @@ public class MapWidget extends AbstractWidget {
     }
 
     private boolean shouldPan() {
-        if (this.mouse == Mouse.MIDDLE) {
+        if (this.mouseType == MouseType.MIDDLE) {
             return true;
         }
-        if (this.mouse == Mouse.LEFT || this.mouse == Mouse.RIGHT) {
+        if (this.mouseType == MouseType.LEFT || this.mouseType == MouseType.RIGHT) {
             return Screen.hasControlDown() || WayfinderClient.TOOL_MANAGER.get() instanceof PanTool;
         }
         return false;
@@ -143,10 +150,10 @@ public class MapWidget extends AbstractWidget {
             this.parent.lerpedPanning.set(this.parent.lerpedPanning.get().add(oldWorld).sub(world));
             this.parent.backgroundPanning.add(this.oldMouseX, this.oldMouseY).sub(mouseX, mouseY);
         } else if (!this.isMouseOver(mouseX, mouseY)) {
-            this.mouse = Mouse.NONE;
+            this.mouseType = MouseType.NONE;
             return;
         } else if (!Screen.hasAltDown() && !Screen.hasControlDown()) {
-            WayfinderClient.TOOL_MANAGER.get().hold(WayfinderClient.PAGE_MANAGER, this.mouse, oldWorld, world);
+            WayfinderClient.TOOL_MANAGER.get().mouseMove(WayfinderClient.PAGE_MANAGER, this.mouseType, oldWorld, world);
         }
         this.oldMouseX = mouseX;
         this.oldMouseY = mouseY;
@@ -154,9 +161,10 @@ public class MapWidget extends AbstractWidget {
 
     @Override
     public boolean mouseReleased(final double mouseX, final double mouseY, final int button) {
-        WayfinderClient.TOOL_MANAGER.get().release(WayfinderClient.PAGE_MANAGER);
+        final Vector2d world = this.parent.screenToWorld(new Vector2d(mouseX, mouseY));
+        WayfinderClient.TOOL_MANAGER.get().mouseRelease(WayfinderClient.PAGE_MANAGER, world);
 
-        this.mouse = Mouse.NONE;
+        this.mouseType = MouseType.NONE;
         return true;
     }
 
