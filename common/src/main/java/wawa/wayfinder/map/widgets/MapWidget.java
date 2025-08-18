@@ -7,9 +7,11 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.joml.*;
 import org.lwjgl.glfw.GLFW;
+import wawa.wayfinder.Helper;
 import wawa.wayfinder.Rendering;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.data.Pin;
@@ -63,7 +65,8 @@ public class MapWidget extends AbstractWidget {
                 WayfinderClient.PAGE_MANAGER.getOrCreatePage(x, y).render(guiGraphics, xOff, yOff);
             }
         }
-        final Vector2d world = this.parent.screenToWorld(new Vector2d(mouseX, mouseY));
+        final Vec2 mouse = Helper.preciseMousePos();
+        final Vector2d world = this.parent.screenToWorld(new Vector2d(mouse.x, mouse.y));
 
         WayfinderClient.TOOL_MANAGER.get().renderWorld(guiGraphics, Mth.floor(world.x), Mth.floor(world.y), xOff, yOff);
 
