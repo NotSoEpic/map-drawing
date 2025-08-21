@@ -280,7 +280,9 @@ public class PageManager {
                 }
 
                 if (page instanceof final EmptyPage ep && ep.attemptedUndo && !ep.isLoading()) {
-                    ep.redoImage.copyFrom(ep.getImage());
+                    if (ep.getImage() != null) {
+                        ep.redoImage.copyFrom(ep.getImage());
+                    }
                     ep.unboChanges(ep.undoImage);
                 }
             }
