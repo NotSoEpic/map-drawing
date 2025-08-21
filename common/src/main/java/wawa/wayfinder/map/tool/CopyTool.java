@@ -84,7 +84,7 @@ public class CopyTool extends Tool {
 
     @Override
     public void renderScreen(final GuiGraphics graphics, final double mouseX, final double mouseY) {
-        graphics.blitSprite(TEXTURE, (int) mouseX - 2, (int) mouseY - 10, 16, 16);
+        graphics.blitSprite(TEXTURE, (int) mouseX - 8, (int) mouseY - 10, 16, 16);
     }
 
     @Override
@@ -93,14 +93,16 @@ public class CopyTool extends Tool {
             graphics.renderOutline((int) (this.start.x() + xOff), (int) (this.start.y() + yOff),
                     worldX - this.start.x(), worldY - this.start.y(),
                     0xff000000);
-        }
-
-        if (this.clipboard != null) {
+        } else if (this.clipboard != null) {
             final RenderType renderType = VeilRenderType.get(Rendering.RenderTypes.PALETTE_SWAP, this.textureID);
             if (renderType == null) return;
 
             Rendering.renderTypeBlit(graphics, renderType, worldX + xOff - (double) (this.clipboard.getWidth() / 2), worldY + yOff - (double) (this.clipboard.getHeight() / 2), 0, 0f, 0f,
                     this.clipboard.getWidth(), this.clipboard.getHeight(), this.clipboard.getWidth(), this.clipboard.getHeight(), 1);
+
+            graphics.renderOutline((int) (worldX + xOff - (double) (this.clipboard.getWidth() / 2)), (int) (worldY + yOff - (double) (this.clipboard.getHeight() / 2)),
+                    this.clipboard.getWidth(), this.clipboard.getHeight(),
+                    0xff000000);
         }
     }
 }
