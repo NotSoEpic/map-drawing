@@ -51,13 +51,13 @@ public class SingleToolWidget extends AbstractWidget {
 
     public static class BrushWidget extends SingleToolWidget {
         public PaletteDrawTool last;
-        private static final TextureAtlasSprite mask = Minecraft.getInstance().getGuiSprites().getSprite(WayfinderClient.id("tool/brush_mask"));
+        private static final TextureAtlasSprite mask = Minecraft.getInstance().getGuiSprites().getSprite(WayfinderClient.id("tool/brush/brush_mask"));
         private final ColorPickerWidget colorPicker;
 
         public BrushWidget(final int x, final int y) {
             super(x, y,
-                    WayfinderClient.id("tool/brush"),
-                    WayfinderClient.id("tool/brush_highlight"),
+                    WayfinderClient.id("tool/brush/brush"),
+                    WayfinderClient.id("tool/brush/brush_highlight"),
                     w -> ((BrushWidget)w).last,
                     Component.literal("brush")
             );

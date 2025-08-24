@@ -4,7 +4,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
-import org.joml.*;
+import org.joml.Vector2d;
+import org.joml.Vector2dc;
+import org.joml.Vector4dc;
 import wawa.wayfinder.Helper;
 import wawa.wayfinder.WayfinderClient;
 
@@ -19,19 +21,15 @@ public class Pin {
     public final Type type;
     private Vector2dc position = null;
 
-    public static Type DEFAULT = new Type(WayfinderClient.id("red"),
-            WayfinderClient.id("pin/red"), WayfinderClient.id("pin/red_highlight"), new Vector2i(0, 15));
+    public static Type DEFAULT = Type.simpleShorthand("red");
     private static final List<Type> TYPES = new ArrayList<>();
 
-    public static Type SPYGLASS_EPHEMERAL = new Type(WayfinderClient.id("spyglass_ephemeral"),
-            WayfinderClient.id("pin/spyglass"), WayfinderClient.id("pin/spyglass_highlight"), new Vector2i(7, 15));
+    public static Type SPYGLASS_EPHEMERAL = Type.simpleShorthand("spyglass");
 
     static {
         addPinType(DEFAULT);
-        addPinType(new Type(WayfinderClient.id("green"),
-                WayfinderClient.id("pin/green"), WayfinderClient.id("pin/green_highlight"), new Vector2i(7, 15)));
-        addPinType(new Type(WayfinderClient.id("blue"),
-                WayfinderClient.id("pin/blue"), WayfinderClient.id("pin/blue_highlight"), new Vector2i(15, 15)));
+        addPinType(Type.simpleShorthand("green"));
+        addPinType(Type.simpleShorthand("blue"));
     }
 
     private static void addPinType(final Type type) {
@@ -78,24 +76,37 @@ public class Pin {
         }
     }
 
-    public record Type(ResourceLocation id, ResourceLocation texture, ResourceLocation highlight, Vector2ic pointOffset) {
+    public record Type(ResourceLocation id, ResourceLocation uiTexture, ResourceLocation highlight, ResourceLocation positionedTexture, ResourceLocation positionedHighlight) {
         @Override
         public int hashCode() {
             return this.id.hashCode();
         }
 
-        public void draw(final GuiGraphics guiGraphics, double dx, double dy, final boolean highlight, final boolean onPoint, final float alpha) {
-            if (onPoint) {
-                dx -= this.pointOffset.x();
-                dy -= this.pointOffset.y();
-            }
+        public static Type simpleShorthand(final String name) {
+            return new Type(
+                    WayfinderClient.id(name),
+                    WayfinderClient.id("pin/" + name + "/" + name),
+                    WayfinderClient.id("pin/" + name + "/" + name + "_highlight"),
+                    WayfinderClient.id("pin/" + name + "/" + name + "_positioned"),
+                    WayfinderClient.id("pin/" + name + "/" + name + "_positioned_highlight")
+            );
+        }
+
+        public void draw(final GuiGraphics guiGraphics, final double dx, final double dy, final boolean highlight, final boolean onPoint, final float alpha) {
             final int x = (int) dx;
             final int y = (int) dy;
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate(dx - x, dy - y, 0); // grrrrah minecraft unecessarily uses ints for all its gui rendering and im too lazy to rewrite it all using doubles
-            guiGraphics.blit(x, y, 0, 16, 16, Minecraft.getInstance().getGuiSprites().getSprite(this.texture), 1f, 1f, 1f, alpha);
-            if (highlight) {
-                guiGraphics.blit(x-1, y-1, 0, 18, 18, Minecraft.getInstance().getGuiSprites().getSprite(this.highlight), 1f, 1f, 1f, alpha);
+            if (onPoint) {
+                guiGraphics.blit(x - 16, y - 16, 0, 32, 32, Minecraft.getInstance().getGuiSprites().getSprite(this.positionedTexture), 1f, 1f, 1f, alpha);
+                if (highlight) {
+                    guiGraphics.blit(x - 17, y - 17, 0, 34, 34, Minecraft.getInstance().getGuiSprites().getSprite(this.positionedHighlight), 1f, 1f, 1f, alpha);
+                }
+            } else {
+                guiGraphics.blit(x, y, 0, 16, 16, Minecraft.getInstance().getGuiSprites().getSprite(this.uiTexture), 1f, 1f, 1f, alpha);
+                if (highlight) {
+                    guiGraphics.blit(x - 1, y - 1, 0, 18, 18, Minecraft.getInstance().getGuiSprites().getSprite(this.highlight), 1f, 1f, 1f, alpha);
+                }
             }
             guiGraphics.pose().popPose();
         }

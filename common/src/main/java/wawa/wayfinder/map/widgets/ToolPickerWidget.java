@@ -17,9 +17,9 @@ import java.util.List;
 
 public class ToolPickerWidget extends AbstractWidget {
     private final List<SingleToolWidget> tools = new ArrayList<>();
-    private final DrawTool pencil = new DrawTool(WayfinderClient.id("cursor/pencil"), 0xFF000000, 0xFF000000);
+    private final DrawTool pencil = new DrawTool(WayfinderClient.id("tool/pencil/pencil_cursor"), 0xFF000000, 0xFF000000);
     private final SingleToolWidget.BrushWidget brushWidget;
-    private final DrawTool eraser = new DrawTool(WayfinderClient.id("cursor/eraser"), 0, 0);
+    private final DrawTool eraser = new DrawTool(WayfinderClient.id("tool/eraser/eraser_cursor"), 0, 0);
     private final PinTool pin = new PinTool();
     private final CopyTool copy = new CopyTool(WayfinderClient.id("cursor/scissors"));
     public ToolPickerWidget(final int x, final int y) {
@@ -33,8 +33,8 @@ public class ToolPickerWidget extends AbstractWidget {
         ));
         this.tools.add(new SingleToolWidget(
                 this.getX(), this.getY() + 20,
-                WayfinderClient.id("tool/pencil"),
-                WayfinderClient.id("tool/pencil_highlight"),
+                WayfinderClient.id("tool/pencil/pencil"),
+                WayfinderClient.id("tool/pencil/pencil_highlight"),
                 (w) -> this.pencil,
                 Component.literal("pencil")
         ));
@@ -42,8 +42,8 @@ public class ToolPickerWidget extends AbstractWidget {
         this.tools.add(this.brushWidget);
         this.tools.add(new SingleToolWidget(
                 this.getX(), this.getY() + 60,
-                WayfinderClient.id("tool/eraser"),
-                WayfinderClient.id("tool/eraser_highlight"),
+                WayfinderClient.id("tool/eraser/eraser"),
+                WayfinderClient.id("tool/eraser/eraser_highlight"),
                 (w) -> this.eraser,
                 Component.literal("eraser")
         ));

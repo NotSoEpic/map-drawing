@@ -113,7 +113,7 @@ public class ColorPickerWidget extends AbstractWidget {
             this.relY = y;
             this.color = color;
             this.visualColor = visualColor;
-            this.tool = new PaletteDrawTool(WayfinderClient.id("cursor/brush"), this.getABGR(), this.visualColor, parent.brushWidget);
+            this.tool = new PaletteDrawTool(WayfinderClient.id("tool/brush/brush_cursor"), this.getABGR(), this.visualColor, parent.brushWidget);
         }
 
         @Override
