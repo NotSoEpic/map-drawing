@@ -24,7 +24,7 @@ import java.util.List;
 
 public class SpyglassPins {
     private static final ResourceLocation PING_RENDERTYPE = WayfinderClient.id("ping");
-    private static final ResourceLocation PING_TEXTURE = WayfinderClient.id("textures/gui/sprites/pin/spyglass.png");
+    private static final ResourceLocation PING_TEXTURE = WayfinderClient.id("textures/gui/sprites/pin/spyglass/spyglass.png");
 
     public static final int MAX_PINS = 16;
     private final List<PinData> pins = new ArrayList<>();
