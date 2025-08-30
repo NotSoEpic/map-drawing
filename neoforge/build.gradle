@@ -51,6 +51,8 @@ dependencies {
         exclude group: "maven.modrinth"
         exclude group: "me.fallenbreath"
     }
+    compileOnly("maven.modrinth:DistantHorizonsApi:${dh_api_version}")
+    runtimeOnly("maven.modrinth:DistantHorizons:${dh_version}-${minecraft_version}")
 }
 
 sourceSets.main.resources {

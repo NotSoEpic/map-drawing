@@ -14,6 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.block.Blocks;
 import org.joml.*;
+import wawa.wayfinder.DistantRaycast;
 import wawa.wayfinder.Helper;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.map.MapScreen;
@@ -52,6 +53,7 @@ public class SpyglassPins {
         if (!this.pins.isEmpty()) {
             Minecraft.getInstance().player.playSound(SoundEvents.AMETHYST_BLOCK_RESONATE, 0.25f, 1f);
             this.pins.clear();
+            DistantRaycast.clearCache();
         }
     }
 
