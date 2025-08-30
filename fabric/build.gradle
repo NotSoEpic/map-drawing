@@ -6,6 +6,10 @@ plugins {
 def generatedResources = project(":common").file("src/generated/resources")
 def commonResources = project(":common").file("src/main/resources")
 
+repositories {
+    flatDir { dir 'libs' }
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
     mappings loom.layered {
@@ -19,7 +23,8 @@ dependencies {
         exclude group: "me.fallenbreath"
     }
     compileOnly("maven.modrinth:DistantHorizonsApi:${dh_api_version}")
-    runtimeOnly("maven.modrinth:DistantHorizons:${dh_version}-${minecraft_version}")
+    // for some reason fabric HATES distant horizons in a dev environment..... just download the jar and put it in run/mods yourself
+//    runtimeOnly("maven.modrinth:DistantHorizons:${dh_version}-${minecraft_version}")
 }
 
 loom {
