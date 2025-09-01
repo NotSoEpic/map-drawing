@@ -54,25 +54,44 @@ public class StampBagHandler {
     }
 
     public void addNewStamp(NativeImage newStamp, String desiredName) {
-        Path imagePath = this.stampPath.resolve(desiredName + ".png");
+        String adjustedName = slug(desiredName);
+        Path imagePath = this.stampPath.resolve(adjustedName + ".png");
+
         if (Files.exists(imagePath)) {
-            WayfinderClient.LOGGER.warn("Attempting to overwite already present stamp image, skipping!");
-            return;
+            imagePath = this.stampPath.resolve(findFirstValidFilename(adjustedName, this.stampPath, "png"));
+            WayfinderClient.LOGGER.debug("Attempting to overwite already present stamp image, adjusting path!");
         }
+
+        Path finalImagePath = imagePath;
 
         Util.ioPool().execute(() -> {
             try {
-                newStamp.writeToFile(imagePath);
+                newStamp.writeToFile(finalImagePath);
             } catch (IOException e) {
                 WayfinderClient.LOGGER.error("Could not save stamp image\n{}", String.valueOf(e));
             }
         });
     }
 
+    // thank you john create for these file management classes
+    public static String findFirstValidFilename(String name, Path folderPath, String extension) {
+        int index = 0;
+        String filename;
+        Path filepath;
+        do {
+            filename = slug(name) + ((index == 0) ? "" : "_" + index) + "." + extension;
+            index++;
+            filepath = folderPath.resolve(filename);
+        } while (Files.exists(filepath));
+        return filename;
+    }
+
+    // thank you john create for these file management classes
+    public static String slug(String name) {
+        return name.replaceAll("\\W+", "_");
+    }
+
     public void removeStamp(String name) {
-
-
-
 
     }
 
