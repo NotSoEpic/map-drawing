@@ -80,10 +80,6 @@ public class CopyTool extends Tool {
 
             this.start = null;
         }
-
-        if (clipboard != null) {
-            activePage.stampHandler.addNewStamp(clipboard, "hello!");
-        }
     }
 
     @Override
