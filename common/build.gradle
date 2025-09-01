@@ -24,6 +24,7 @@ dependencies {
     implementation("foundry.veil:veil-common-${minecraft_version}:${veil_version}") {
         exclude group: "maven.modrinth"
     }
+    compileOnly "maven.modrinth:DistantHorizonsApi:${dh_api_version}"
 }
 
 configurations {

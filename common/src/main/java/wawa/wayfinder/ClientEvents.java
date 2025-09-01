@@ -20,6 +20,7 @@ public class ClientEvents {
 
     public static void leave() {
         WayfinderClient.PAGE_MANAGER.saveAndClear();
+        DistantRaycast.clearCache();
     }
 
     public static void postWorldRender(final MultiBufferSource bufferSource, final PoseStack poseStack, final float partialTick) {
