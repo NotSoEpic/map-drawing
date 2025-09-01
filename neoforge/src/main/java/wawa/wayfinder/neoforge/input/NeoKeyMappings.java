@@ -7,6 +7,7 @@ import net.neoforged.neoforge.client.settings.KeyModifier;
 import net.neoforged.neoforge.common.util.Lazy;
 import org.lwjgl.glfw.GLFW;
 import wawa.wayfinder.WayfinderClient;
+import wawa.wayfinder.map.StampBagScreen;
 import wawa.wayfinder.platform.services.IKeyMappings;
 
 public class NeoKeyMappings implements IKeyMappings {
@@ -42,6 +43,7 @@ public class NeoKeyMappings implements IKeyMappings {
             case REDO -> REDO;
             case SWAP -> SWAP;
         };
+
         return mapping.get().consumeClick();
     }
 

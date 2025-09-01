@@ -1,5 +1,6 @@
 package wawa.wayfinder.map.widgets;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -22,10 +23,19 @@ public class ToolPickerWidget extends AbstractWidget {
     private final SingleToolWidget.BrushWidget brushWidget;
     private final PinTool pin = new PinTool();
 
+    /**
+     * Used for additional widgets being added after our tools have been.
+     */
+    public int finalToolY;
+
     public ToolPickerWidget(final int x, final int y) {
         super(x, y, 0, 0, Component.literal("tool picker"));
+        //updated after every tool entry
+        //make sure of it!!
+        finalToolY = this.getY();
+
         this.tools.add(new SingleToolWidget(
-                this.getX(), this.getY(),
+                this.getX(), offsetFinalY(0),
                 WayfinderClient.id("tool/paw"),
                 WayfinderClient.id("tool/paw_highlight"),
                 (w) -> PanTool.INSTANCE,
@@ -33,17 +43,18 @@ public class ToolPickerWidget extends AbstractWidget {
         ));
 
         this.tools.add(new SingleToolWidget(
-                this.getX(), this.getY() + 20,
+                this.getX(), offsetFinalY(20),
                 WayfinderClient.id("tool/pencil/pencil"),
                 WayfinderClient.id("tool/pencil/pencil_highlight"),
                 (w) -> this.pencil,
                 Component.literal("pencil")
         ));
 
-        this.brushWidget = new SingleToolWidget.BrushWidget(this.getX(), this.getY() + 40);
+        this.brushWidget = new SingleToolWidget.BrushWidget(this.getX(), offsetFinalY(20));
         this.tools.add(this.brushWidget);
+
         this.tools.add(new SingleToolWidget(
-                this.getX(), this.getY() + 60,
+                this.getX(), offsetFinalY(20),
                 WayfinderClient.id("tool/eraser/eraser"),
                 WayfinderClient.id("tool/eraser/eraser_highlight"),
                 (w) -> this.eraser,
@@ -51,13 +62,13 @@ public class ToolPickerWidget extends AbstractWidget {
         ));
 
         this.tools.add(new SingleToolWidget.PinWidget(
-                this.getX(), this.getY() + 80,
+                this.getX(), offsetFinalY(20),
                 (w) -> this.pin,
                 Component.literal("pin")
         ));
 
         this.tools.add(new SingleToolWidget(
-                this.getX(), this.getY() + 100,
+                this.getX(), offsetFinalY(20),
                 WayfinderClient.id("tool/scissors"),
                 WayfinderClient.id("tool/scissors_highlight"),
                 (w) -> CopyTool.INSTANCE,
@@ -65,6 +76,10 @@ public class ToolPickerWidget extends AbstractWidget {
         ));
 
         this.updateBounds();
+    }
+
+    private int offsetFinalY(int offset) {
+        return finalToolY += offset;
     }
 
     public void pickHand() {
@@ -99,6 +114,10 @@ public class ToolPickerWidget extends AbstractWidget {
                 }
             }
         }
+    }
+
+    public NativeImage getCopiedImage() {
+        return CopyTool.INSTANCE.clipboard;
     }
 
     private void updateBounds() {

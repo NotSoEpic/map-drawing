@@ -6,6 +6,7 @@ import net.minecraft.client.KeyMapping;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import wawa.wayfinder.WayfinderClient;
+import wawa.wayfinder.map.StampBagScreen;
 import wawa.wayfinder.platform.services.IKeyMappings;
 
 public class FabricKeyMappings implements IKeyMappings {

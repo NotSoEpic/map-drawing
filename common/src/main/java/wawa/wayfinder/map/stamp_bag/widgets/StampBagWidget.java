@@ -20,7 +20,7 @@ public class StampBagWidget extends AbstractWidget {
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int i, int i1, float v) {
-        if (CopyTool.INSTANCE.clipboard == null) {
+        if (mapScreen.toolPicker.getCopiedImage() == null) {
             GUIElementAtlases.STAMP_BAG_CLOSED.render(guiGraphics, getX(), getY());
         } else {
             GUIElementAtlases.STAMP_BAG_OPEN.render(guiGraphics, getX(), getY());
@@ -31,8 +31,8 @@ public class StampBagWidget extends AbstractWidget {
     public void onClick(double mouseX, double mouseY) {
         super.onClick(mouseX, mouseY);
 
-        if (CopyTool.INSTANCE.clipboard != null) {
-            mapScreen.stampScreen.changeStage(StampBagScreen.ScreenStage.SAVING);
+        if (mapScreen.toolPicker.getCopiedImage() != null) {
+            mapScreen.stampScreen.changeStage(StampBagScreen.ScreenState.SAVING);
         }
     }
 

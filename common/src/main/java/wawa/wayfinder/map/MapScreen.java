@@ -53,7 +53,7 @@ public class MapScreen extends Screen {
         this.toolPicker = new ToolPickerWidget(this.width - 15 - 16 / 2, 30);
         this.addRenderableWidget(this.toolPicker);
 
-        this.stampBag = new StampBagWidget(0, 0, this);
+        this.stampBag = new StampBagWidget(this.width - 15 - 16 / 2, toolPicker.finalToolY + 20, this);
         addRenderableWidget(stampBag);
 
         this.compassRose = new CompassRoseWidget(this.width - 45, this.height - 45);
@@ -68,7 +68,11 @@ public class MapScreen extends Screen {
 
         stampScreen = StampBagScreen.INSTANCE;
         stampScreen.setMapScreen(this);
-        stampScreen.resetWidgets();
+        stampScreen.resetWidgetInfo();
+        stampScreen.activeWidgets.forEach(w -> {
+            w.active = true;
+            addWidget(w);
+        }); //make sure if we resize, we re-add our widgets from the bag screen
     }
 
     @Override
@@ -119,29 +123,32 @@ public class MapScreen extends Screen {
 
     @Override
     public boolean keyPressed(final int keyCode, final int scanCode, final int modifiers) {
-        if (Services.KEY_MAPPINGS.matches(IKeyMappings.Normal.OPEN_MAP, keyCode, scanCode, modifiers)) {
-            this.onClose();
-            return true;
-        }
+        if (!stampScreen.hasAnyTextBoxFoxused()) {
+            if (Services.KEY_MAPPINGS.matches(IKeyMappings.Normal.OPEN_MAP, keyCode, scanCode, modifiers)) {
+                this.onClose();
+                return true;
+            }
 
-        if (Services.KEY_MAPPINGS.matches(IKeyMappings.Normal.SWAP, keyCode, scanCode, modifiers)) {
-            WayfinderClient.TOOL_MANAGER.swap();
-        }
+            if (Services.KEY_MAPPINGS.matches(IKeyMappings.Normal.SWAP, keyCode, scanCode, modifiers)) {
+                WayfinderClient.TOOL_MANAGER.swap();
+            }
 
-        if (Services.KEY_MAPPINGS.matches(IKeyMappings.Normal.UNDO, keyCode, scanCode, modifiers)) {
-            WayfinderClient.PAGE_MANAGER.undoChanges();
-        }
+            if (Services.KEY_MAPPINGS.matches(IKeyMappings.Normal.UNDO, keyCode, scanCode, modifiers)) {
+                WayfinderClient.PAGE_MANAGER.undoChanges();
+            }
 
-        if (Services.KEY_MAPPINGS.matches(IKeyMappings.Normal.REDO, keyCode, scanCode, modifiers)) {
-            WayfinderClient.PAGE_MANAGER.redoChanges();
-        }
+            if (Services.KEY_MAPPINGS.matches(IKeyMappings.Normal.REDO, keyCode, scanCode, modifiers)) {
+                WayfinderClient.PAGE_MANAGER.redoChanges();
+            }
 
-        switch (Services.KEY_MAPPINGS.getToolSwap(keyCode, scanCode, modifiers)) {
-            case HAND -> this.toolPicker.pickHand();
-            case BRUSH -> this.toolPicker.pickBrush();
-            case PENCIL -> this.toolPicker.pickPencil();
-            case ERASER -> this.toolPicker.pickEraser();
-            case null -> {}
+            switch (Services.KEY_MAPPINGS.getToolSwap(keyCode, scanCode, modifiers)) {
+                case HAND -> this.toolPicker.pickHand();
+                case BRUSH -> this.toolPicker.pickBrush();
+                case PENCIL -> this.toolPicker.pickPencil();
+                case ERASER -> this.toolPicker.pickEraser();
+                case null -> {
+                }
+            }
         }
 
         return super.keyPressed(keyCode, scanCode, modifiers);
@@ -151,6 +158,7 @@ public class MapScreen extends Screen {
     public void onClose() {
         super.onClose();
         minecraft.level.playLocalSound(minecraft.getInstance().player, SoundEvents.BOOK_PUT, SoundSource.MASTER, 1f, 0.5f);
+        stampScreen.parentClose();
         WayfinderClient.PAGE_MANAGER.getSpyglassPins().clear();
     }
 
