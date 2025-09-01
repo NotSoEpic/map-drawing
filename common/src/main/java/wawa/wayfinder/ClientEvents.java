@@ -13,7 +13,9 @@ public class ClientEvents {
     }
 
     public static void join(final Level level, final Minecraft client) {
+        WayfinderClient.PAGE_MANAGER.saveAndClear();
         WayfinderClient.PAGE_MANAGER.reloadPageIO(level, client);
+        WayfinderClient.PAGE_MANAGER.reloadStampManager(level, client);
     }
 
     public static void leave() {

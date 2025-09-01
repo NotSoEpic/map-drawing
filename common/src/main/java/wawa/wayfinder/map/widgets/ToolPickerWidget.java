@@ -18,10 +18,10 @@ import java.util.List;
 public class ToolPickerWidget extends AbstractWidget {
     private final List<SingleToolWidget> tools = new ArrayList<>();
     private final DrawTool pencil = new DrawTool(WayfinderClient.id("tool/pencil/pencil_cursor"), 0xFF000000, 0xFF000000);
-    private final SingleToolWidget.BrushWidget brushWidget;
     private final DrawTool eraser = new DrawTool(WayfinderClient.id("tool/eraser/eraser_cursor"), 0, 0);
+    private final SingleToolWidget.BrushWidget brushWidget;
     private final PinTool pin = new PinTool();
-    private final CopyTool copy = new CopyTool(WayfinderClient.id("cursor/scissors"));
+
     public ToolPickerWidget(final int x, final int y) {
         super(x, y, 0, 0, Component.literal("tool picker"));
         this.tools.add(new SingleToolWidget(
@@ -31,6 +31,7 @@ public class ToolPickerWidget extends AbstractWidget {
                 (w) -> PanTool.INSTANCE,
                 Component.literal("paw")
         ));
+
         this.tools.add(new SingleToolWidget(
                 this.getX(), this.getY() + 20,
                 WayfinderClient.id("tool/pencil/pencil"),
@@ -38,6 +39,7 @@ public class ToolPickerWidget extends AbstractWidget {
                 (w) -> this.pencil,
                 Component.literal("pencil")
         ));
+
         this.brushWidget = new SingleToolWidget.BrushWidget(this.getX(), this.getY() + 40);
         this.tools.add(this.brushWidget);
         this.tools.add(new SingleToolWidget(
@@ -47,18 +49,21 @@ public class ToolPickerWidget extends AbstractWidget {
                 (w) -> this.eraser,
                 Component.literal("eraser")
         ));
+
         this.tools.add(new SingleToolWidget.PinWidget(
                 this.getX(), this.getY() + 80,
                 (w) -> this.pin,
                 Component.literal("pin")
         ));
+
         this.tools.add(new SingleToolWidget(
                 this.getX(), this.getY() + 100,
                 WayfinderClient.id("tool/scissors"),
                 WayfinderClient.id("tool/scissors_highlight"),
-                (w) -> this.copy,
+                (w) -> CopyTool.INSTANCE,
                 Component.literal("copy")
         ));
+
         this.updateBounds();
     }
 
@@ -81,10 +86,6 @@ public class ToolPickerWidget extends AbstractWidget {
 
     public void pickEraser() {
         WayfinderClient.TOOL_MANAGER.set(this.eraser);
-    }
-
-    public void pickCopy() {
-        WayfinderClient.TOOL_MANAGER.set(this.copy);
     }
 
     public void pickColor(final int color) {

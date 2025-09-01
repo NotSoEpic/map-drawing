@@ -8,6 +8,7 @@ import org.joml.Vector2dc;
 import org.joml.Vector2i;
 import wawa.wayfinder.NativeImageTracker;
 import wawa.wayfinder.data.history.OperationHistory;
+import wawa.wayfinder.map.stamp_bag.StampBagHandler;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -17,6 +18,7 @@ import java.util.function.Predicate;
  */
 public class PageManager {
     public PageIO pageIO;
+    public StampBagHandler stampHandler;
     private final Map<Vector2i, AbstractPage> pages = new HashMap<>();
     private final Map<Pin.Type, Pin> pins = new HashMap<>();
     private final SpyglassPins spyglassPins = new SpyglassPins();
@@ -256,10 +258,13 @@ public class PageManager {
     }
 
     public void reloadPageIO(final Level level, final Minecraft client) {
-        this.saveAndClear();
         this.pageIO = new PageIO(level, client);
         this.pins.clear();
         this.pins.putAll(this.pageIO.readPins());
+    }
+
+    public void reloadStampManager(final Level level, final Minecraft client) {
+        stampHandler = new StampBagHandler(this);
     }
 
     private int cleanupTimer = 0;
@@ -309,6 +314,9 @@ public class PageManager {
         this.pastHistories.clear();
         this.futureHistories.forEach(OperationHistory::clear);
         this.futureHistories.clear();
+
+        pageIO = null;
+        stampHandler = null;
 
         NativeImageTracker.checkAllocationAndClose();
     }

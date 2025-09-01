@@ -21,7 +21,7 @@ public class CopyTool extends Tool {
     public static CopyTool INSTANCE = new CopyTool(WayfinderClient.id("copy_tool"));
     private static final ResourceLocation TEXTURE = WayfinderClient.id("cursor/scissors");
     private final ResourceLocation textureID;
-    private NativeImage clipboard = null;
+    public NativeImage clipboard = null;
     private Vector2ic start = null;
 
     public CopyTool(final ResourceLocation textureID) {
@@ -79,6 +79,10 @@ public class CopyTool extends Tool {
             }
 
             this.start = null;
+        }
+
+        if (clipboard != null) {
+            activePage.stampHandler.addNewStamp(clipboard, "hello!");
         }
     }
 
