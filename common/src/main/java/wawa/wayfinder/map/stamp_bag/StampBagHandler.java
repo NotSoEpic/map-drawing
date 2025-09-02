@@ -14,7 +14,9 @@ import net.minecraft.util.GsonHelper;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.data.PageIO;
 
+import javax.annotation.Nullable;
 import java.io.*;
+import java.net.IDN;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -34,12 +36,12 @@ public class StampBagHandler {
     /**
      * Path used to save stamps too
      */
-    public Path stampPath;
+    private Path stampPath;
 
     /**
      * Path used to access metadata.json
      */
-    public Path metaDataPath;
+    private Path metaDataPath;
 
     /**
      * The current state of this bag handler. All other functions stop when not set to {@link StampBagHandler.SavingState#NORMAL}
@@ -50,20 +52,20 @@ public class StampBagHandler {
      * The RAM version of the metadata.json.
      * @see MetaDataRecord
      */
-    private volatile MetaDataRecord metadataObject;
+    private MetaDataRecord metadataObject;
     private Future<MetaDataRecord> loadingRecordThread;
     private Future<?> savingRecordThread;
 
     /**
      * Whether {@link StampBagHandler#metadataObject} should be saved
      */
-    private volatile boolean dirty = false;
+    private boolean dirty = false;
 
     /**
      * Whether metadata.json should be loaded from disk. <p/>
      * Saving is <b>ALWAYS</b> prioritized.
      */
-    private volatile boolean loadRequested = false;
+    private boolean loadRequested = false;
 
     public StampBagHandler() {
         createStampDirectory();
@@ -101,8 +103,13 @@ public class StampBagHandler {
 
         switch (state) {
             case SAVING -> {
+                if (!dirty) {
+                    state = SavingState.NORMAL;
+                    return;
+                }
+
                 if (dirty && savingRecordThread == null) {
-                    savingRecordThread = saveStableMetaData();
+                    savingRecordThread = saveStableMetaData(metadataObject);
                 }
 
                 if (savingRecordThread != null && savingRecordThread.isDone()) {
@@ -114,6 +121,11 @@ public class StampBagHandler {
             }
 
             case LOADING -> {
+                if (!loadRequested) {
+                    state = SavingState.NORMAL;
+                    return;
+                }
+
                 if (loadRequested && loadingRecordThread == null) {
                     loadingRecordThread = loadStableMetaData();
                 }
@@ -124,7 +136,7 @@ public class StampBagHandler {
                     try {
                         metadataObject = loadingRecordThread.get();
                     } catch (InterruptedException | ExecutionException e) { //should never be called....
-                        WayfinderClient.LOGGER.warn("Unable to successfully load MetaData! {}", e.toString());
+                        WayfinderClient.LOGGER.error("Unable to successfully load MetaData! {}", e.toString());
                     }
 
                     loadingRecordThread = null;
@@ -179,13 +191,13 @@ public class StampBagHandler {
                             Streams.parse(WayfinderClient.WAYFINDER_GSON.newJsonReader(Files.newBufferedReader(metaDataPath))));
 
                     if (md.isError()) {
-                        WayfinderClient.LOGGER.warn("Malformed metadata file! {}", md.error());
+                        WayfinderClient.LOGGER.error("Malformed metadata file! {}", md.error());
                         return null;
                     }
 
                     loadedRecord = md.getOrThrow();
                 } catch (IOException e) {
-                    WayfinderClient.LOGGER.warn("Unable to read metadata file: {}", e.toString());
+                    WayfinderClient.LOGGER.error("Unable to read metadata file: {}", e.toString());
                 }
 
                 return loadedRecord;
@@ -195,21 +207,29 @@ public class StampBagHandler {
         return null;
     }
 
-    private Future<?> saveStableMetaData() {
+    private Future<?> saveStableMetaData(MetaDataRecord record) {
         if (state == SavingState.SAVING) {
             return Util.ioPool().submit(() -> {
                 try {
-                    JsonElement ele = META_DATA_CODEC.encodeStart(JsonOps.INSTANCE, metadataObject).getOrThrow();
+                    JsonElement ele = META_DATA_CODEC.encodeStart(JsonOps.INSTANCE, record).getOrThrow();
                     JsonWriter jwriter = WayfinderClient.WAYFINDER_GSON.newJsonWriter(Files.newBufferedWriter(metaDataPath));
                     jwriter.setSerializeNulls(false);
                     jwriter.setIndent(" ".repeat(Math.max(0, 2)));
                     GsonHelper.writeValue(jwriter, ele, null);
                     jwriter.close();
                 } catch (IOException e) {
-                    WayfinderClient.LOGGER.warn("Unable to write metadata file: {}", e.toString());
-                    metadataObject = null;
+                    WayfinderClient.LOGGER.error("Unable to write metadata file: {}", e.toString());
                 }
             });
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public MetaDataRecord getRecord() {
+        if (state == SavingState.NORMAL) {
+            return metadataObject;
         }
 
         return null;
