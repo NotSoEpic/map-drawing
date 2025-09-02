@@ -1,34 +1,77 @@
 package wawa.wayfinder.map.stamp_bag;
 
+import com.google.gson.JsonElement;
+import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonWriter;
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.GsonHelper;
 import wawa.wayfinder.WayfinderClient;
-import wawa.wayfinder.data.PageManager;
+import wawa.wayfinder.data.PageIO;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class StampBagHandler {
 
-    public PageManager parentManager;
+    public static final Codec<MetaDataRecord> META_DATA_CODEC = RecordCodecBuilder.create(i -> i.group(
+            Codec.list(Codec.STRING).fieldOf("favorites").forGetter(MetaDataRecord::favorites),
+            Codec.unboundedMap(Codec.STRING, Codec.STRING).fieldOf("translatables").forGetter(MetaDataRecord::translatedNames)
+    ).apply(i, (favorites, translatable) -> new MetaDataRecord(new ArrayList<>(favorites), new HashMap<>(translatable))));
+
+    /**
+     * Path used to save stamps too
+     */
     public Path stampPath;
+
+    /**
+     * Path used to access metadata.json
+     */
     public Path metaDataPath;
 
-    List<String> favorites = new ArrayList<>();
+    /**
+     * The current state of this bag handler. All other functions stop when not set to {@link StampBagHandler.SavingState#NORMAL}
+     */
+    private SavingState state = SavingState.NORMAL;
 
-    public StampBagHandler(PageManager parentManager) {
-        this.parentManager = parentManager;
+    /**
+     * The RAM version of the metadata.json.
+     * @see MetaDataRecord
+     */
+    private volatile MetaDataRecord metadataObject;
+    private Future<MetaDataRecord> loadingRecordThread;
+    private Future<?> savingRecordThread;
+
+    /**
+     * Whether {@link StampBagHandler#metadataObject} should be saved
+     */
+    private volatile boolean dirty = false;
+
+    /**
+     * Whether metadata.json should be loaded from disk. <p/>
+     * Saving is <b>ALWAYS</b> prioritized.
+     */
+    private volatile boolean loadRequested = false;
+
+    public StampBagHandler() {
         createStampDirectory();
     }
 
     private void createStampDirectory() {
-        Path path = parentManager.pageIO.getPagePath();
-        this.stampPath = path.resolve("stamps");
+        Path mainPath = Minecraft.getInstance().gameDirectory.toPath().resolve(PageIO.mapName);
+        this.stampPath = mainPath.resolve("stamps");
         this.metaDataPath = stampPath.resolve("metadata.json");
 
         if (Files.notExists(stampPath)) {
@@ -40,33 +83,68 @@ public class StampBagHandler {
         }
 
         if (Files.notExists(metaDataPath)) {
-            try {
-                BufferedWriter writer = Files.newBufferedWriter(metaDataPath);
-                JsonWriter jsonWriter = WayfinderClient.WAYFINDER_GSON.newJsonWriter(writer);
+            metadataObject = new MetaDataRecord(new ArrayList<>(), new HashMap<>());
+            dirty = true;
+        } else {
+            loadRequested = true;
+        }
+    }
 
-                jsonWriter.beginObject();
-                jsonWriter.endObject();
-                jsonWriter.close();
-            } catch (IOException e) {
-                WayfinderClient.LOGGER.error("Could not create metadata json\n{}", String.valueOf(e));
+    public void tick() {
+        if (state == SavingState.NORMAL) {
+            if (dirty) {
+                state = SavingState.SAVING;
+            } else if (loadRequested) {
+                state = SavingState.LOADING;
+            }
+        }
+
+        switch (state) {
+            case SAVING -> {
+                if (dirty && savingRecordThread == null) {
+                    savingRecordThread = saveStableMetaData();
+                }
+
+                if (savingRecordThread != null && savingRecordThread.isDone()) {
+                    state = SavingState.NORMAL;
+                    dirty = false;
+
+                    savingRecordThread = null;
+                }
+            }
+
+            case LOADING -> {
+                if (loadRequested && loadingRecordThread == null) {
+                    loadingRecordThread = loadStableMetaData();
+                }
+
+                if (loadingRecordThread != null && loadingRecordThread.isDone()) {
+                    state = SavingState.NORMAL;
+                    loadRequested = false;
+                    try {
+                        metadataObject = loadingRecordThread.get();
+                    } catch (InterruptedException | ExecutionException e) { //should never be called....
+                        WayfinderClient.LOGGER.warn("Unable to successfully load MetaData! {}", e.toString());
+                    }
+
+                    loadingRecordThread = null;
+                }
             }
         }
     }
 
     public void addNewStamp(NativeImage newStamp, String desiredName) {
         String adjustedName = slug(desiredName);
-        Path imagePath = this.stampPath.resolve(adjustedName + ".png");
+        adjustedName = findFirstValidFilename(adjustedName, this.stampPath, "png");
+        WayfinderClient.LOGGER.debug("Saving new stamp image: {}; adjusted to:{}", desiredName, adjustedName);
+        Path imagePath = this.stampPath.resolve(adjustedName);
 
-        if (Files.exists(imagePath)) {
-            imagePath = this.stampPath.resolve(findFirstValidFilename(adjustedName, this.stampPath, "png"));
-            WayfinderClient.LOGGER.debug("Attempting to overwite already present stamp image, adjusting path!");
-        }
-
-        Path finalImagePath = imagePath;
+        metadataObject.translatedNames.put(adjustedName, desiredName);
+        dirty = true;
 
         Util.ioPool().execute(() -> {
             try {
-                newStamp.writeToFile(finalImagePath);
+                newStamp.writeToFile(imagePath);
             } catch (IOException e) {
                 WayfinderClient.LOGGER.error("Could not save stamp image\n{}", String.valueOf(e));
             }
@@ -91,34 +169,66 @@ public class StampBagHandler {
         return name.replaceAll("\\W+", "_");
     }
 
-    public void removeStamp(String name) {
+    private Future<MetaDataRecord> loadStableMetaData() {
+        if (state == SavingState.LOADING) {
+            return Util.ioPool().submit(() -> {
+                MetaDataRecord loadedRecord = null;
 
+                try {
+                    DataResult<MetaDataRecord> md = META_DATA_CODEC.parse(JsonOps.INSTANCE,
+                            Streams.parse(WayfinderClient.WAYFINDER_GSON.newJsonReader(Files.newBufferedReader(metaDataPath))));
+
+                    if (md.isError()) {
+                        WayfinderClient.LOGGER.warn("Malformed metadata file! {}", md.error());
+                        return null;
+                    }
+
+                    loadedRecord = md.getOrThrow();
+                } catch (IOException e) {
+                    WayfinderClient.LOGGER.warn("Unable to read metadata file: {}", e.toString());
+                }
+
+                return loadedRecord;
+            });
+        }
+
+        return null;
     }
 
-    public void addNewFavorite(String name) {
-        favorites.add(name);
+    private Future<?> saveStableMetaData() {
+        if (state == SavingState.SAVING) {
+            return Util.ioPool().submit(() -> {
+                try {
+                    JsonElement ele = META_DATA_CODEC.encodeStart(JsonOps.INSTANCE, metadataObject).getOrThrow();
+                    JsonWriter jwriter = WayfinderClient.WAYFINDER_GSON.newJsonWriter(Files.newBufferedWriter(metaDataPath));
+                    jwriter.setSerializeNulls(false);
+                    jwriter.setIndent(" ".repeat(Math.max(0, 2)));
+                    GsonHelper.writeValue(jwriter, ele, null);
+                    jwriter.close();
+                } catch (IOException e) {
+                    WayfinderClient.LOGGER.warn("Unable to write metadata file: {}", e.toString());
+                    metadataObject = null;
+                }
+            });
+        }
+
+        return null;
     }
 
-    public void removeFavorite(String name) {
-        favorites.remove(name);
+    private enum SavingState {
+        NORMAL, SAVING, LOADING
     }
 
-    public void saveFavorites() {
-
-
-    }
-
-    public void getStampsForRange(int from) {
-        getStampsForRange(from, from + 6);
-    }
-
-    public void getStampsForRange(int from, int to) {
-
-
-    }
-
-
-    public record StampImage() {
+    /**
+     * A mutable version of metadata.json. <p>
+     * Saved to disk when {@link StampBagHandler#dirty} is set to true; Read from disk when {@link StampBagHandler#loadRequested} is set to true. <p>
+     * Saving is <b>ALWAYS</b> prioritized.
+     *
+     * @param favorites
+     * @param translatedNames
+     */
+    public record MetaDataRecord(List<String/*untranslated*/> favorites,
+                                 Map<String/*untranslated*/, String/*translated*/> translatedNames) {
 
     }
 }

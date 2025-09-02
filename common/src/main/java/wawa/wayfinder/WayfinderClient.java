@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
 import wawa.wayfinder.data.PageManager;
+import wawa.wayfinder.map.stamp_bag.StampBagHandler;
 import wawa.wayfinder.map.tool.CopyTool;
 import wawa.wayfinder.map.tool.ToolManager;
 import wawa.wayfinder.platform.Services;
@@ -17,6 +18,8 @@ public final class WayfinderClient {
     public static PageManager PAGE_MANAGER = new PageManager();
     public static ToolManager TOOL_MANAGER = new ToolManager(CopyTool.INSTANCE); // todo dont commit this
     private static boolean DH_PRESENT = false;
+
+    public static final StampBagHandler STAMP_HANDLER = new StampBagHandler();
 
     @ApiStatus.Internal
     public static final Gson WAYFINDER_GSON = new GsonBuilder().setLenient()

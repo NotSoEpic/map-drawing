@@ -5,20 +5,21 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.level.Level;
 import wawa.wayfinder.input.InputListener;
+import wawa.wayfinder.map.stamp_bag.StampBagHandler;
 
 public class ClientEvents {
     public static void tick(final Minecraft client) {
         InputListener.tick(client);
         WayfinderClient.PAGE_MANAGER.tick();
+        WayfinderClient.STAMP_HANDLER.tick();
     }
 
-    public static void join(final Level level, final Minecraft client) {
+    public static void loadLevel(final Level level, final Minecraft client) {
         WayfinderClient.PAGE_MANAGER.saveAndClear();
         WayfinderClient.PAGE_MANAGER.reloadPageIO(level, client);
-        WayfinderClient.PAGE_MANAGER.reloadStampManager(level, client);
     }
 
-    public static void leave() {
+    public static void leaveServer() {
         WayfinderClient.PAGE_MANAGER.saveAndClear();
         DistantRaycast.clearCache();
     }

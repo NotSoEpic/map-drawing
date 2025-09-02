@@ -24,6 +24,7 @@ import java.util.UUID;
  * Holds file path information and helper functions for reading and writing image data
  */
 public class PageIO {
+    public static final String mapName = "wayfinder_maps";
     private final Path pagePath;
 
     public PageIO(final Level level, final Minecraft client) {
@@ -40,7 +41,7 @@ public class PageIO {
      */
     private Path buildMapPath(final Level level, final Minecraft client) {
         Path path = client.gameDirectory.toPath()
-                .resolve("wayfinder_maps");
+                .resolve(mapName);
         final long seed = ((BiomeManagerAccessor) level.getBiomeManager()).getBiomeZoomSeed();
         final UUID uuid = Mth.createInsecureUUID(RandomSource.create(seed));
         if (client.isLocalServer()) {

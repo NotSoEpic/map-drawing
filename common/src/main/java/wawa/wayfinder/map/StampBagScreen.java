@@ -53,7 +53,7 @@ public class StampBagScreen {
     private void addSaveWidgets() {
         confirmSave = new GUIElementButton(0, 0, 16, GUIElementAtlases.STAMP_BAG_SAVE_CONFIRM, (b) -> {
             if (!saveText.getValue().isEmpty() && mapScreen != null && mapScreen.toolPicker.getCopiedImage() != null) {
-                WayfinderClient.PAGE_MANAGER.stampHandler.addNewStamp(mapScreen.toolPicker.getCopiedImage(), saveText.getValue());
+                WayfinderClient.STAMP_HANDLER.addNewStamp(mapScreen.toolPicker.getCopiedImage(), saveText.getValue());
                 saveText.setValue("");
             }
 

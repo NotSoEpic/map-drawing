@@ -16,9 +16,9 @@ public final class WayfinderFabricClient implements ClientModInitializer {
 
         FabricKeyMappings.init();
         ClientTickEvents.END_CLIENT_TICK.register(ClientEvents::tick);
-        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> ClientEvents.join(client.level, client));
-        ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register((client, level) -> ClientEvents.join(level, client));
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ClientEvents.leave());
+//        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> ClientEvents.join(client.level, client));
+        ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register((client, level) -> ClientEvents.loadLevel(level, client));
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ClientEvents.leaveServer());
         WorldRenderEvents.AFTER_ENTITIES.register(ctx -> ClientEvents.postWorldRender(ctx.consumers(), ctx.matrixStack(), ctx.tickCounter().getRealtimeDeltaTicks()));
     }
 }

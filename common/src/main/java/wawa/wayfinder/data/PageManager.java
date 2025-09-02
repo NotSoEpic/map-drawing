@@ -18,7 +18,6 @@ import java.util.function.Predicate;
  */
 public class PageManager {
     public PageIO pageIO;
-    public StampBagHandler stampHandler;
     private final Map<Vector2i, AbstractPage> pages = new HashMap<>();
     private final Map<Pin.Type, Pin> pins = new HashMap<>();
     private final SpyglassPins spyglassPins = new SpyglassPins();
@@ -263,10 +262,6 @@ public class PageManager {
         this.pins.putAll(this.pageIO.readPins());
     }
 
-    public void reloadStampManager(final Level level, final Minecraft client) {
-        stampHandler = new StampBagHandler(this);
-    }
-
     private int cleanupTimer = 0;
 
     public void tick() {
@@ -316,7 +311,6 @@ public class PageManager {
         this.futureHistories.clear();
 
         pageIO = null;
-        stampHandler = null;
 
         NativeImageTracker.checkAllocationAndClose();
     }
