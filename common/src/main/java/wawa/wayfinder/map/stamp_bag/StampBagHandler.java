@@ -11,10 +11,10 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.GsonHelper;
+import org.jetbrains.annotations.Nullable;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.data.PageIO;
 
-import javax.annotation.Nullable;
 import java.io.*;
 import java.net.IDN;
 import java.nio.file.Files;
@@ -108,7 +108,7 @@ public class StampBagHandler {
                     return;
                 }
 
-                if (dirty && savingRecordThread == null) {
+                if (savingRecordThread == null) {
                     savingRecordThread = saveStableMetaData(metadataObject);
                 }
 
@@ -126,7 +126,7 @@ public class StampBagHandler {
                     return;
                 }
 
-                if (loadRequested && loadingRecordThread == null) {
+                if (loadingRecordThread == null) {
                     loadingRecordThread = loadStableMetaData();
                 }
 
@@ -164,7 +164,7 @@ public class StampBagHandler {
     }
 
     // thank you john create for these file management classes
-    public static String findFirstValidFilename(String name, Path folderPath, String extension) {
+    private static String findFirstValidFilename(String name, Path folderPath, String extension) {
         int index = 0;
         String filename;
         Path filepath;
@@ -177,7 +177,7 @@ public class StampBagHandler {
     }
 
     // thank you john create for these file management classes
-    public static String slug(String name) {
+    private static String slug(String name) {
         return name.replaceAll("\\W+", "_");
     }
 
