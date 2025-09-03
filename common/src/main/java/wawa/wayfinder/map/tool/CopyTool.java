@@ -58,7 +58,7 @@ public class CopyTool extends Tool {
     }
 
     @Override
-    public void mouseRelease(final PageManager activePage, final Vector2d world) {
+    public void mouseRelease(final PageManager activePage, MapWidget.MouseType mouseType, final Vector2d world) {
         final Vector2ic end = new Vector2i(world, RoundingMode.FLOOR);
 
         if (this.start != null) {

@@ -1,13 +1,14 @@
 package wawa.wayfinder.map.tool;
 
 import net.minecraft.client.Minecraft;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
 public class ToolManager {
     private Tool tool;
     private Tool previous;
 
-    public ToolManager(final Tool def) {
+    public ToolManager(final @NotNull Tool def) {
         this.tool = def;
         this.previous = def;
     }

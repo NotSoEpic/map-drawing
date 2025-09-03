@@ -15,7 +15,7 @@ public abstract class Tool {
 
     public void mouseMove(final PageManager activePage, final MapWidget.MouseType mouseType, final Vector2dc oldWorld, final Vector2dc world) {}
 
-    public void mouseRelease(final PageManager activePage, final Vector2d world) {}
+    public void mouseRelease(final PageManager activePage, final MapWidget.MouseType mouseType, final Vector2d world) {}
 
     public void controlScroll(final PageManager activePage, final double mouseX, final double mouseY, final double scrollY) {}
 
@@ -33,4 +33,6 @@ public abstract class Tool {
      * @param mouseY position of mouse cursor in gui coordinates
      */
     public void renderScreen(final GuiGraphics graphics, final double mouseX, final double mouseY) {}
+
+    public void tick(final boolean mapOpen) {}
 }

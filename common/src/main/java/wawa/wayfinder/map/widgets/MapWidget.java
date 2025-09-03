@@ -117,8 +117,8 @@ public class MapWidget extends AbstractWidget {
                 default -> MouseType.NONE;
             };
             final Vector2d world = this.parent.screenToWorld(new Vector2d(mouseX, mouseY));
-            if (newType != this.mouseType) {
-                WayfinderClient.TOOL_MANAGER.get().mouseRelease(WayfinderClient.PAGE_MANAGER, world);
+            if (newType != this.mouseType && this.mouseType != MouseType.NONE) {
+                WayfinderClient.TOOL_MANAGER.get().mouseRelease(WayfinderClient.PAGE_MANAGER, this.mouseType, world);
             }
             this.mouseType = newType;
             if (Screen.hasControlDown()) {
@@ -165,7 +165,9 @@ public class MapWidget extends AbstractWidget {
     @Override
     public boolean mouseReleased(final double mouseX, final double mouseY, final int button) {
         final Vector2d world = this.parent.screenToWorld(new Vector2d(mouseX, mouseY));
-        WayfinderClient.TOOL_MANAGER.get().mouseRelease(WayfinderClient.PAGE_MANAGER, world);
+        if (this.mouseType !=  MouseType.NONE) {
+            WayfinderClient.TOOL_MANAGER.get().mouseRelease(WayfinderClient.PAGE_MANAGER, this.mouseType, world);
+        }
 
         this.mouseType = MouseType.NONE;
         return true;

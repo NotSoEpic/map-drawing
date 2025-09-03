@@ -18,7 +18,10 @@ import wawa.wayfinder.Helper;
 import wawa.wayfinder.LerpedVector2d;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.map.stamp_bag.widgets.StampBagWidget;
-import wawa.wayfinder.map.widgets.*;
+import wawa.wayfinder.map.widgets.CompassRoseWidget;
+import wawa.wayfinder.map.widgets.DebugTextRenderable;
+import wawa.wayfinder.map.widgets.MapWidget;
+import wawa.wayfinder.map.widgets.ToolPickerWidget;
 import wawa.wayfinder.platform.Services;
 import wawa.wayfinder.platform.services.IKeyMappings;
 
@@ -117,8 +120,9 @@ public class MapScreen extends Screen {
 
     @Override
     public boolean mouseReleased(final double mouseX, final double mouseY, final int button) {
+        final boolean result = super.mouseReleased(mouseX, mouseY, button);
         this.mapWidget.mouseType = MapWidget.MouseType.NONE;
-        return super.mouseReleased(mouseX, mouseY, button);
+        return result;
     }
 
     @Override

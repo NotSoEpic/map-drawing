@@ -5,13 +5,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.level.Level;
 import wawa.wayfinder.input.InputListener;
-import wawa.wayfinder.map.stamp_bag.StampBagHandler;
+import wawa.wayfinder.map.MapScreen;
 
 public class ClientEvents {
     public static void tick(final Minecraft client) {
         InputListener.tick(client);
         WayfinderClient.PAGE_MANAGER.tick();
         WayfinderClient.STAMP_HANDLER.tick();
+        WayfinderClient.TOOL_MANAGER.get().tick(client.screen instanceof MapScreen);
     }
 
     public static void loadLevel(final Level level, final Minecraft client) {

@@ -8,7 +8,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
 import wawa.wayfinder.data.PageManager;
 import wawa.wayfinder.map.stamp_bag.StampBagHandler;
-import wawa.wayfinder.map.tool.CopyTool;
+import wawa.wayfinder.map.tool.PanTool;
 import wawa.wayfinder.map.tool.ToolManager;
 import wawa.wayfinder.platform.Services;
 
@@ -16,7 +16,7 @@ public final class WayfinderClient {
     public static final String MOD_ID = "wayfinder";
     public static final Logger LOGGER = LogUtils.getLogger();
     public static PageManager PAGE_MANAGER = new PageManager();
-    public static ToolManager TOOL_MANAGER = new ToolManager(CopyTool.INSTANCE); // todo dont commit this
+    public static ToolManager TOOL_MANAGER = new ToolManager(PanTool.INSTANCE);
     private static boolean DH_PRESENT = false;
 
     public static final StampBagHandler STAMP_HANDLER = new StampBagHandler();
