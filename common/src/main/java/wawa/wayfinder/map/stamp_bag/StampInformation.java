@@ -16,8 +16,8 @@ import java.util.Collection;
 public final class StampInformation {
 
     public static final Codec<StampInformation> CODEC = RecordCodecBuilder.create(i -> i.group(
-                    Codec.STRING.fieldOf("file_name").forGetter(StampInformation::fileName),
-                    Codec.STRING.fieldOf("custom_name").forGetter(StampInformation::customName),
+                    Codec.STRING.fieldOf("file_name").forGetter(StampInformation::getFileName),
+                    Codec.STRING.fieldOf("custom_name").forGetter(StampInformation::getCustomName),
                     Codec.BOOL.fieldOf("favorite").forGetter(StampInformation::isFavorited))
             .apply(i, (f, c, fav) -> new StampInformation(f, c, fav, null)));
 
@@ -58,11 +58,11 @@ public final class StampInformation {
 //        }
     }
 
-    public String fileName() {
+    public String getFileName() {
         return fileName;
     }
 
-    public String customName() {
+    public String getCustomName() {
         return customName;
     }
 
@@ -99,7 +99,7 @@ public final class StampInformation {
                 this.requestedImage.close();
             } else {
                 ticksSinceImageGet = 0;
-                NativeImageTracker.newImage(newImage.getWidth(), newImage.getHeight(), false);
+//                NativeImageTracker.newImage(newImage.getWidth(), newImage.getHeight(), false);
             }
 
             this.requestedImage = newImage;

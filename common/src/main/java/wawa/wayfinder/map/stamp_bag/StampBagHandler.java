@@ -199,6 +199,23 @@ public class StampBagHandler {
         return null;
     }
 
+    public StampInformation requestSingleStamp(int i) {
+        if (i <= metadataObject.allStamps().size() - 1) {
+            StampInformation si = metadataObject.allStamps().get(i);
+            if (si.getRequestedImage() == null) {
+                loadStampImage(si);
+            }
+
+            return si;
+        }
+
+        return null;
+    }
+
+    public void requestAllStamps(Collection<StampInformation> collection) {
+        collection.addAll(metadataObject.allStamps());
+        filterAndLoadStampsFromDisk(collection);
+    }
 
     /**
      * Bulk requests stamps from an array of indices into {@link StampBagHandler#metadataObject} <p>
@@ -216,22 +233,28 @@ public class StampBagHandler {
             }
         }
 
-        List<StampInformation> immut = collection.stream()
-                .filter(si -> si.getRequestedImage() == null)
-                .toList();
+        filterAndLoadStampsFromDisk(collection);
+    }
 
-        for (StampInformation si : immut) {
-            stampThreads.add(Util.ioPool().submit(() -> {
-                Path stampPath = this.stampPath.resolve(si.fileName());
-                try {
-                    InputStream inputStream = Files.newInputStream(stampPath);
-                    NativeImage image = NativeImage.read(inputStream);
-                    si.setRequestedImage(image);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }));
+    private void filterAndLoadStampsFromDisk(Collection<StampInformation> collection) {
+        for (StampInformation si : collection) {
+            if (si.getRequestedImage() == null) {
+                loadStampImage(si);
+            }
         }
+    }
+
+    private void loadStampImage(StampInformation si) {
+        stampThreads.add(Util.ioPool().submit(() -> {
+            Path stampPath = this.stampPath.resolve(si.getFileName());
+            try {
+                InputStream inputStream = Files.newInputStream(stampPath);
+                NativeImage image = NativeImage.read(inputStream);
+                si.setRequestedImage(image);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }));
     }
 
     private enum SavingState {
