@@ -15,7 +15,11 @@ import wawa.wayfinder.NativeImageTracker;
 import wawa.wayfinder.Rendering;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.data.PageManager;
+import wawa.wayfinder.map.stamp_bag.StampBagHandler;
 import wawa.wayfinder.map.widgets.MapWidget;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CopyTool extends Tool {
     public static CopyTool INSTANCE = new CopyTool(WayfinderClient.id("copy_tool"));

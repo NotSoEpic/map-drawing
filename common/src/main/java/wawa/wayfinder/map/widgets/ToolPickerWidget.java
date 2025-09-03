@@ -8,10 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec2;
 import wawa.wayfinder.Helper;
 import wawa.wayfinder.WayfinderClient;
-import wawa.wayfinder.map.tool.CopyTool;
-import wawa.wayfinder.map.tool.DrawTool;
-import wawa.wayfinder.map.tool.PanTool;
-import wawa.wayfinder.map.tool.PinTool;
+import wawa.wayfinder.map.tool.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +19,8 @@ public class ToolPickerWidget extends AbstractWidget {
     private final DrawTool eraser = new DrawTool(WayfinderClient.id("tool/eraser/eraser_cursor"), 0, 0);
     private final SingleToolWidget.BrushWidget brushWidget;
     private final PinTool pin = new PinTool();
+
+    private final StampBagDebuggerTool bagDebugger = new StampBagDebuggerTool();
 
     /**
      * Used for additional widgets being added after our tools have been.
@@ -74,6 +73,12 @@ public class ToolPickerWidget extends AbstractWidget {
                 (w) -> CopyTool.INSTANCE,
                 Component.literal("copy")
         ));
+
+        this.tools.add(new SingleToolWidget(this.getX(), offsetFinalY(20),
+                WayfinderClient.id("tool/scissors"),
+                WayfinderClient.id("tool/scissors_highlight"),
+                (w) -> bagDebugger,
+                Component.literal("bag_debugger")));
 
         this.updateBounds();
     }

@@ -311,7 +311,5 @@ public class PageManager {
         this.futureHistories.clear();
 
         pageIO = null;
-
-        NativeImageTracker.checkAllocationAndClose();
     }
 }

@@ -28,7 +28,7 @@ public abstract class Tool {
 
     /**
      * Renders tool components relative to the screen, after transform pop
-     * Fractional gui coordinates are translated in the PoseStack before this function and popped afterwards
+     * Fractional gui coordinates are customName in the PoseStack before this function and popped afterwards
      * @param mouseX position of mouse cursor in gui coordinates
      * @param mouseY position of mouse cursor in gui coordinates
      */

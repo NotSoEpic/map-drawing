@@ -16,22 +16,18 @@ import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.data.PageIO;
 
 import java.io.*;
-import java.net.IDN;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
 public class StampBagHandler {
 
     public static final Codec<MetaDataRecord> META_DATA_CODEC = RecordCodecBuilder.create(i -> i.group(
-            Codec.list(Codec.STRING).fieldOf("favorites").forGetter(MetaDataRecord::favorites),
-            Codec.unboundedMap(Codec.STRING, Codec.STRING).fieldOf("translatables").forGetter(MetaDataRecord::translatedNames)
-    ).apply(i, (favorites, translatable) -> new MetaDataRecord(new ArrayList<>(favorites), new HashMap<>(translatable))));
+            Codec.list(StampInformation.CODEC).fieldOf("translatables").forGetter(MetaDataRecord::allStamps)
+    ).apply(i, (translatable) -> new MetaDataRecord(new ArrayList<>(translatable))));
 
     /**
      * Path used to save stamps too
@@ -50,11 +46,14 @@ public class StampBagHandler {
 
     /**
      * The RAM version of the metadata.json.
+     *
      * @see MetaDataRecord
      */
     private MetaDataRecord metadataObject;
     private Future<MetaDataRecord> loadingRecordThread;
     private Future<?> savingRecordThread;
+
+    private final List<Future<?>> stampThreads = new ArrayList<>();
 
     /**
      * Whether {@link StampBagHandler#metadataObject} should be saved
@@ -65,7 +64,7 @@ public class StampBagHandler {
      * Whether metadata.json should be loaded from disk. <p/>
      * Saving is <b>ALWAYS</b> prioritized.
      */
-    private boolean loadRequested = false;
+    private boolean metaDataLoadingRequested = false;
 
     public StampBagHandler() {
         createStampDirectory();
@@ -85,62 +84,36 @@ public class StampBagHandler {
         }
 
         if (Files.notExists(metaDataPath)) {
-            metadataObject = new MetaDataRecord(new ArrayList<>(), new HashMap<>());
+            metadataObject = new MetaDataRecord(new ArrayList<>());
             dirty = true;
         } else {
-            loadRequested = true;
+            metaDataLoadingRequested = true;
         }
     }
 
     public void tick() {
+        switchStates();
+        state.stateManager.accept(this);
+
+        if (metadataObject != null) {
+            metadataObject.allStamps.forEach(StampInformation::tick);
+        }
+    }
+
+    private void switchStates() {
         if (state == SavingState.NORMAL) {
+            if (!stampThreads.isEmpty()) {
+                state = SavingState.LOADING_IMAGES;
+                return;
+            }
+
             if (dirty) {
                 state = SavingState.SAVING;
-            } else if (loadRequested) {
+                return;
+            }
+
+            if (metaDataLoadingRequested) {
                 state = SavingState.LOADING;
-            }
-        }
-
-        switch (state) {
-            case SAVING -> {
-                if (!dirty) {
-                    state = SavingState.NORMAL;
-                    return;
-                }
-
-                if (savingRecordThread == null) {
-                    savingRecordThread = saveStableMetaData(metadataObject);
-                }
-
-                if (savingRecordThread != null && savingRecordThread.isDone()) {
-                    state = SavingState.NORMAL;
-                    dirty = false;
-
-                    savingRecordThread = null;
-                }
-            }
-
-            case LOADING -> {
-                if (!loadRequested) {
-                    state = SavingState.NORMAL;
-                    return;
-                }
-
-                if (loadingRecordThread == null) {
-                    loadingRecordThread = loadStableMetaData();
-                }
-
-                if (loadingRecordThread != null && loadingRecordThread.isDone()) {
-                    state = SavingState.NORMAL;
-                    loadRequested = false;
-                    try {
-                        metadataObject = loadingRecordThread.get();
-                    } catch (InterruptedException | ExecutionException e) { //should never be called....
-                        WayfinderClient.LOGGER.error("Unable to successfully load MetaData! {}", e.toString());
-                    }
-
-                    loadingRecordThread = null;
-                }
             }
         }
     }
@@ -151,7 +124,7 @@ public class StampBagHandler {
         WayfinderClient.LOGGER.debug("Saving new stamp image: {}; adjusted to:{}", desiredName, adjustedName);
         Path imagePath = this.stampPath.resolve(adjustedName);
 
-        metadataObject.translatedNames.put(adjustedName, desiredName);
+        metadataObject.allStamps.add(new StampInformation(adjustedName, desiredName, false, null));
         dirty = true;
 
         Util.ioPool().execute(() -> {
@@ -226,29 +199,103 @@ public class StampBagHandler {
         return null;
     }
 
-    @Nullable
-    public MetaDataRecord getRecord() {
-        if (state == SavingState.NORMAL) {
-            return metadataObject;
+
+    /**
+     * Bulk requests stamps from an array of indices into {@link StampBagHandler#metadataObject} <p>
+     * If the requested stamp does not have an image associated with it, one will attempt to be loaded from disk and associated with the appropriate {@link StampInformation}
+     *
+     * @param collection The collection to populate with {@link StampInformation}
+     * @param indices    An array of indices to grab
+     */
+    public void bulkRequestStamps(Collection<StampInformation> collection, int... indices) {
+        for (int i : indices) {
+            int size = metadataObject.allStamps().size();
+
+            if (i <= size - 1) {
+                collection.add(metadataObject.allStamps().get(i));
+            }
         }
 
-        return null;
+        List<StampInformation> immut = collection.stream()
+                .filter(si -> si.getRequestedImage() == null)
+                .toList();
+
+        for (StampInformation si : immut) {
+            stampThreads.add(Util.ioPool().submit(() -> {
+                Path stampPath = this.stampPath.resolve(si.fileName());
+                try {
+                    InputStream inputStream = Files.newInputStream(stampPath);
+                    NativeImage image = NativeImage.read(inputStream);
+                    si.setRequestedImage(image);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }));
+        }
     }
 
     private enum SavingState {
-        NORMAL, SAVING, LOADING
+        NORMAL(null),
+        SAVING((sbh) -> {
+            if (!sbh.dirty) {
+                sbh.state = SavingState.NORMAL;
+                return;
+            }
+
+            if (sbh.savingRecordThread == null) {
+                sbh.savingRecordThread = sbh.saveStableMetaData(sbh.metadataObject);
+            }
+
+            if (sbh.savingRecordThread != null && sbh.savingRecordThread.isDone()) {
+                sbh.state = SavingState.NORMAL;
+                sbh.dirty = false;
+
+                sbh.savingRecordThread = null;
+            }
+        }),
+        LOADING((sbh) -> {
+            if (!sbh.metaDataLoadingRequested) {
+                sbh.state = SavingState.NORMAL;
+                return;
+            }
+
+            if (sbh.loadingRecordThread == null) {
+                sbh.loadingRecordThread = sbh.loadStableMetaData();
+            }
+
+            if (sbh.loadingRecordThread != null && sbh.loadingRecordThread.isDone()) {
+                sbh.state = SavingState.NORMAL;
+                sbh.metaDataLoadingRequested = false;
+                try {
+                    sbh.metadataObject = sbh.loadingRecordThread.get();
+                } catch (InterruptedException | ExecutionException e) { //should never be called....
+                    WayfinderClient.LOGGER.error("Unable to successfully load MetaData! {}", e.toString());
+                }
+
+                sbh.loadingRecordThread = null;
+            }
+        }),
+        LOADING_IMAGES((sbh) -> {
+            sbh.stampThreads.removeIf(Future::isDone);
+            if (sbh.stampThreads.isEmpty()) {
+                sbh.state = SavingState.NORMAL;
+            }
+        });
+
+        private final Consumer<StampBagHandler> stateManager;
+
+        SavingState(@Nullable Consumer<StampBagHandler> handler) {
+            this.stateManager = Objects.requireNonNullElseGet(handler, () -> (sbh) -> {
+            });
+        }
     }
 
     /**
      * A mutable version of metadata.json. <p>
-     * Saved to disk when {@link StampBagHandler#dirty} is set to true; Read from disk when {@link StampBagHandler#loadRequested} is set to true. <p>
+     * Saved to disk when {@link StampBagHandler#dirty} is set to true; Read from disk when {@link StampBagHandler#metaDataLoadingRequested} is set to true. <p>
      * Saving is <b>ALWAYS</b> prioritized.
-     *
-     * @param favorites
-     * @param translatedNames
      */
-    public record MetaDataRecord(List<String/*untranslated*/> favorites,
-                                 Map<String/*untranslated*/, String/*translated*/> translatedNames) {
+    public record MetaDataRecord(List<StampInformation> allStamps) {
 
     }
 }
