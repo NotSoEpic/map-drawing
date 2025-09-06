@@ -12,20 +12,13 @@ import wawa.wayfinder.WayfinderClient;
 import java.io.IOException;
 
 public class StampTexture extends AbstractTexture {
-    private static final int MAX_LIFE = 20;
+    private static final int MAX_LIFE = 20 * 30; //30 seconds after no users, remove memory
 
     private int usages = 0;
     private int ticksUntilRemoval = MAX_LIFE;
 
     @Nullable
     private NativeImage stamp;
-
-    public StampTexture(@Nullable NativeImage stamp) {
-        this.stamp = stamp;
-        if (stamp != null) {
-            prepareStamp(stamp);
-        }
-    }
 
     public void tick() {
         if (stamp != null) {

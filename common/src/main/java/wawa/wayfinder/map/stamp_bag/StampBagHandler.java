@@ -124,7 +124,7 @@ public class StampBagHandler {
         WayfinderClient.LOGGER.debug("Saving new stamp image: {}; adjusted to:{}", desiredName, adjustedName);
         Path imagePath = this.stampPath.resolve(adjustedName);
 
-        metadataObject.allStamps.add(new StampInformation(adjustedName, desiredName, false));
+        metadataObject.allStamps.add(new StampInformation(adjustedName, desiredName, false, newStamp));
         dirty = true;
 
         Util.ioPool().execute(() -> {

@@ -5,7 +5,6 @@ import foundry.veil.api.client.render.rendertype.VeilRenderType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import wawa.wayfinder.Rendering;
@@ -41,6 +40,7 @@ public class StampBagDebuggerTool extends Tool {
         for (InfoAndID id : idList) {
             Minecraft.getInstance().getTextureManager().release(id.id);
             id.info.getStampTexture().removeUser();
+            id.textureRegistered.set(false);
         }
         
         idList.clear();
@@ -81,7 +81,6 @@ public class StampBagDebuggerTool extends Tool {
             graphics.drawString(Minecraft.getInstance().font, infoAndID.info.getCustomName(), (int) x, (int) y - 4, Color.GREEN.getRGB());
             graphics.drawString(Minecraft.getInstance().font, infoAndID.info.getFileName(), (int) x, (int) y - 16, Color.GREEN.getRGB());
             graphics.drawString(Minecraft.getInstance().font, "is favorited: " + infoAndID.info.isFavorited(), (int) x, (int) y - 26, Color.GREEN.getRGB());
-
         }
     }
 

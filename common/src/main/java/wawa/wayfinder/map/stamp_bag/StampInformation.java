@@ -42,12 +42,17 @@ public final class StampInformation {
      */
     private final @NotNull StampTexture stampTexture;
 
+    public StampInformation(String fileName, String customName, boolean favorite, NativeImage newStamp) {
+        this(fileName, customName, favorite);
+        stampTexture.setFirstStamp(newStamp);
+    }
+
     public StampInformation(String fileName, String customName, boolean favorite) {
         this.fileName = fileName;
         this.customName = customName;
 
         this.favorited = favorite;
-        this.stampTexture = new StampTexture(null);
+        this.stampTexture = new StampTexture();
     }
 
     public String getFileName() {
