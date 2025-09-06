@@ -1,5 +1,6 @@
 package wawa.wayfinder.map.tool;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import foundry.veil.api.client.render.rendertype.VeilRenderType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -11,10 +12,12 @@ import wawa.wayfinder.Rendering;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.data.PageManager;
 import wawa.wayfinder.map.stamp_bag.StampInformation;
+import wawa.wayfinder.map.stamp_bag.StampTexture;
 
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class StampBagDebuggerTool extends Tool {
 
@@ -27,18 +30,21 @@ public class StampBagDebuggerTool extends Tool {
         WayfinderClient.STAMP_HANDLER.requestAllStamps(collection);
         for (int i = 0; i < collection.size(); i++) {
             StampInformation si = collection.get(i);
-            idList.add(new InfoAndID(WayfinderClient.id("stamp_debugger_" + i), si));
+            
+            si.getStampTexture().addUser();
+            idList.add(new InfoAndID(WayfinderClient.id("stamp_debugger_" + i), si, new AtomicBoolean()));
         }
     }
 
     @Override
     public void onDeselect() {
-        for (InfoAndID infoAndID : idList) {
-            Minecraft.getInstance().getTextureManager().release(infoAndID.id);
-            infoAndID.info.setRequestedImage(null);
+        for (InfoAndID id : idList) {
+            Minecraft.getInstance().getTextureManager().release(id.id);
+            id.info.getStampTexture().removeUser();
         }
-
+        
         idList.clear();
+        pointer = 0;
     }
 
     @Override
@@ -51,26 +57,26 @@ public class StampBagDebuggerTool extends Tool {
     public void renderWorld(GuiGraphics graphics, int worldX, int worldY, double xOff, double yOff) {
         if (!idList.isEmpty()) {
             InfoAndID infoAndID = idList.get(pointer);
-            if (infoAndID.info.getRequestedImage() == null) {
+            NativeImage texture = infoAndID.info.getStampTexture().getTexture();
+            if (texture == null) {
                 return;
             }
 
-            if (infoAndID.texture == null) {
-                infoAndID.texture = new DynamicTexture(infoAndID.info.getRequestedImage());
-                Minecraft.getInstance().getTextureManager().register(infoAndID.id, infoAndID.texture);
+            if (!infoAndID.textureRegistered.get()) {
+                infoAndID.textureRegistered.set(true);
+                Minecraft.getInstance().getTextureManager().register(infoAndID.id, infoAndID.info().getStampTexture());
             }
-
-
+            
             final RenderType renderType = VeilRenderType.get(Rendering.RenderTypes.PALETTE_SWAP, infoAndID.id);
             if (renderType == null) {
                 return;
             }
 
-            DynamicTexture renderable = infoAndID.texture;
-            double x = worldX + xOff - (double) (renderable.getPixels().getWidth() / 2);
-            double y = worldY + yOff - (double) (renderable.getPixels().getHeight() / 2);
+            StampTexture renderable = infoAndID.info.getStampTexture();
+            double x = worldX + xOff - (double) (renderable.getTexture().getWidth() / 2);
+            double y = worldY + yOff - (double) (renderable.getTexture().getHeight() / 2);
             Rendering.renderTypeBlit(graphics, renderType, x, y, 0, 0f, 0f,
-                    renderable.getPixels().getWidth(), renderable.getPixels().getHeight(), renderable.getPixels().getWidth(), renderable.getPixels().getHeight(), 1);
+                    renderable.getTexture().getWidth(), renderable.getTexture().getHeight(), renderable.getTexture().getWidth(), renderable.getTexture().getHeight(), 1);
 
             graphics.drawString(Minecraft.getInstance().font, infoAndID.info.getCustomName(), (int) x, (int) y - 4, Color.GREEN.getRGB());
             graphics.drawString(Minecraft.getInstance().font, infoAndID.info.getFileName(), (int) x, (int) y - 16, Color.GREEN.getRGB());
@@ -79,14 +85,6 @@ public class StampBagDebuggerTool extends Tool {
         }
     }
 
-    public static final class InfoAndID {
-        private final ResourceLocation id;
-        private final StampInformation info;
-        public DynamicTexture texture = null;
-
-        public InfoAndID(ResourceLocation id, StampInformation info) {
-            this.id = id;
-            this.info = info;
-        }
+    public record InfoAndID(ResourceLocation id, StampInformation info, AtomicBoolean textureRegistered) {
     }
 }

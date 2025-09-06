@@ -96,7 +96,7 @@ public class StampBagHandler {
         state.stateManager.accept(this);
 
         if (metadataObject != null) {
-            metadataObject.allStamps.forEach(StampInformation::tick);
+            metadataObject.allStamps.forEach(si -> si.getStampTexture().tick());
         }
     }
 
@@ -124,7 +124,7 @@ public class StampBagHandler {
         WayfinderClient.LOGGER.debug("Saving new stamp image: {}; adjusted to:{}", desiredName, adjustedName);
         Path imagePath = this.stampPath.resolve(adjustedName);
 
-        metadataObject.allStamps.add(new StampInformation(adjustedName, desiredName, false, null));
+        metadataObject.allStamps.add(new StampInformation(adjustedName, desiredName, false));
         dirty = true;
 
         Util.ioPool().execute(() -> {
@@ -202,7 +202,7 @@ public class StampBagHandler {
     public StampInformation requestSingleStamp(int i) {
         if (i <= metadataObject.allStamps().size() - 1) {
             StampInformation si = metadataObject.allStamps().get(i);
-            if (si.getRequestedImage() == null) {
+            if (si.getStampTexture() == null) {
                 loadStampImage(si);
             }
 
@@ -238,7 +238,7 @@ public class StampBagHandler {
 
     private void filterAndLoadStampsFromDisk(Collection<StampInformation> collection) {
         for (StampInformation si : collection) {
-            if (si.getRequestedImage() == null) {
+            if (si.getStampTexture().getTexture() == null) {
                 loadStampImage(si);
             }
         }
@@ -250,7 +250,7 @@ public class StampBagHandler {
             try {
                 InputStream inputStream = Files.newInputStream(stampPath);
                 NativeImage image = NativeImage.read(inputStream);
-                si.setRequestedImage(image);
+                si.setStampTexture(image);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

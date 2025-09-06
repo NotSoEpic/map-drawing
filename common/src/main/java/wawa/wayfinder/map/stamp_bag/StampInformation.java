@@ -3,8 +3,8 @@ package wawa.wayfinder.map.stamp_bag;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import wawa.wayfinder.NativeImageTracker;
 import wawa.wayfinder.mixin.NativeImageAccessor;
 
 import java.util.Collection;
@@ -19,7 +19,7 @@ public final class StampInformation {
                     Codec.STRING.fieldOf("file_name").forGetter(StampInformation::getFileName),
                     Codec.STRING.fieldOf("custom_name").forGetter(StampInformation::getCustomName),
                     Codec.BOOL.fieldOf("favorite").forGetter(StampInformation::isFavorited))
-            .apply(i, (f, c, fav) -> new StampInformation(f, c, fav, null)));
+            .apply(i, StampInformation::new));
 
     /**
      * The name this stamp is saved to disk under
@@ -40,22 +40,14 @@ public final class StampInformation {
      * The requested image associated with this stamp. <p/>
      * Null until {@link StampBagHandler#bulkRequestStamps(Collection, int...)} is called with the index associated with this SI.
      */
-    private @Nullable NativeImage requestedImage;
+    private final @NotNull StampTexture stampTexture;
 
-    private int ticksSinceImageGet = 0;
-
-    public StampInformation(String fileName, String customName, boolean favorite, @Nullable NativeImage requestedImage) {
+    public StampInformation(String fileName, String customName, boolean favorite) {
         this.fileName = fileName;
         this.customName = customName;
 
         this.favorited = favorite;
-        this.requestedImage = requestedImage;
-    }
-
-    public void tick() {
-//        if (ticksSinceImageGet != -1 && ticksSinceImageGet++ >= (20 * 60 * 5)) {
-//            setRequestedImage(null);
-//        }
+        this.stampTexture = new StampTexture(null);
     }
 
     public String getFileName() {
@@ -74,35 +66,14 @@ public final class StampInformation {
         this.favorited = favorited;
     }
 
-    public void resetCloseCounter() {
-        ticksSinceImageGet = 0;
+    public @NotNull StampTexture getStampTexture() {
+        return stampTexture;
     }
 
-    public @Nullable NativeImage getRequestedImage() {
-        //lazy checking of native image in case mojang decides it's time to close this for no reason
-        if (requestedImage == null) {
-            return null;
-        }
-
-        if (((NativeImageAccessor) (Object) requestedImage).getPixels() == 0L) {
-            setRequestedImage(null);
-            return null;
-        }
-
-        return requestedImage;
-    }
-
-    public void setRequestedImage(@Nullable NativeImage newImage) {
-        if (newImage != this.requestedImage) {
-            if (newImage == null) {
-                ticksSinceImageGet = -1;
-                this.requestedImage.close();
-            } else {
-                ticksSinceImageGet = 0;
-//                NativeImageTracker.newImage(newImage.getWidth(), newImage.getHeight(), false);
-            }
-
-            this.requestedImage = newImage;
+    public void setStampTexture(@Nullable NativeImage newImage) {
+        NativeImage texture = stampTexture.getTexture();
+        if (texture == null) {
+            stampTexture.setFirstStamp(newImage);
         }
     }
 }
