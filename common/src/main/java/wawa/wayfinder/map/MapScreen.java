@@ -59,11 +59,12 @@ public class MapScreen extends Screen {
         allWidgets.add(mapWidget);
         this.addRenderableWidget(this.mapWidget);
 
-        this.toolPicker = new ToolPickerWidget(this.width - 15 - 16 / 2, 30);
+        int toolX = this.width - 15 - 16 / 2;
+        this.toolPicker = new ToolPickerWidget(toolX, 30);
         allWidgets.add(toolPicker);
         this.addRenderableWidget(this.toolPicker);
 
-        this.stampBag = new StampBagWidget(this.width - 15 - 16 / 2, toolPicker.finalToolY + 20, this);
+        this.stampBag = new StampBagWidget(toolX, toolPicker.finalToolY + 20, this);
         allWidgets.add(stampBag);
         addRenderableWidget(stampBag);
 
@@ -89,6 +90,7 @@ public class MapScreen extends Screen {
         this.backgroundPanning.add(diffTracker.mul(this.zoom));
 
         super.render(guiGraphics, mouseX, mouseY, partialTick);
+
         stampScreen.renderScreen(guiGraphics, mouseX, mouseY, partialTick);
 
         final Vec2 mouse = Helper.preciseMousePos();

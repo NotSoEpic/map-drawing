@@ -17,10 +17,20 @@ public class StampTexture extends AbstractTexture {
     private int usages = 0;
     private int ticksUntilRemoval = MAX_LIFE;
 
+    private boolean removedFromHandler = false;
+
     @Nullable
     private NativeImage stamp;
 
     public void tick() {
+        if (removedFromHandler) {
+            if (stamp != null) {
+                releaseStamp();
+            }
+
+            return;
+        }
+
         if (stamp != null) {
             if (usages <= 0 && ticksUntilRemoval-- <= 0) {
                 releaseStamp();
@@ -35,7 +45,9 @@ public class StampTexture extends AbstractTexture {
     }
 
     public void addUser() {
-        usages++;
+        if (!removedFromHandler) {
+            usages++;
+        }
     }
 
     public void removeUser() {
@@ -48,7 +60,7 @@ public class StampTexture extends AbstractTexture {
         return this.stamp;
     }
 
-    private void releaseStamp() {
+    public void releaseStamp() {
         if (stamp != null) {
             stamp.close();
             super.releaseId();
@@ -57,7 +69,7 @@ public class StampTexture extends AbstractTexture {
     }
 
     public void setFirstStamp(@NotNull NativeImage image) {
-        if (stamp == null) {
+        if (!removedFromHandler && stamp == null) {
             stamp = image;
             prepareStamp(stamp);
         }
@@ -82,6 +94,12 @@ public class StampTexture extends AbstractTexture {
         } else {
             WayfinderClient.LOGGER.warn("Trying to upload disposed texture {}", this.getId());
         }
+    }
+
+    public void removeFromHandler() {
+        removedFromHandler = true;
+        releaseStamp();
+        usages = 0;
     }
 
     @Override

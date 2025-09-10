@@ -65,6 +65,7 @@ public class MapWidget extends AbstractWidget {
                 WayfinderClient.PAGE_MANAGER.getOrCreatePage(x, y).render(guiGraphics, xOff, yOff);
             }
         }
+
         final Vec2 mouse = Helper.preciseMousePos();
         final Vector2d world = this.parent.screenToWorld(new Vector2d(mouse.x, mouse.y));
 
@@ -78,6 +79,7 @@ public class MapWidget extends AbstractWidget {
         final Vector4dc transformedScreenBounds = new Vector4d(
                 -hw + INNER_PADDING, -hh + INNER_PADDING, this.width - hw - INNER_PADDING, this.height - hh - INNER_PADDING
         );
+
         for (final Pin pin : WayfinderClient.PAGE_MANAGER.getPins()) {
             boolean highlight = false;
             if (WayfinderClient.TOOL_MANAGER.get() instanceof final PinTool pinTool) {
@@ -85,6 +87,7 @@ public class MapWidget extends AbstractWidget {
             }
             pin.draw(guiGraphics, mouseScreen, xOff, yOff, scale, highlight, transformedScreenBounds);
         }
+
         for (final SpyglassPins.PinData pin : WayfinderClient.PAGE_MANAGER.getSpyglassPins().getPins()) {
             pin.pin().draw(guiGraphics, mouseScreen, xOff, yOff, scale, false, transformedScreenBounds);
         }

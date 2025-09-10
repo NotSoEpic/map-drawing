@@ -4,14 +4,11 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import wawa.wayfinder.mixin.NativeImageAccessor;
 
 import java.util.Collection;
 
 /**
- * Developer exposed information for a stamp. file name, custom name, and favoritism is populated when initialized through {@link StampBagHandler}. <p>
- * Requested image is populated when called through {@link StampBagHandler#bulkRequestStamps(Collection, int...)}
+ * Developer exposed information for a stamp. file name, custom name, and favoritism is populated when initialized through {@link StampBagHandler}
  */
 public final class StampInformation {
 
@@ -38,9 +35,10 @@ public final class StampInformation {
 
     /**
      * The requested image associated with this stamp. <p/>
-     * Null until {@link StampBagHandler#bulkRequestStamps(Collection, int...)} is called with the index associated with this SI.
      */
     private final @NotNull StampTexture stampTexture;
+
+    private boolean removed = false;
 
     public StampInformation(String fileName, String customName, boolean favorite, NativeImage newStamp) {
         this(fileName, customName, favorite);
@@ -71,14 +69,21 @@ public final class StampInformation {
         this.favorited = favorited;
     }
 
-    public @NotNull StampTexture getStampTexture() {
+    public @NotNull StampTexture getTextureManager() {
         return stampTexture;
     }
 
-    public void setStampTexture(@Nullable NativeImage newImage) {
-        NativeImage texture = stampTexture.getTexture();
-        if (texture == null) {
-            stampTexture.setFirstStamp(newImage);
+    public void setStampTexture(@NotNull NativeImage newImage) {
+        if (!removed) {
+            NativeImage texture = stampTexture.getTexture();
+            if (texture == null) {
+                stampTexture.setFirstStamp(newImage);
+            }
         }
+    }
+
+    public void setRemoved() {
+        removed = true;
+        getTextureManager().removeFromHandler();
     }
 }
