@@ -3,6 +3,7 @@ package wawa.wayfinder.map;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -25,6 +26,7 @@ import wawa.wayfinder.map.widgets.ToolPickerWidget;
 import wawa.wayfinder.platform.Services;
 import wawa.wayfinder.platform.services.IKeyMappings;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MapScreen extends Screen {
@@ -35,6 +37,8 @@ public class MapScreen extends Screen {
     private MapWidget mapWidget;
     public ToolPickerWidget toolPicker;
     public CompassRoseWidget compassRose;
+
+    public List<AbstractWidget> allWidgets = new ArrayList<>();
 
     public StampBagWidget stampBag;
 
@@ -52,30 +56,31 @@ public class MapScreen extends Screen {
     protected void init() {
         super.init();
         this.mapWidget = new MapWidget(this);
+        allWidgets.add(mapWidget);
         this.addRenderableWidget(this.mapWidget);
-        this.toolPicker = new ToolPickerWidget(this.width - 15 - 16 / 2, 30);
+
+        int toolX = this.width - 15 - 16 / 2;
+        this.toolPicker = new ToolPickerWidget(toolX, 30);
+        allWidgets.add(toolPicker);
         this.addRenderableWidget(this.toolPicker);
 
-        this.stampBag = new StampBagWidget(this.width - 15 - 16 / 2, toolPicker.finalToolY + 20, this);
+        this.stampBag = new StampBagWidget(toolX, toolPicker.finalToolY + 20, this);
+        allWidgets.add(stampBag);
         addRenderableWidget(stampBag);
 
         this.compassRose = new CompassRoseWidget(this.width - 45, this.height - 45);
         this.addRenderableOnly(this.compassRose);
         this.addRenderableOnly(new DebugTextRenderable(this));
         GLFW.glfwSetInputMode(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
-        if (!cursorAdjusted) { // Init is run whenever the screen is resized & the cursor is set in the super of the constructor. its evil but it works
-            Window window = Minecraft.getInstance().getWindow();
-            GLFW.glfwSetCursorPos(window.getWindow(), window.getScreenWidth() / 2f, window.getScreenHeight() / 2.75f);
-            cursorAdjusted = true;
-        }
+//        if (!cursorAdjusted) { // Init is run whenever the screen is resized & the cursor is set in the super of the constructor. its evil but it works
+//            Window window = Minecraft.getInstance().getWindow();
+//            GLFW.glfwSetCursorPos(window.getWindow(), window.getScreenWidth() / 2f, window.getScreenHeight() / 2.75f);
+//            cursorAdjusted = true;
+//        }
 
         stampScreen = StampBagScreen.INSTANCE;
         stampScreen.setMapScreen(this);
-        stampScreen.resetWidgetInfo();
-        stampScreen.activeWidgets.forEach(w -> {
-            w.active = true;
-            addWidget(w);
-        }); //make sure if we resize, we re-add our widgets from the bag screen
+        stampScreen.changeStage(stampScreen.getState());
     }
 
     @Override
@@ -85,6 +90,7 @@ public class MapScreen extends Screen {
         this.backgroundPanning.add(diffTracker.mul(this.zoom));
 
         super.render(guiGraphics, mouseX, mouseY, partialTick);
+
         stampScreen.renderScreen(guiGraphics, mouseX, mouseY, partialTick);
 
         final Vec2 mouse = Helper.preciseMousePos();

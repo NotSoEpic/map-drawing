@@ -1,44 +1,53 @@
 package wawa.wayfinder.map.tool;
 
+import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.vertex.PoseStack;
 import foundry.veil.api.client.render.rendertype.VeilRenderType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import wawa.wayfinder.Rendering;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.data.PageManager;
 import wawa.wayfinder.map.stamp_bag.StampInformation;
+import wawa.wayfinder.map.stamp_bag.StampTexture;
 
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class StampBagDebuggerTool extends Tool {
 
     private final List<InfoAndID> idList = new ArrayList<>();
     private int pointer;
 
+    public static final ResourceLocation backgroundID = WayfinderClient.id("stamp_browser_background");
+
     @Override
     public void onSelect() {
         ArrayList<StampInformation> collection = new ArrayList<>();
-        WayfinderClient.STAMP_HANDLER.requestAllStamps(collection);
+        WayfinderClient.STAMP_HANDLER.requestAllStamps(collection, false);
         for (int i = 0; i < collection.size(); i++) {
             StampInformation si = collection.get(i);
-            idList.add(new InfoAndID(WayfinderClient.id("stamp_debugger_" + i), si));
+
+            si.getTextureManager().addUser();
+            idList.add(new InfoAndID(WayfinderClient.id("stamp_debugger_" + i), si, new AtomicBoolean()));
         }
     }
 
     @Override
     public void onDeselect() {
-        for (InfoAndID infoAndID : idList) {
-            Minecraft.getInstance().getTextureManager().release(infoAndID.id);
-            infoAndID.info.setRequestedImage(null);
+        for (InfoAndID id : idList) {
+            Minecraft.getInstance().getTextureManager().release(id.id);
+            id.info.getTextureManager().removeUser();
+            id.textureRegistered.set(false);
         }
 
         idList.clear();
+        pointer = 0;
     }
 
     @Override
@@ -51,42 +60,40 @@ public class StampBagDebuggerTool extends Tool {
     public void renderWorld(GuiGraphics graphics, int worldX, int worldY, double xOff, double yOff) {
         if (!idList.isEmpty()) {
             InfoAndID infoAndID = idList.get(pointer);
-            if (infoAndID.info.getRequestedImage() == null) {
+            NativeImage texture = infoAndID.info.getTextureManager().getTexture();
+            if (texture == null) {
                 return;
             }
 
-            if (infoAndID.texture == null) {
-                infoAndID.texture = new DynamicTexture(infoAndID.info.getRequestedImage());
-                Minecraft.getInstance().getTextureManager().register(infoAndID.id, infoAndID.texture);
+            if (!infoAndID.textureRegistered.get()) {
+                infoAndID.textureRegistered.set(true);
+                Minecraft.getInstance().getTextureManager().register(infoAndID.id, infoAndID.info().getTextureManager());
             }
-
 
             final RenderType renderType = VeilRenderType.get(Rendering.RenderTypes.PALETTE_SWAP, infoAndID.id);
             if (renderType == null) {
                 return;
             }
 
-            DynamicTexture renderable = infoAndID.texture;
-            double x = worldX + xOff - (double) (renderable.getPixels().getWidth() / 2);
-            double y = worldY + yOff - (double) (renderable.getPixels().getHeight() / 2);
-            Rendering.renderTypeBlit(graphics, renderType, x, y, 0, 0f, 0f,
-                    renderable.getPixels().getWidth(), renderable.getPixels().getHeight(), renderable.getPixels().getWidth(), renderable.getPixels().getHeight(), 1);
 
-            graphics.drawString(Minecraft.getInstance().font, infoAndID.info.getCustomName(), (int) x, (int) y - 4, Color.GREEN.getRGB());
-            graphics.drawString(Minecraft.getInstance().font, infoAndID.info.getFileName(), (int) x, (int) y - 16, Color.GREEN.getRGB());
-            graphics.drawString(Minecraft.getInstance().font, "is favorited: " + infoAndID.info.isFavorited(), (int) x, (int) y - 26, Color.GREEN.getRGB());
+            StampTexture renderable = infoAndID.info.getTextureManager();
+            double x = worldX + xOff - (double) (renderable.getTexture().getWidth() / 2);
+            double y = worldY + yOff - (double) (renderable.getTexture().getHeight() / 2);
 
+            PoseStack ps = graphics.pose();
+            ps.pushPose();
+            ps.translate(x, y, 0);
+            graphics.blitSprite(backgroundID, -2, -32, Math.max(renderable.getTexture().getWidth() + 4, 98), renderable.getTexture().getHeight() + 34);
+            Rendering.renderTypeBlit(graphics, renderType, 0, 0, 0, 0f, 0f,
+                    renderable.getTexture().getWidth(), renderable.getTexture().getHeight(), renderable.getTexture().getWidth(), renderable.getTexture().getHeight(), 1);
+
+            graphics.drawString(Minecraft.getInstance().font, infoAndID.info.getCustomName(), 0, -4, Color.GREEN.getRGB());
+            graphics.drawString(Minecraft.getInstance().font, infoAndID.info.getFileName(), 0, -16, Color.GREEN.getRGB());
+            graphics.drawString(Minecraft.getInstance().font, "is favorited: " + infoAndID.info.isFavorited(), 0, -26, Color.GREEN.getRGB());
+            ps.popPose();
         }
     }
 
-    public static final class InfoAndID {
-        private final ResourceLocation id;
-        private final StampInformation info;
-        public DynamicTexture texture = null;
-
-        public InfoAndID(ResourceLocation id, StampInformation info) {
-            this.id = id;
-            this.info = info;
-        }
+    public record InfoAndID(ResourceLocation id, StampInformation info, AtomicBoolean textureRegistered) {
     }
 }

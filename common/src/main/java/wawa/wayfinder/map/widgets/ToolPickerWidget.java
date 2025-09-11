@@ -149,6 +149,10 @@ public class ToolPickerWidget extends AbstractWidget {
 
     @Override
     public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
+        if (!active) {
+            return false;
+        }
+
         for (final SingleToolWidget tool : this.tools) {
             if (tool.mouseClicked(mouseX, mouseY, button)) {
                 return true;

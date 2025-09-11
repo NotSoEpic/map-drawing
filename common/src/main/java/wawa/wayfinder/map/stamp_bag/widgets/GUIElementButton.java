@@ -1,4 +1,4 @@
-package wawa.wayfinder.map.stamp_bag.widgets.abstract_classes;
+package wawa.wayfinder.map.stamp_bag.widgets;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;

@@ -31,8 +31,16 @@ public class StampBagWidget extends AbstractWidget {
     public void onClick(double mouseX, double mouseY) {
         super.onClick(mouseX, mouseY);
 
+        StampBagScreen ss = mapScreen.stampScreen;
+        if (ss.getState() != StampBagScreen.ScreenState.IDLE) {
+            ss.changeStage(StampBagScreen.ScreenState.IDLE);
+            return;
+        }
+
         if (mapScreen.toolPicker.getCopiedImage() != null) {
-            mapScreen.stampScreen.changeStage(StampBagScreen.ScreenState.SAVING);
+            ss.changeStage(StampBagScreen.ScreenState.SAVING);
+        } else {
+            ss.changeStage(StampBagScreen.ScreenState.BROWSING);
         }
     }
 

@@ -15,16 +15,19 @@ import org.jetbrains.annotations.Nullable;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.data.PageIO;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 public class StampBagHandler {
-
     public static final Codec<MetaDataRecord> META_DATA_CODEC = RecordCodecBuilder.create(i -> i.group(
             Codec.list(StampInformation.CODEC).fieldOf("translatables").forGetter(MetaDataRecord::allStamps)
     ).apply(i, (translatable) -> new MetaDataRecord(new ArrayList<>(translatable))));
@@ -96,7 +99,7 @@ public class StampBagHandler {
         state.stateManager.accept(this);
 
         if (metadataObject != null) {
-            metadataObject.allStamps.forEach(StampInformation::tick);
+            metadataObject.allStamps.forEach(si -> si.getTextureManager().tick());
         }
     }
 
@@ -124,7 +127,7 @@ public class StampBagHandler {
         WayfinderClient.LOGGER.debug("Saving new stamp image: {}; adjusted to:{}", desiredName, adjustedName);
         Path imagePath = this.stampPath.resolve(adjustedName);
 
-        metadataObject.allStamps.add(new StampInformation(adjustedName, desiredName, false, null));
+        metadataObject.allStamps.add(new StampInformation(adjustedName, desiredName, false, newStamp));
         dirty = true;
 
         Util.ioPool().execute(() -> {
@@ -199,21 +202,29 @@ public class StampBagHandler {
         return null;
     }
 
-    public StampInformation requestSingleStamp(int i) {
-        if (i <= metadataObject.allStamps().size() - 1) {
-            StampInformation si = metadataObject.allStamps().get(i);
-            if (si.getRequestedImage() == null) {
-                loadStampImage(si);
+    public void requestAllStamps(Collection<StampInformation> collection, boolean favoritesOnly) {
+        for (StampInformation si : metadataObject.allStamps()) {
+            if (favoritesOnly && !si.isFavorited()) {
+                continue;
             }
 
-            return si;
+            collection.add(si);
         }
 
-        return null;
+        filterAndLoadStampsFromDisk(collection);
     }
 
-    public void requestAllStamps(Collection<StampInformation> collection) {
-        collection.addAll(metadataObject.allStamps());
+    public void requestStampContaining(Collection<StampInformation> collection, String containing, boolean favoritesOnly) {
+        for (StampInformation si : metadataObject.allStamps()) {
+            if (favoritesOnly && !si.isFavorited()) {
+                continue;
+            }
+
+            if (si.getCustomName().contains(containing)) {
+                collection.add(si);
+            }
+        }
+
         filterAndLoadStampsFromDisk(collection);
     }
 
@@ -224,12 +235,16 @@ public class StampBagHandler {
      * @param collection The collection to populate with {@link StampInformation}
      * @param indices    An array of indices to grab
      */
-    public void bulkRequestStamps(Collection<StampInformation> collection, int... indices) {
-        for (int i : indices) {
-            int size = metadataObject.allStamps().size();
+    public void bulkRequestStamps(Collection<StampInformation> collection, boolean favoritesOnly, int... indices) {
+        for (StampInformation si : metadataObject.allStamps()) {
+            if(favoritesOnly && !si.isFavorited()) {
+                continue;
+            }
 
-            if (i <= size - 1) {
-                collection.add(metadataObject.allStamps().get(i));
+            for (int i : indices) {
+                if (metadataObject.allStamps().indexOf(si) == i) {
+                    collection.add(si);
+                }
             }
         }
 
@@ -238,7 +253,7 @@ public class StampBagHandler {
 
     private void filterAndLoadStampsFromDisk(Collection<StampInformation> collection) {
         for (StampInformation si : collection) {
-            if (si.getRequestedImage() == null) {
+            if (si.getTextureManager().getTexture() == null) {
                 loadStampImage(si);
             }
         }
@@ -250,11 +265,27 @@ public class StampBagHandler {
             try {
                 InputStream inputStream = Files.newInputStream(stampPath);
                 NativeImage image = NativeImage.read(inputStream);
-                si.setRequestedImage(image);
+                si.setStampTexture(image);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }));
+    }
+
+    public int getTotalEntries() {
+        return metadataObject.allStamps().size();
+    }
+
+    public void setDirty() {
+        dirty = true;
+    }
+
+    public void removeStamp(StampInformation si) {
+        si.setRemoved();
+        metadataObject.allStamps().remove(si);
+        setDirty();
+
+        //TODO: move removed stamps to deleted folder
     }
 
     private enum SavingState {
