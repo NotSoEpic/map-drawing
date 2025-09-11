@@ -2,6 +2,7 @@ package wawa.wayfinder.platform;
 
 
 import wawa.wayfinder.WayfinderClient;
+import wawa.wayfinder.platform.services.IConfig;
 import wawa.wayfinder.platform.services.IKeyMappings;
 import wawa.wayfinder.platform.services.IPlatformHelper;
 
@@ -17,6 +18,7 @@ public class Services {
     // mod is loaded.
     public static final IPlatformHelper PLATFORM = load(IPlatformHelper.class);
     public static final IKeyMappings KEY_MAPPINGS = load(IKeyMappings.class);
+    public static final IConfig CONFIG = load(IConfig.class);
 
     // This code is used to load a service for the current environment. Your implementation of the service must be defined
     // manually by including a text file in META-INF/services named with the fully qualified class name of the service.
