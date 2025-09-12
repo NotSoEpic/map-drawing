@@ -1,12 +1,15 @@
 package wawa.wayfinder.fabric;
 
+import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.neoforged.fml.config.ModConfig;
 import wawa.wayfinder.ClientEvents;
 import wawa.wayfinder.WayfinderClient;
+import wawa.wayfinder.config.WayfinderClientConfig;
 import wawa.wayfinder.fabric.input.FabricKeyMappings;
 
 public final class WayfinderFabricClient implements ClientModInitializer {
@@ -20,5 +23,6 @@ public final class WayfinderFabricClient implements ClientModInitializer {
         ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register((client, level) -> ClientEvents.loadLevel(level, client));
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ClientEvents.leaveServer());
         WorldRenderEvents.AFTER_ENTITIES.register(ctx -> ClientEvents.postWorldRender(ctx.consumers(), ctx.matrixStack(), ctx.tickCounter().getRealtimeDeltaTicks()));
+        NeoForgeConfigRegistry.INSTANCE.register(WayfinderClient.MOD_ID, ModConfig.Type.CLIENT, WayfinderClientConfig.CONFIG_SPEC);
     }
 }

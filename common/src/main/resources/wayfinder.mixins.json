@@ -6,7 +6,6 @@
   "minVersion": "0.8",
   "client": [
     "BiomeManagerAccessor",
-    "DebugScreenOverlayMixin",
     "KeyBindingAccessor",
     "LevelRendererAccessor",
     "MinecraftMixin",
@@ -14,7 +13,10 @@
     "ScreenAccessor",
     "SpyglassItemMixin",
     "VeilImGuiImplMixin",
-    "VeilRenderSystemMixin"
+    "VeilRenderSystemMixin",
+    "coordinates_config.DebugScreenOverlayMixin",
+    "coordinates_config.KeyboardHandlerMixin",
+    "coordinates_config.PlayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

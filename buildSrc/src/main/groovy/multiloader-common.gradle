@@ -49,6 +49,10 @@ repositories {
             includeGroup "maven.modrinth"
         }
     }
+    maven {
+        name = "Fuzs Mod Resources"
+        url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
+    }
 }
 
 // Declare capabilities on the outgoing configurations.
@@ -106,7 +110,8 @@ processResources {
             'credits'                      : credits,
             'java_version'                 : java_version,
             'veil_version'                 : veil_version,
-            'dh_version'                   : dh_version
+            'dh_version'                   : dh_version,
+            'fcap_version'                 : fcap_version
     ]
 
     filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml', '*.mixins.json']) {

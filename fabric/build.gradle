@@ -25,6 +25,7 @@ dependencies {
     compileOnly("maven.modrinth:DistantHorizonsApi:${dh_api_version}")
     // for some reason fabric HATES distant horizons in a dev environment..... just download the jar and put it in run/mods yourself
 //    runtimeOnly("maven.modrinth:DistantHorizons:${dh_version}-${minecraft_version}")
+    modApi("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${fcap_version}")
 }
 
 loom {

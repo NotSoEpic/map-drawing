@@ -28,7 +28,8 @@
     "fabric-api": "*",
     "minecraft": "${minecraft_version}",
     "java": ">=${java_version}",
-    "veil": ">=${veil_version}"
+    "veil": ">=${veil_version}",
+    "forgeconfigapiport": ">=${fcap_version}"
   },
   "suggests": {
     "distant-horizons": ">=${dh_version}"
