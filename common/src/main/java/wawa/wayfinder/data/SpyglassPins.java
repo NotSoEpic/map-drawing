@@ -31,7 +31,7 @@ public class SpyglassPins {
     private final List<PinData> pins = new ArrayList<>();
     private int zoomlessTimer = 0;
 
-    public Collection<PinData> getPins() {
+    public List<PinData> getPins() {
         return this.pins;
     }
 
