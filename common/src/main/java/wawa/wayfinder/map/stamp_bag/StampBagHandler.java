@@ -28,328 +28,361 @@ import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 public class StampBagHandler {
-    public static final Codec<MetaDataRecord> META_DATA_CODEC = RecordCodecBuilder.create(i -> i.group(
-            Codec.list(StampInformation.CODEC).fieldOf("translatables").forGetter(MetaDataRecord::allStamps)
-    ).apply(i, (translatable) -> new MetaDataRecord(new ArrayList<>(translatable))));
+	public static final Codec<MetaDataRecord> META_DATA_CODEC = RecordCodecBuilder.create(i -> i.group(
+			Codec.list(StampInformation.CODEC).fieldOf("translatables").forGetter(MetaDataRecord::allStamps)
+	).apply(i, (translatable) -> new MetaDataRecord(new ArrayList<>(translatable), new ArrayList<>())));
 
-    /**
-     * Path used to save stamps too
-     */
-    private Path stampPath;
+	/**
+	 * Path used to save stamps too
+	 */
+	private Path stampPath;
 
-    /**
-     * Path used to access metadata.json
-     */
-    private Path metaDataPath;
+	/**
+	 * Path used to access metadata.json
+	 */
+	private Path metaDataPath;
 
-    /**
-     * The current state of this bag handler. All other functions stop when not set to {@link StampBagHandler.SavingState#NORMAL}
-     */
-    private SavingState state = SavingState.NORMAL;
+	/**
+	 * The current state of this bag handler. All other functions stop when not set to {@link SavingState#NORMAL}
+	 */
+	private SavingState state = SavingState.NORMAL;
 
-    /**
-     * The RAM version of the metadata.json.
-     *
-     * @see MetaDataRecord
-     */
-    private MetaDataRecord metadataObject;
-    private Future<MetaDataRecord> loadingRecordThread;
-    private Future<?> savingRecordThread;
+	/**
+	 * The RAM version of the metadata.json.
+	 *
+	 * @see MetaDataRecord
+	 */
+	private MetaDataRecord metadataObject;
+	private Future<MetaDataRecord> loadingRecordThread;
+	private Future<?> savingRecordThread;
 
-    private final List<Future<?>> stampThreads = new ArrayList<>();
+	private final List<Future<?>> stampThreads = new ArrayList<>();
 
-    /**
-     * Whether {@link StampBagHandler#metadataObject} should be saved
-     */
-    private boolean dirty = false;
+	/**
+	 * Whether {@link StampBagHandler#metadataObject} should be saved
+	 */
+	private boolean dirty = false;
 
-    /**
-     * Whether metadata.json should be loaded from disk. <p/>
-     * Saving is <b>ALWAYS</b> prioritized.
-     */
-    private boolean metaDataLoadingRequested = false;
+	/**
+	 * Whether metadata.json should be loaded from disk. <p/>
+	 * Saving is <b>ALWAYS</b> prioritized.
+	 */
+	private boolean metaDataLoadingRequested = false;
 
-    public StampBagHandler() {
-        createStampDirectory();
-    }
+	public StampBagHandler() {
+		createStampDirectory();
+	}
 
-    private void createStampDirectory() {
-        Path mainPath = Minecraft.getInstance().gameDirectory.toPath().resolve(PageIO.mapName);
-        this.stampPath = mainPath.resolve("stamps");
-        this.metaDataPath = stampPath.resolve("metadata.json");
+	private void createStampDirectory() {
+		Path mainPath = Minecraft.getInstance().gameDirectory.toPath().resolve(PageIO.mapName);
+		this.stampPath = mainPath.resolve("stamps");
+		this.metaDataPath = stampPath.resolve("metadata.json");
 
-        if (Files.notExists(stampPath)) {
-            try {
-                Files.createDirectory(stampPath);
-            } catch (IOException e) {
-                WayfinderClient.LOGGER.error("Could not create stamp directory\n{}", String.valueOf(e));
-            }
-        }
+		if (Files.notExists(stampPath)) {
+			try {
+				Files.createDirectory(stampPath);
+			} catch (IOException e) {
+				WayfinderClient.LOGGER.error("Could not create stamp directory\n{}", String.valueOf(e));
+			}
+		}
 
-        if (Files.notExists(metaDataPath)) {
-            metadataObject = new MetaDataRecord(new ArrayList<>());
-            dirty = true;
-        } else {
-            metaDataLoadingRequested = true;
-        }
-    }
+		if (Files.notExists(metaDataPath)) {
+			metadataObject = new MetaDataRecord(new ArrayList<>(), new ArrayList<>());
+			dirty = true;
+		} else {
+			metaDataLoadingRequested = true;
+		}
+	}
 
-    public void tick() {
-        switchStates();
-        state.stateManager.accept(this);
+	public void tick() {
+		switchStates();
+		state.stateManager.accept(this);
 
-        if (metadataObject != null) {
-            metadataObject.allStamps.forEach(si -> si.getTextureManager().tick());
-        }
-    }
+		if (metadataObject != null) {
+			metadataObject.allStamps.forEach(si -> si.getTextureManager().tick());
+		}
+	}
 
-    private void switchStates() {
-        if (state == SavingState.NORMAL) {
-            if (!stampThreads.isEmpty()) {
-                state = SavingState.LOADING_IMAGES;
-                return;
-            }
+	private void switchStates() {
+		if (state == SavingState.NORMAL) {
+			if (!stampThreads.isEmpty()) {
+				state = SavingState.LOADING_IMAGES;
+				return;
+			}
 
-            if (dirty) {
-                state = SavingState.SAVING;
-                return;
-            }
+			if (dirty) {
+				state = SavingState.SAVING;
+				return;
+			}
 
-            if (metaDataLoadingRequested) {
-                state = SavingState.LOADING;
-            }
-        }
-    }
+			if (metaDataLoadingRequested) {
+				state = SavingState.LOADING;
+			}
+		}
+	}
 
-    public void addNewStamp(NativeImage newStamp, String desiredName) {
-        String adjustedName = slug(desiredName);
-        adjustedName = findFirstValidFilename(adjustedName, this.stampPath, "png");
-        WayfinderClient.LOGGER.debug("Saving new stamp image: {}; adjusted to:{}", desiredName, adjustedName);
-        Path imagePath = this.stampPath.resolve(adjustedName);
+	public void addNewStamp(NativeImage newStamp, String desiredName) {
+		String adjustedName = slug(desiredName);
+		adjustedName = findFirstValidFilename(adjustedName, this.stampPath, "png");
+		WayfinderClient.LOGGER.debug("Saving new stamp image: {}; adjusted to:{}", desiredName, adjustedName);
+		Path imagePath = this.stampPath.resolve(adjustedName);
 
-        metadataObject.allStamps.add(new StampInformation(adjustedName, desiredName, false, newStamp));
-        dirty = true;
+		metadataObject.allStamps.add(new StampInformation(adjustedName, desiredName, false, newStamp));
+		dirty = true;
 
-        Util.ioPool().execute(() -> {
-            try {
-                newStamp.writeToFile(imagePath);
-            } catch (IOException e) {
-                WayfinderClient.LOGGER.error("Could not save stamp image\n{}", String.valueOf(e));
-            }
-        });
-    }
+		Util.ioPool().execute(() -> {
+			try {
+				newStamp.writeToFile(imagePath);
+			} catch (IOException e) {
+				WayfinderClient.LOGGER.error("Could not save stamp image\n{}", String.valueOf(e));
+			}
+		});
+	}
 
-    // thank you john create for these file management classes
-    private static String findFirstValidFilename(String name, Path folderPath, String extension) {
-        int index = 0;
-        String filename;
-        Path filepath;
-        do {
-            filename = slug(name) + ((index == 0) ? "" : "_" + index) + "." + extension;
-            index++;
-            filepath = folderPath.resolve(filename);
-        } while (Files.exists(filepath));
-        return filename;
-    }
+	// thank you john create for these file management classes
+	private static String findFirstValidFilename(String name, Path folderPath, String extension) {
+		int index = 0;
+		String filename;
+		Path filepath;
+		do {
+			filename = slug(name) + ((index == 0) ? "" : "_" + index) + "." + extension;
+			index++;
+			filepath = folderPath.resolve(filename);
+		} while (Files.exists(filepath));
+		return filename;
+	}
 
-    // thank you john create for these file management classes
-    private static String slug(String name) {
-        return name.replaceAll("\\W+", "_");
-    }
+	// thank you john create for these file management classes
+	private static String slug(String name) {
+		return name.replaceAll("\\W+", "_");
+	}
 
-    private Future<MetaDataRecord> loadStableMetaData() {
-        if (state == SavingState.LOADING) {
-            return Util.ioPool().submit(() -> {
-                MetaDataRecord loadedRecord = null;
+	private Future<MetaDataRecord> loadStableMetaData() {
+		if (state == SavingState.LOADING) {
+			return Util.ioPool().submit(() -> {
+				MetaDataRecord loadedRecord = null;
 
-                try {
-                    DataResult<MetaDataRecord> md = META_DATA_CODEC.parse(JsonOps.INSTANCE,
-                            Streams.parse(WayfinderClient.WAYFINDER_GSON.newJsonReader(Files.newBufferedReader(metaDataPath))));
+				try {
+					DataResult<MetaDataRecord> md = META_DATA_CODEC.parse(JsonOps.INSTANCE,
+							Streams.parse(WayfinderClient.WAYFINDER_GSON.newJsonReader(Files.newBufferedReader(metaDataPath))));
 
-                    if (md.isError()) {
-                        WayfinderClient.LOGGER.error("Malformed metadata file! {}", md.error());
-                        return null;
-                    }
+					if (md.isError()) {
+						WayfinderClient.LOGGER.error("Malformed metadata file! {}", md.error());
+						return null;
+					}
 
-                    loadedRecord = md.getOrThrow();
-                } catch (IOException e) {
-                    WayfinderClient.LOGGER.error("Unable to read metadata file: {}", e.toString());
-                }
+					loadedRecord = md.getOrThrow();
+				} catch (IOException e) {
+					WayfinderClient.LOGGER.error("Unable to read metadata file: {}", e.toString());
+				}
 
-                return loadedRecord;
-            });
-        }
+				return loadedRecord;
+			});
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    private Future<?> saveStableMetaData(MetaDataRecord record) {
-        if (state == SavingState.SAVING) {
-            return Util.ioPool().submit(() -> {
-                try {
-                    JsonElement ele = META_DATA_CODEC.encodeStart(JsonOps.INSTANCE, record).getOrThrow();
-                    JsonWriter jwriter = WayfinderClient.WAYFINDER_GSON.newJsonWriter(Files.newBufferedWriter(metaDataPath));
-                    jwriter.setSerializeNulls(false);
-                    jwriter.setIndent(" ".repeat(Math.max(0, 2)));
-                    GsonHelper.writeValue(jwriter, ele, null);
-                    jwriter.close();
-                } catch (IOException e) {
-                    WayfinderClient.LOGGER.error("Unable to write metadata file: {}", e.toString());
-                }
-            });
-        }
+	private Future<?> saveStableMetaData(MetaDataRecord record) {
+		if (state == SavingState.SAVING) {
+			return Util.ioPool().submit(() -> {
+				try {
+					JsonElement ele = META_DATA_CODEC.encodeStart(JsonOps.INSTANCE, record).getOrThrow();
+					JsonWriter jwriter = WayfinderClient.WAYFINDER_GSON.newJsonWriter(Files.newBufferedWriter(metaDataPath));
+					jwriter.setSerializeNulls(false);
+					jwriter.setIndent(" ".repeat(Math.max(0, 2)));
+					GsonHelper.writeValue(jwriter, ele, null);
+					jwriter.close();
+				} catch (IOException e) {
+					WayfinderClient.LOGGER.error("Unable to write metadata file: {}", e.toString());
+				}
+			});
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    public void requestAllStamps(Collection<StampInformation> collection, boolean favoritesOnly) {
-        for (StampInformation si : metadataObject.allStamps()) {
-            if (favoritesOnly && !si.isFavorited()) {
-                continue;
-            }
+	public void requestAllStamps(Collection<StampInformation> collection, boolean favoritesOnly) {
+		for (StampInformation si : metadataObject.allStamps()) {
+			if (favoritesOnly && !si.isFavorited()) {
+				continue;
+			}
 
-            collection.add(si);
-        }
+			collection.add(si);
+		}
 
-        filterAndLoadStampsFromDisk(collection);
-    }
+		filterAndLoadStampsFromDisk(collection);
+	}
 
-    public void requestStampContaining(Collection<StampInformation> collection, String containing, boolean favoritesOnly) {
-        for (StampInformation si : metadataObject.allStamps()) {
-            if (favoritesOnly && !si.isFavorited()) {
-                continue;
-            }
+	public void requestStampContaining(Collection<StampInformation> collection, String searchParam, boolean favoritesOnly) {
+		List<StampInformation> stampCollection = getProperCollection(favoritesOnly);
 
-            if (si.getCustomName().contains(containing)) {
-                collection.add(si);
-            }
-        }
+		for (StampInformation si : stampCollection) {
+			if (si.getCustomName().toLowerCase().contains(searchParam.toLowerCase())) {
+				collection.add(si);
+			}
+		}
 
-        filterAndLoadStampsFromDisk(collection);
-    }
+		filterAndLoadStampsFromDisk(collection);
+	}
 
-    /**
-     * Bulk requests stamps from an array of indices into {@link StampBagHandler#metadataObject} <p>
-     * If the requested stamp does not have an image associated with it, one will attempt to be loaded from disk and associated with the appropriate {@link StampInformation}
-     *
-     * @param collection The collection to populate with {@link StampInformation}
-     * @param indices    An array of indices to grab
-     */
-    public void bulkRequestStamps(Collection<StampInformation> collection, boolean favoritesOnly, int... indices) {
-        for (StampInformation si : metadataObject.allStamps()) {
-            if(favoritesOnly && !si.isFavorited()) {
-                continue;
-            }
+	/**
+	 * Bulk requests stamps from an array of indices into {@link StampBagHandler#metadataObject} <p>
+	 * If the requested stamp does not have an image associated with it, one will attempt to be loaded from disk and associated with the appropriate {@link StampInformation}
+	 *
+	 * @param collection The collection to populate with {@link StampInformation}
+	 * @param indices    An array of indices to grab
+	 */
+	public void bulkRequestStamps(Collection<StampInformation> collection, boolean favoritesOnly, int... indices) {
+		List<StampInformation> stampCollection = getProperCollection(favoritesOnly);
 
-            for (int i : indices) {
-                if (metadataObject.allStamps().indexOf(si) == i) {
-                    collection.add(si);
-                }
-            }
-        }
+		for (StampInformation si : stampCollection) {
+			for (int i : indices) {
+				if (stampCollection.indexOf(si) == i) {
+					collection.add(si);
+				}
+			}
+		}
 
-        filterAndLoadStampsFromDisk(collection);
-    }
+		filterAndLoadStampsFromDisk(collection);
+	}
 
-    private void filterAndLoadStampsFromDisk(Collection<StampInformation> collection) {
-        for (StampInformation si : collection) {
-            if (si.getTextureManager().getTexture() == null) {
-                loadStampImage(si);
-            }
-        }
-    }
+	private List<StampInformation> getProperCollection(boolean favoritesOnly) {
+		List<StampInformation> stampCollection;
 
-    private void loadStampImage(StampInformation si) {
-        stampThreads.add(Util.ioPool().submit(() -> {
-            Path stampPath = this.stampPath.resolve(si.getFileName());
-            try {
-                InputStream inputStream = Files.newInputStream(stampPath);
-                NativeImage image = NativeImage.read(inputStream);
-                si.setStampTexture(image);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }));
-    }
+		if (favoritesOnly) {
+			metadataObject.bulkUpdateFavorites();
+			stampCollection = metadataObject.favorites();
+		} else {
+			stampCollection = metadataObject.allStamps();
+		}
 
-    public int getTotalEntries() {
-        return metadataObject.allStamps().size();
-    }
+		return stampCollection;
+	}
 
-    public void setDirty() {
-        dirty = true;
-    }
+	private void filterAndLoadStampsFromDisk(Collection<StampInformation> collection) {
+		for (StampInformation si : collection) {
+			if (si.getTextureManager().getTexture() == null) {
+				loadStampImage(si);
+			}
+		}
+	}
 
-    public void removeStamp(StampInformation si) {
-        si.setRemoved();
-        metadataObject.allStamps().remove(si);
-        setDirty();
+	private void loadStampImage(StampInformation si) {
+		stampThreads.add(Util.ioPool().submit(() -> {
+			Path stampPath = this.stampPath.resolve(si.getFileName());
+			try {
+				InputStream inputStream = Files.newInputStream(stampPath);
+				NativeImage image = NativeImage.read(inputStream);
+				si.setStampTexture(image);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}));
+	}
 
-        //TODO: move removed stamps to deleted folder
-    }
+	public int getTotalEntryCount() {
+		return getTotalEntryCount(false);
+	}
 
-    private enum SavingState {
-        NORMAL(null),
-        SAVING((sbh) -> {
-            if (!sbh.dirty) {
-                sbh.state = SavingState.NORMAL;
-                return;
-            }
+	public int getTotalEntryCount(boolean favoritesOnly) {
+		if (favoritesOnly) {
+			int favoriteCount = 0;
 
-            if (sbh.savingRecordThread == null) {
-                sbh.savingRecordThread = sbh.saveStableMetaData(sbh.metadataObject);
-            }
+			for (StampInformation allStamp : metadataObject.allStamps()) {
+				if (allStamp.isFavorited()) {
+					favoriteCount++;
+				}
+			}
 
-            if (sbh.savingRecordThread != null && sbh.savingRecordThread.isDone()) {
-                sbh.state = SavingState.NORMAL;
-                sbh.dirty = false;
+			return favoriteCount;
+		}
 
-                sbh.savingRecordThread = null;
-            }
-        }),
-        LOADING((sbh) -> {
-            if (!sbh.metaDataLoadingRequested) {
-                sbh.state = SavingState.NORMAL;
-                return;
-            }
 
-            if (sbh.loadingRecordThread == null) {
-                sbh.loadingRecordThread = sbh.loadStableMetaData();
-            }
+		return metadataObject.allStamps().size();
+	}
 
-            if (sbh.loadingRecordThread != null && sbh.loadingRecordThread.isDone()) {
-                sbh.state = SavingState.NORMAL;
-                sbh.metaDataLoadingRequested = false;
-                try {
-                    sbh.metadataObject = sbh.loadingRecordThread.get();
-                } catch (InterruptedException | ExecutionException e) { //should never be called....
-                    WayfinderClient.LOGGER.error("Unable to successfully load MetaData! {}", e.toString());
-                }
+	public void setDirty() {
+		dirty = true;
+	}
 
-                sbh.loadingRecordThread = null;
-            }
-        }),
-        LOADING_IMAGES((sbh) -> {
-            sbh.stampThreads.removeIf(Future::isDone);
-            if (sbh.stampThreads.isEmpty()) {
-                sbh.state = SavingState.NORMAL;
-            }
-        });
+	public void removeStamp(StampInformation si) {
+		si.setRemoved();
+		metadataObject.allStamps().remove(si);
+		setDirty();
 
-        private final Consumer<StampBagHandler> stateManager;
+		//TODO: move removed stamps to deleted folder
+	}
 
-        SavingState(@Nullable Consumer<StampBagHandler> handler) {
-            this.stateManager = Objects.requireNonNullElseGet(handler, () -> (sbh) -> {
-            });
-        }
-    }
+	private enum SavingState {
+		NORMAL(null),
+		SAVING((sbh) -> {
+			if (!sbh.dirty) {
+				sbh.state = SavingState.NORMAL;
+				return;
+			}
 
-    /**
-     * A mutable version of metadata.json. <p>
-     * Saved to disk when {@link StampBagHandler#dirty} is set to true; Read from disk when {@link StampBagHandler#metaDataLoadingRequested} is set to true. <p>
-     * Saving is <b>ALWAYS</b> prioritized.
-     */
-    public record MetaDataRecord(List<StampInformation> allStamps) {
+			if (sbh.savingRecordThread == null) {
+				sbh.savingRecordThread = sbh.saveStableMetaData(sbh.metadataObject);
+			}
 
-    }
+			if (sbh.savingRecordThread != null && sbh.savingRecordThread.isDone()) {
+				sbh.state = SavingState.NORMAL;
+				sbh.dirty = false;
+
+				sbh.savingRecordThread = null;
+			}
+		}),
+		LOADING((sbh) -> {
+			if (!sbh.metaDataLoadingRequested) {
+				sbh.state = SavingState.NORMAL;
+				return;
+			}
+
+			if (sbh.loadingRecordThread == null) {
+				sbh.loadingRecordThread = sbh.loadStableMetaData();
+			}
+
+			if (sbh.loadingRecordThread != null && sbh.loadingRecordThread.isDone()) {
+				sbh.state = SavingState.NORMAL;
+				sbh.metaDataLoadingRequested = false;
+				try {
+					sbh.metadataObject = sbh.loadingRecordThread.get();
+				} catch (InterruptedException | ExecutionException e) { //should never be called....
+					WayfinderClient.LOGGER.error("Unable to successfully load MetaData! {}", e.toString());
+				}
+
+				sbh.loadingRecordThread = null;
+			}
+		}),
+		LOADING_IMAGES((sbh) -> {
+			sbh.stampThreads.removeIf(Future::isDone);
+			if (sbh.stampThreads.isEmpty()) {
+				sbh.state = SavingState.NORMAL;
+			}
+		});
+
+		private final Consumer<StampBagHandler> stateManager;
+
+		SavingState(@Nullable Consumer<StampBagHandler> handler) {
+			this.stateManager = Objects.requireNonNullElseGet(handler, () -> (sbh) -> {
+			});
+		}
+	}
+
+	/**
+	 * A mutable version of metadata.json. <p>
+	 * Saved to disk when {@link StampBagHandler#dirty} is set to true; Read from disk when {@link StampBagHandler#metaDataLoadingRequested} is set to true. <p>
+	 * Saving is <b>ALWAYS</b> prioritized.
+	 */
+	public record MetaDataRecord(List<StampInformation> allStamps, List<StampInformation> favorites) {
+		public void bulkUpdateFavorites() {
+			favorites.clear();
+			for (StampInformation si : allStamps) {
+				if (si.isFavorited()) {
+					favorites.add(si);
+				}
+			}
+		}
+	}
 }
