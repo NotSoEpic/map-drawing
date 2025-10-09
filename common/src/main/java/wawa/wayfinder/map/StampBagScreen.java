@@ -185,6 +185,8 @@ public class StampBagScreen {
     public void changeStage(ScreenState newStage) {
         for (AbstractWidget w : activeWidgets) {
             mapScreen.removeWidget(w);
+	        w.setFocused(false);
+	        w.active = false;
         }
         resetWidgetInfo();
         activeWidgets.clear();
