@@ -95,6 +95,10 @@ public class SingleToolWidget extends AbstractWidget {
 
         @Override
         public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
+	        if (!this.colorPicker.isActive()) {
+		        return false;
+	        }
+
             if (!super.mouseClicked(mouseX, mouseY, button)) {
                 return this.colorPicker.mouseClicked(mouseX, mouseY, button);
             }
@@ -136,6 +140,10 @@ public class SingleToolWidget extends AbstractWidget {
 
         @Override
         public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
+			if (!this.pinPicker.isActive()) {
+				return false;
+			}
+
             if (!super.mouseClicked(mouseX, mouseY, button)) {
                 return this.pinPicker.mouseClicked(mouseX, mouseY, button);
             }
