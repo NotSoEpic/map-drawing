@@ -58,12 +58,12 @@ public class StampBagScreen {
         createEntryWidgets();
 
         up = new GUIElementButton(0, 0, 16, GUIElementAtlases.STAMP_BAG_BROWSE_UP, b -> {
-            page = Math.clamp(page - 1, 1, (int) Math.ceil(WayfinderClient.STAMP_HANDLER.getTotalEntries() / 3f));
+            page = Math.clamp(page - 1, 1, (int) Math.ceil(usingSearch ? requestedInfo.size() / 3f : WayfinderClient.STAMP_HANDLER.getTotalEntries() / 3f));
             refreshStamps();
         });
 
         down = new GUIElementButton(0, 0, 16, GUIElementAtlases.STAMP_BAG_BROWSE_DOWN, b -> {
-            page = Math.clamp(page + 1, 1, (int) Math.ceil(WayfinderClient.STAMP_HANDLER.getTotalEntries() / 3f));
+            page = Math.clamp(page + 1, 1, (int) Math.ceil(usingSearch ? requestedInfo.size() / 3f : WayfinderClient.STAMP_HANDLER.getTotalEntries() / 3f));
             refreshStamps();
         });
 
@@ -238,11 +238,16 @@ public class StampBagScreen {
         }
 
         for (int i = 0; i < 3; i++) {
+	        int index = i;
+	        if (usingSearch) {
+				index = pageLoc - (3 - i);
+			}
+
             StampEntry entry = entries[i];
 
             //TODO: add page support while using search...
-            if (i <= requestedInfo.size() - 1) {
-                entry.self.changeStampInformation(requestedInfo.get(i));
+            if (index <= requestedInfo.size() - 1) {
+                entry.self.changeStampInformation(requestedInfo.get(index));
                 addWidget(entry.self);
                 addWidget(entry.delete);
                 addWidget(entry.favorite);
