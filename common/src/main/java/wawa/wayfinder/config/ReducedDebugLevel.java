@@ -1,5 +1,7 @@
 package wawa.wayfinder.config;
 
+import net.minecraft.client.Minecraft;
+
 public enum ReducedDebugLevel {
 	NONE,
 	COORDINATES,
@@ -7,10 +9,10 @@ public enum ReducedDebugLevel {
 	ALL;
 
 	public boolean allowsCoordinates() {
-		return this == NONE;
+		return this == NONE || Minecraft.getInstance().player.isCreative();
 	}
 
 	public boolean allowsRotation() {
-		return this != ALL && this != COORDINATES_AND_ROTATION;
+		return (this != ALL && this != COORDINATES_AND_ROTATION) || !Minecraft.getInstance().player.isCreative();
 	}
 }

@@ -9,12 +9,15 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import wawa.wayfinder.Rendering;
+import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.gui.GUIElementAtlases;
 import wawa.wayfinder.map.StampBagScreen;
 import wawa.wayfinder.map.stamp_bag.StampInformation;
 import wawa.wayfinder.map.stamp_bag.StampTexture;
 import wawa.wayfinder.map.stamp_bag.widgets.abstract_classes.AbstractStampScreenWidget;
 import wawa.wayfinder.map.tool.StampBagDebuggerTool;
+import wawa.wayfinder.map.tool.StampTool;
+import wawa.wayfinder.map.tool.ToolManager;
 
 import java.awt.*;
 import java.util.function.Consumer;
@@ -46,6 +49,9 @@ public class StampEntryWidget extends AbstractStampScreenWidget {
     @Override
     public void onClick(double mouseX, double mouseY) {
         onClick.accept(this);
+        WayfinderClient.TOOL_MANAGER.set(StampTool.INSTANCE);
+        StampTool.INSTANCE.setActiveStamp(this.stampInformation);
+        StampBagScreen.INSTANCE.changeStage(StampBagScreen.ScreenState.IDLE);
     }
 
     @Override

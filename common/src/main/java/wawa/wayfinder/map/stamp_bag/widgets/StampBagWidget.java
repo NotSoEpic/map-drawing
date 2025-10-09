@@ -4,6 +4,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
+import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.gui.GUIElementAtlases;
 import wawa.wayfinder.map.MapScreen;
 import wawa.wayfinder.map.StampBagScreen;
@@ -20,10 +21,11 @@ public class StampBagWidget extends AbstractWidget {
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int i, int i1, float v) {
-        if (mapScreen.toolPicker.getCopiedImage() == null) {
-            GUIElementAtlases.STAMP_BAG_CLOSED.render(guiGraphics, getX(), getY());
-        } else {
+        if ((mapScreen.toolPicker.getCopiedImage() != null & WayfinderClient.TOOL_MANAGER.get() instanceof CopyTool)
+                || StampBagScreen.INSTANCE.getState() != StampBagScreen.ScreenState.IDLE) {
             GUIElementAtlases.STAMP_BAG_OPEN.render(guiGraphics, getX(), getY());
+        } else {
+            GUIElementAtlases.STAMP_BAG_CLOSED.render(guiGraphics, getX(), getY());
         }
     }
 
@@ -37,7 +39,7 @@ public class StampBagWidget extends AbstractWidget {
             return;
         }
 
-        if (mapScreen.toolPicker.getCopiedImage() != null) {
+        if (mapScreen.toolPicker.getCopiedImage() != null && WayfinderClient.TOOL_MANAGER.get() instanceof CopyTool) {
             ss.changeStage(StampBagScreen.ScreenState.SAVING);
         } else {
             ss.changeStage(StampBagScreen.ScreenState.BROWSING);

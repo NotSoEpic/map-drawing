@@ -43,6 +43,9 @@ public class StampBagScreen {
     private final EditBox searchWidget;
 
     public StampEntry[] entries = new StampEntry[3];
+    private int browseBGWidth = 178;
+    private int browseBGY = 100;
+    private int browseBGHeight = 138;
 
     public StampBagScreen() {
         saveText = new EditBox(Minecraft.getInstance().font, 72, 17, Component.empty());
@@ -302,15 +305,12 @@ public class StampBagScreen {
             }
 
             case BROWSING -> {
-                int width = 178;
-                int backgroundX = (this.mapScreen.width - 15 - 16 / 2) - (164) - 21;
-                int backgroundY = 100;
-
-                guiGraphics.blitSprite(StampBagDebuggerTool.backgroundID, backgroundX, backgroundY, width, 138);
+                int browseBGX = (this.mapScreen.width - 15 - 16 / 2) - (164) - 21;
+                guiGraphics.blitSprite(StampBagDebuggerTool.backgroundID, browseBGX, browseBGY, browseBGWidth, browseBGHeight);
 
                 for (int i = 0; i < entries.length; i++) {
                     if (entries[i].addedWidgets) {
-                        GUIElementAtlases.STAMP_BAG_BROWSE_ENTRY.render(guiGraphics, backgroundX + 10, backgroundY + 26 + (i * 37));
+                        GUIElementAtlases.STAMP_BAG_BROWSE_ENTRY.render(guiGraphics, browseBGX + 10, browseBGY + 26 + (i * 37));
                     }
 
                     float total;
@@ -320,8 +320,17 @@ public class StampBagScreen {
                         total = WayfinderClient.STAMP_HANDLER.getTotalEntries() / 3f;
                     }
 
-                    guiGraphics.drawString(Minecraft.getInstance().font, "%s/%s".formatted(total  == 0 ? 0 : page, (int) Math.ceil(total)), backgroundX + GUIElementAtlases.STAMP_BAG_BROWSE_ENTRY.width() + 27, backgroundY + 74, Color.BLACK.getRGB(), false);
+                    guiGraphics.drawString(Minecraft.getInstance().font, "%s/%s".formatted(total  == 0 ? 0 : page, (int) Math.ceil(total)), browseBGX + GUIElementAtlases.STAMP_BAG_BROWSE_ENTRY.width() + 27, browseBGY + 74, Color.BLACK.getRGB(), false);
                 }
+            }
+        }
+    }
+
+    public void mouseClicked(double mouseX, double mouseY, int button) {
+        if (state != ScreenState.IDLE && state != ScreenState.SAVING) {
+            int browseBGX = (this.mapScreen.width - 15 - 16 / 2) - (164) - 21;
+            if (mouseX < browseBGX || mouseX > browseBGX + browseBGWidth || mouseY < browseBGY || mouseY > browseBGY + browseBGHeight ) {
+                changeStage(ScreenState.IDLE);
             }
         }
     }

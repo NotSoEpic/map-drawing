@@ -74,11 +74,11 @@ public class ToolPickerWidget extends AbstractWidget {
                 Component.literal("copy")
         ));
 
-        this.tools.add(new SingleToolWidget(this.getX(), offsetFinalY(20),
-                WayfinderClient.id("tool/scissors"),
-                WayfinderClient.id("tool/scissors_highlight"),
-                (w) -> bagDebugger,
-                Component.literal("bag_debugger")));
+//        this.tools.add(new SingleToolWidget(this.getX(), offsetFinalY(20),
+//                WayfinderClient.id("tool/scissors"),
+//                WayfinderClient.id("tool/scissors_highlight"),
+//                (w) -> bagDebugger,
+//                Component.literal("bag_debugger")));
 
         this.updateBounds();
     }

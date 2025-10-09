@@ -139,6 +139,12 @@ public class MapScreen extends Screen {
     }
 
     @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        StampBagScreen.INSTANCE.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
     public boolean keyPressed(final int keyCode, final int scanCode, final int modifiers) {
         if (!stampScreen.hasAnyTextBoxFoxused()) {
             if (Services.KEY_MAPPINGS.matches(IKeyMappings.Normal.OPEN_MAP, keyCode, scanCode, modifiers)) {
@@ -175,6 +181,7 @@ public class MapScreen extends Screen {
     public void onClose() {
         super.onClose();
         minecraft.level.playLocalSound(minecraft.getInstance().player, SoundEvents.BOOK_PUT, SoundSource.MASTER, 1f, 0.5f);
+        StampBagScreen.INSTANCE.changeStage(StampBagScreen.ScreenState.IDLE);
         stampScreen.parentClose();
         WayfinderClient.PAGE_MANAGER.getSpyglassPins().clear();
     }
