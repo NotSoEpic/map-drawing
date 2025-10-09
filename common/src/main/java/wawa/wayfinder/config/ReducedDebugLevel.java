@@ -9,10 +9,10 @@ public enum ReducedDebugLevel {
 	ALL;
 
 	public boolean allowsCoordinates() {
-		return this == NONE || Minecraft.getInstance().player.isCreative();
+		return this == NONE || Minecraft.getInstance().player.isCreative() || Minecraft.getInstance().player.isSpectator();
 	}
 
 	public boolean allowsRotation() {
-		return (this != ALL && this != COORDINATES_AND_ROTATION) || !Minecraft.getInstance().player.isCreative();
+		return (this != ALL && this != COORDINATES_AND_ROTATION) || !Minecraft.getInstance().player.isCreative() || Minecraft.getInstance().player.isSpectator();
 	}
 }
