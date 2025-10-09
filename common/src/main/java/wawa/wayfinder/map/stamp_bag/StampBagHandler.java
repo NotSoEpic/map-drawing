@@ -203,21 +203,13 @@ public class StampBagHandler {
 	}
 
 	public void requestAllStamps(Collection<StampInformation> collection, boolean favoritesOnly) {
-		for (StampInformation si : metadataObject.allStamps()) {
-			if (favoritesOnly && !si.isFavorited()) {
-				continue;
-			}
-
-			collection.add(si);
-		}
+		collection.addAll(getCorrectStampCollection(favoritesOnly));
 
 		filterAndLoadStampsFromDisk(collection);
 	}
 
 	public void requestStampContaining(Collection<StampInformation> collection, String searchParam, boolean favoritesOnly) {
-		List<StampInformation> stampCollection = getProperCollection(favoritesOnly);
-
-		for (StampInformation si : stampCollection) {
+		for (StampInformation si : getCorrectStampCollection(favoritesOnly)) {
 			if (si.getCustomName().toLowerCase().contains(searchParam.toLowerCase())) {
 				collection.add(si);
 			}
@@ -234,8 +226,7 @@ public class StampBagHandler {
 	 * @param indices    An array of indices to grab
 	 */
 	public void bulkRequestStamps(Collection<StampInformation> collection, boolean favoritesOnly, int... indices) {
-		List<StampInformation> stampCollection = getProperCollection(favoritesOnly);
-
+		List<StampInformation> stampCollection = getCorrectStampCollection(favoritesOnly);
 		for (StampInformation si : stampCollection) {
 			for (int i : indices) {
 				if (stampCollection.indexOf(si) == i) {
@@ -247,7 +238,7 @@ public class StampBagHandler {
 		filterAndLoadStampsFromDisk(collection);
 	}
 
-	private List<StampInformation> getProperCollection(boolean favoritesOnly) {
+	private List<StampInformation> getCorrectStampCollection(boolean favoritesOnly) {
 		List<StampInformation> stampCollection;
 
 		if (favoritesOnly) {
