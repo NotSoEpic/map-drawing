@@ -245,7 +245,6 @@ public class StampBagScreen {
 
             StampEntry entry = entries[i];
 
-            //TODO: add page support while using search...
             if (index <= requestedInfo.size() - 1) {
                 entry.self.changeStampInformation(requestedInfo.get(index));
                 addWidget(entry.self);
@@ -253,7 +252,6 @@ public class StampBagScreen {
                 addWidget(entry.favorite);
                 entry.addedWidgets = true;
             } else {
-                //figure out how these are getting rendered in certain scenarios when they should absolutely not be
                 removeWidget(entry.self);
                 removeWidget(entry.delete);
                 removeWidget(entry.favorite);
