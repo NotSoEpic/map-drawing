@@ -11,6 +11,7 @@ import wawa.wayfinder.DistantRaycast;
 import wawa.wayfinder.Helper;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.compat.DHTerrainAccess;
+import wawa.wayfinder.data.SpyglassPins;
 import wawa.wayfinder.map.MapScreen;
 import wawa.wayfinder.platform.Services;
 import wawa.wayfinder.platform.services.IKeyMappings;
@@ -29,6 +30,19 @@ public class InputListener {
                     minecraft.setScreen(new MapScreen(playerPosition, new Vector2d(target.x, target.z)));
                 }
                 return;
+            } else {
+                final int numPins = WayfinderClient.PAGE_MANAGER.getSpyglassPins().getPins().size();
+                if (numPins >= 1) {
+                    // If pins exist, move camera to average position
+                    double avgX = 0;
+                    double avgZ = 0;
+                    for (SpyglassPins.PinData pin : WayfinderClient.PAGE_MANAGER.getSpyglassPins().getPins()) {
+                        avgX += pin.position().x() / numPins;
+                        avgZ += pin.position().z() / numPins;
+                    }
+                    minecraft.setScreen(new MapScreen(playerPosition, new Vector2d(avgX, avgZ)));
+                    return;
+                }
             }
 
             minecraft.setScreen(new MapScreen(playerPosition, playerPosition));

@@ -18,6 +18,7 @@ public class DHTerrainAccess {
 
     private IDhApiTerrainDataCache cache = null;
 
+    //todo crash when cache includes some far away chunks
     public void clearCache() {
         if (this.cache != null) {
             this.cache.clear();
