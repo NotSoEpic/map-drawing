@@ -6,7 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
+import org.jetbrains.annotations.Nullable;
 import org.joml.RoundingMode;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
@@ -15,122 +15,109 @@ import wawa.wayfinder.Rendering;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.data.PageManager;
 import wawa.wayfinder.map.stamp_bag.StampInformation;
+import wawa.wayfinder.map.stamp_bag.StampTexture;
 import wawa.wayfinder.map.widgets.MapWidget;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 public class StampTool extends Tool {
-    public static StampTool INSTANCE = new StampTool();
-    private static final ResourceLocation TEXTURE = WayfinderClient.id("tool/stamp/stamp");
-    private final List<InfoAndID> idList = new ArrayList<>();
-    private int pointer;
+	public static StampTool INSTANCE = new StampTool();
+	private static final ResourceLocation TEXTURE = WayfinderClient.id("tool/stamp/stamp");
 
-    public StampTool() {
-    }
+	private StampInformation information = null;
+	private boolean registeredTexture = false;
+	private ResourceLocation textureLoc = null;
 
-    @Override
-    public void mouseDown(PageManager activePage, MapWidget.MouseType mouseType, Vector2d world) {
-        if (mouseType == MapWidget.MouseType.LEFT) {
-            if (!idList.isEmpty()) {
-                InfoAndID infoAndID = idList.get(pointer);
-                NativeImage texture = infoAndID.info.getTextureManager().getTexture();
-                if (texture == null) {
-                    return;
-                }
+	//effectively our on select now!
+	public void setActiveStamp(@Nullable StampInformation stampInformation) {
+		changeStamp(stampInformation);
+	}
 
-                world = world.add(0, 8);
-                final Vector2ic end = new Vector2i(world, RoundingMode.FLOOR);
+	@Override
+	public void onDeselect() {
+		changeStamp(null);
+		Minecraft.getInstance().getTextureManager().release(textureLoc);
+		registeredTexture = false;
+		textureLoc = null;
+	}
 
-                activePage.putRegion(end.x() - texture.getWidth() / 2, end.y() - texture.getHeight() / 2, texture.getWidth(), texture.getHeight(),
-                        (dx, dy, old) -> {
-                            int pixelColor = texture.getPixelRGBA(dx, dy);
-                            if (pixelColor == 0) {
-                                return activePage.getPixelARGB((end.x() - texture.getWidth() / 2) + dx, (end.y() - texture.getHeight() / 2) + dy);
-                            } else {
-                                return texture.getPixelRGBA(dx, dy);
-                            }
-                        }
-                );
-            }
-        }
-    }
+	private void changeStamp(@Nullable StampInformation stampInformation) {
+		if (information != stampInformation) {
+			if (information != null) {
+				information.getTextureManager().removeUser();
+			}
 
-    public void setActiveStamp(StampInformation stamp) {
-        for (InfoAndID id : idList) {
-            if (id.info == stamp) {
-                pointer = id.order;
-                return;
-            }
-        }
-    }
+			if (stampInformation != null) {
+				stampInformation.getTextureManager().addUser();
+			}
+		}
 
-    @Override
-    public void onSelect() {
-        ArrayList<StampInformation> collection = new ArrayList<>();
-        WayfinderClient.STAMP_HANDLER.requestAllStamps(collection, false);
-        for (int i = 0; i < collection.size(); i++) {
-            StampInformation si = collection.get(i);
+		this.information = stampInformation;
+	}
 
-            si.getTextureManager().addUser();
-            idList.add(new InfoAndID(WayfinderClient.id("stamp_tool_" + i), si, new AtomicBoolean(), i));
-        }
-    }
+	@Override
+	public void mouseDown(PageManager activePage, MapWidget.MouseType mouseType, Vector2d world) {
+		if (mouseType == MapWidget.MouseType.LEFT) {
+			if (information != null) { //idk how this would be the case...
+				StampTexture manager = information.getTextureManager();
+				NativeImage texture = manager.getTexture();
+				if (texture == null) {
+					return;
+				}
 
-    @Override
-    public void onDeselect() {
-        for (InfoAndID id : idList) {
-            Minecraft.getInstance().getTextureManager().release(id.id);
-            id.info.getTextureManager().removeUser();
-            id.textureRegistered.set(false);
-        }
+				//just making sure we can actually see the texture AND minecraft knows about it first
+				if (registeredTexture) {
+					world = world.add(0, 8);
+					final Vector2ic end = new Vector2i(world, RoundingMode.FLOOR);
 
-        idList.clear();
-        pointer = 0;
-    }
+					activePage.putRegion(end.x() - texture.getWidth() / 2, end.y() - texture.getHeight() / 2, texture.getWidth(), texture.getHeight(),
+							(dx, dy, old) -> {
+								int pixelColor = texture.getPixelRGBA(dx, dy);
+								if (pixelColor == 0) {
+									return activePage.getPixelARGB((end.x() - texture.getWidth() / 2) + dx, (end.y() - texture.getHeight() / 2) + dy);
+								} else {
+									return texture.getPixelRGBA(dx, dy);
+								}
+							}
+					);
+				}
+			}
+		}
+	}
 
-    @Override
-    public void controlScroll(PageManager activePage, double mouseX, double mouseY, double scrollY) {
-        pointer += (int) scrollY;
-        pointer = Mth.clamp(pointer, 0, idList.size() - 1);
-    }
+	@Override
+	public void renderWorld(GuiGraphics graphics, int worldX, int worldY, double xOff, double yOff) {
+		if (information != null) {
+			StampTexture manager = information.getTextureManager();
+			NativeImage texture = manager.getTexture();
+			if (texture == null) {
+				return;
+			}
 
-    @Override
-    public void renderScreen(GuiGraphics graphics, double mouseX, double mouseY) {
-        graphics.blitSprite(TEXTURE, (int) mouseX - 8, (int) mouseY - 8, 16, 16);
-    }
+			if (!registeredTexture) {
+				registeredTexture = true;
+				ResourceLocation managerLocation = WayfinderClient.id("stamp_tool_image");
+				this.textureLoc = managerLocation;
 
-    @Override
-    public void renderWorld(GuiGraphics graphics, int worldX, int worldY, double xOff, double yOff) {
-        if (!idList.isEmpty()) {
-            InfoAndID infoAndID = idList.get(pointer);
-            NativeImage texture = infoAndID.info.getTextureManager().getTexture();
-            if (texture == null) {
-                return;
-            }
+				Minecraft.getInstance().getTextureManager().register(managerLocation, manager);
+			}
 
-            if (!infoAndID.textureRegistered.get()) {
-                infoAndID.textureRegistered.set(true);
-                Minecraft.getInstance().getTextureManager().register(infoAndID.id, infoAndID.info().getTextureManager());
-            }
+			final RenderType renderType = VeilRenderType.get(Rendering.RenderTypes.PALETTE_SWAP, textureLoc);
+			if (renderType == null) {
+				return;
+			}
 
-            final RenderType renderType = VeilRenderType.get(Rendering.RenderTypes.PALETTE_SWAP, infoAndID.id);
-            if (renderType == null) {
-                return;
-            }
+			worldY = worldY + 8;
 
-            worldY = worldY + 8;
+			Rendering.renderTypeBlit(graphics, renderType, worldX + xOff - (double) (texture.getWidth() / 2), worldY + yOff - (double) (texture.getHeight() / 2), 0, 0f, 0f,
+					texture.getWidth(), texture.getHeight(), texture.getWidth(), texture.getHeight(), 1);
 
-            Rendering.renderTypeBlit(graphics, renderType, worldX + xOff - (double) (texture.getWidth() / 2), worldY + yOff - (double) (texture.getHeight() / 2), 0, 0f, 0f,
-                    texture.getWidth(), texture.getHeight(), texture.getWidth(), texture.getHeight(), 1);
+			graphics.renderOutline((int) (worldX + xOff - (double) (texture.getWidth() / 2)), (int) (worldY + yOff - (double) (texture.getHeight() / 2)),
+					texture.getWidth(), texture.getHeight(),
+					0xff000000);
+		}
+	}
 
-            graphics.renderOutline((int) (worldX + xOff - (double) (texture.getWidth() / 2)), (int) (worldY + yOff - (double) (texture.getHeight() / 2)),
-                    texture.getWidth(), texture.getHeight(),
-                    0xff000000);
-        }
-    }
-
-    public record InfoAndID(ResourceLocation id, StampInformation info, AtomicBoolean textureRegistered, int order) {
-    }
+	@Override
+	public void renderScreen(GuiGraphics graphics, double mouseX, double mouseY) {
+		graphics.blitSprite(TEXTURE, (int) mouseX - 8, (int) mouseY - 8, 16, 16);
+	}
 }

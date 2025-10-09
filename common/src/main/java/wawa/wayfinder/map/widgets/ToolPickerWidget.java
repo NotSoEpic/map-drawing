@@ -121,7 +121,7 @@ public class ToolPickerWidget extends AbstractWidget {
         }
     }
 
-    public NativeImage getCopiedImage() {
+    public NativeImage getImageFromScissorTool() {
         return CopyTool.INSTANCE.clipboard;
     }
 

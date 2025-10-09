@@ -1,5 +1,6 @@
 package wawa.wayfinder.map;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -86,9 +87,15 @@ public class StampBagScreen {
 
     private void createSaveWidgets() {
         confirmSave = new GUIElementButton(0, 0, 16, GUIElementAtlases.STAMP_BAG_SAVE_CONFIRM, (b) -> {
-            if (!saveText.getValue().isEmpty() && mapScreen != null && mapScreen.toolPicker.getCopiedImage() != null) {
-                WayfinderClient.STAMP_HANDLER.addNewStamp(mapScreen.toolPicker.getCopiedImage(), saveText.getValue());
-                saveText.setValue("");
+            if (!saveText.getValue().isEmpty() && mapScreen != null) {
+	            NativeImage clipboard = mapScreen.toolPicker.getImageFromScissorTool();
+	            if (clipboard != null) {
+		            NativeImage copied = new NativeImage(clipboard.getWidth(), clipboard.getHeight(), false);
+					copied.copyFrom(clipboard);
+
+		            WayfinderClient.STAMP_HANDLER.addNewStamp(copied, saveText.getValue());
+		            saveText.setValue("");
+	            }
             }
 
             changeStage(ScreenState.IDLE);
