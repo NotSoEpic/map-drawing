@@ -35,10 +35,10 @@ public class ToolPickerWidget extends AbstractWidget {
 
         this.tools.add(new SingleToolWidget(
                 this.getX(), offsetFinalY(0),
-                WayfinderClient.id("tool/paw"),
-                WayfinderClient.id("tool/paw_highlight"),
+                WayfinderClient.id("tool/pan"),
+                WayfinderClient.id("tool/pan_highlight"),
                 (w) -> PanTool.INSTANCE,
-                Component.literal("paw")
+                Component.literal("pan")
         ));
 
         this.tools.add(new SingleToolWidget(

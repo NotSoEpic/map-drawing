@@ -19,6 +19,7 @@ import wawa.wayfinder.Helper;
 import wawa.wayfinder.LerpedVector2d;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.map.stamp_bag.widgets.StampBagWidget;
+import wawa.wayfinder.map.tool.PanTool;
 import wawa.wayfinder.map.widgets.CompassRoseWidget;
 import wawa.wayfinder.map.widgets.DebugTextRenderable;
 import wawa.wayfinder.map.widgets.MapWidget;
@@ -71,7 +72,13 @@ public class MapScreen extends Screen {
         this.compassRose = new CompassRoseWidget(this.width - 45, this.height - 45);
         this.addRenderableOnly(this.compassRose);
         this.addRenderableOnly(new DebugTextRenderable(this));
-        GLFW.glfwSetInputMode(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
+
+        if (WayfinderClient.TOOL_MANAGER.get() instanceof PanTool) {
+            GLFW.glfwSetInputMode(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
+        } else {
+            GLFW.glfwSetInputMode(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
+        }
+
 //        if (!cursorAdjusted) { // Init is run whenever the screen is resized & the cursor is set in the super of the constructor. its evil but it works
 //            Window window = Minecraft.getInstance().getWindow();
 //            GLFW.glfwSetCursorPos(window.getWindow(), window.getScreenWidth() / 2f, window.getScreenHeight() / 2.75f);

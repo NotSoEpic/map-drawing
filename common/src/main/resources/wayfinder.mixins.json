@@ -15,6 +15,7 @@
     "VeilImGuiImplMixin",
     "VeilRenderSystemMixin",
     "coordinates_config.DebugScreenOverlayMixin",
+    "coordinates_config.GuiMixin",
     "coordinates_config.KeyboardHandlerMixin",
     "coordinates_config.PlayerMixin"
   ],

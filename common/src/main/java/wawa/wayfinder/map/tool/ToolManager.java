@@ -17,8 +17,8 @@ public class ToolManager {
         this.tool.onDeselect();
         this.previous = this.tool;
         this.tool = tool;
-        this.tool.onSelect();
         GLFW.glfwSetInputMode(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
+        this.tool.onSelect();
     }
 
     public Tool get() {
