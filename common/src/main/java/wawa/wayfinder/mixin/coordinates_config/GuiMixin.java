@@ -11,7 +11,7 @@ import wawa.wayfinder.config.WayfinderClientConfig;
 @Mixin(Gui.class)
 public class GuiMixin {
     @WrapOperation(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/DebugScreenOverlay;showDebugScreen()Z"))
-            private boolean wayfinder$showDebugScreen(DebugScreenOverlay instance, Operation<Boolean> original) {
+	private boolean wayfinder$showDebugScreen(DebugScreenOverlay instance, Operation<Boolean> original) {
         if(!WayfinderClientConfig.REDUCED_DEBUG_LEVEL.get().allowsRotation()) {
             return false;
         }

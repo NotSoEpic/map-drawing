@@ -1,6 +1,5 @@
 package wawa.wayfinder.map;
 
-import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -20,7 +19,7 @@ import wawa.wayfinder.LerpedVector2d;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.map.stamp_bag.widgets.StampBagWidget;
 import wawa.wayfinder.map.tool.PanTool;
-import wawa.wayfinder.map.widgets.CompassRoseWidget;
+import wawa.wayfinder.map.widgets.CompassWidget;
 import wawa.wayfinder.map.widgets.DebugTextRenderable;
 import wawa.wayfinder.map.widgets.MapWidget;
 import wawa.wayfinder.map.widgets.ToolPickerWidget;
@@ -37,7 +36,7 @@ public class MapScreen extends Screen {
     public Vector2d backgroundPanning = new Vector2d(); // panning irrespective of zoom
     private MapWidget mapWidget;
     public ToolPickerWidget toolPicker;
-    public CompassRoseWidget compassRose;
+    public CompassWidget compassWidget;
 
     public List<AbstractWidget> allWidgets = new ArrayList<>();
 
@@ -69,8 +68,8 @@ public class MapScreen extends Screen {
         allWidgets.add(stampBag);
         addRenderableWidget(stampBag);
 
-        this.compassRose = new CompassRoseWidget(this.width - 45, this.height - 45);
-        this.addRenderableOnly(this.compassRose);
+        this.compassWidget = new CompassWidget(this.width - 100, this.height - 90);
+        this.addRenderableOnly(this.compassWidget);
         this.addRenderableOnly(new DebugTextRenderable(this));
 
         if (WayfinderClient.TOOL_MANAGER.get() instanceof PanTool) {
