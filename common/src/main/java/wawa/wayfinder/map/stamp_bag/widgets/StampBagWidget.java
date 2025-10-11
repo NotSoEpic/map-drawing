@@ -24,8 +24,14 @@ public class StampBagWidget extends AbstractWidget {
         if ((mapScreen.toolPicker.getImageFromScissorTool() != null & WayfinderClient.TOOL_MANAGER.get() instanceof CopyTool)
                 || StampBagScreen.INSTANCE.getState() != StampBagScreen.ScreenState.IDLE) {
             GUIElementAtlases.STAMP_BAG_OPEN.render(guiGraphics, getX(), getY());
+            if (isHovered) {
+                GUIElementAtlases.STAMP_BAG_OPEN_HIGHLIGHT.render(guiGraphics, getX() - 1, getY() - 1);
+            }
         } else {
             GUIElementAtlases.STAMP_BAG_CLOSED.render(guiGraphics, getX(), getY());
+            if (isHovered) {
+                GUIElementAtlases.STAMP_BAG_CLOSED_HIGHLIGHT.render(guiGraphics, getX() - 1, getY() - 1);
+            }
         }
     }
 

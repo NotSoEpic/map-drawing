@@ -11,6 +11,7 @@ import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.gui.GUIElementAtlases;
 import wawa.wayfinder.map.stamp_bag.StampInformation;
 import wawa.wayfinder.map.stamp_bag.widgets.GUIElementButton;
+import wawa.wayfinder.map.stamp_bag.widgets.StampBagWidget;
 import wawa.wayfinder.map.stamp_bag.widgets.StampEntryWidget;
 import wawa.wayfinder.map.tool.StampBagDebuggerTool;
 
@@ -363,7 +364,7 @@ public class StampBagScreen {
 	public void mouseClicked(double mouseX, double mouseY, int button) {
 		if (state != ScreenState.IDLE && state != ScreenState.SAVING) {
 			int browseBGX = (this.mapScreen.width - 15 - 16 / 2) - (164) - 21;
-			if (mouseX < browseBGX || mouseX > browseBGX + browseBGWidth || mouseY < browseBGY || mouseY > browseBGY + browseBGHeight) {
+			if ((mouseX < browseBGX || mouseX > browseBGX + browseBGWidth || mouseY < browseBGY || mouseY > browseBGY + browseBGHeight) && !this.mapScreen.stampBag.isHovered()) {
 				changeStage(ScreenState.IDLE);
 			}
 		}
