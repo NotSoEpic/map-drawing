@@ -24,6 +24,14 @@ public class LangGen extends LanguageProvider {
         this.add(NeoKeyMappings.BRUSH, "Pick Brush");
         this.add(NeoKeyMappings.ERASER, "Pick Eraser");
 
+        this.add("wayfinder.tool.pan", "Deselect Tool");
+        this.add("wayfinder.tool.pen", "Pen");
+        this.add("wayfinder.tool.brush", "Brush");
+        this.add("wayfinder.tool.eraser", "Eraser");
+        this.add("wayfinder.tool.pin", "Pin");
+        this.add("wayfinder.tool.scissors", "Copy");
+        this.add("wayfinder.tool.stamp", "Stamp Bag");
+
         this.add("item.wayfinder.spyglass.use_tooltip", "Attack while scoped in to place a temporary pin");
     }
 

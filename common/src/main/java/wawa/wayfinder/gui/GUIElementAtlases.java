@@ -27,8 +27,9 @@ public record GUIElementAtlases(
             STAMP_BAG_BROWSE_ENTRY = create(STAMP_BAG_SAVE_LOC, 0, 32, 128, 32, STAMP_BAG_SAVE_SCREEN_DIMENSIONS),
             STAMP_BAG_BROWSE_UP = create(STAMP_BAG_SAVE_LOC, 32, 64, 16, 16, STAMP_BAG_SAVE_SCREEN_DIMENSIONS),
             STAMP_BAG_BROWSE_DOWN = create(STAMP_BAG_SAVE_LOC, 48, 64, 16, 16, STAMP_BAG_SAVE_SCREEN_DIMENSIONS),
-            STAMP_BAG_BROWSE_FAVORITE = create(STAMP_BAG_SAVE_LOC, 0, 64, 16, 16, STAMP_BAG_SAVE_SCREEN_DIMENSIONS),
-            STAMP_BAG_BROWSE_TRASH = create(STAMP_BAG_SAVE_LOC, 16, 64, 16, 16, STAMP_BAG_SAVE_SCREEN_DIMENSIONS);
+            STAMP_BAG_BROWSE_UNFAVORITE = create(STAMP_BAG_SAVE_LOC, 0, 64, 16, 16, STAMP_BAG_SAVE_SCREEN_DIMENSIONS),
+            STAMP_BAG_BROWSE_FAVORITE = create(STAMP_BAG_SAVE_LOC, 0, 80, 16, 16, STAMP_BAG_SAVE_SCREEN_DIMENSIONS),
+    STAMP_BAG_BROWSE_TRASH = create(STAMP_BAG_SAVE_LOC, 16, 64, 16, 16, STAMP_BAG_SAVE_SCREEN_DIMENSIONS);
 
     public static GUIElementAtlases create(ResourceLocation loc, int startX, int startY, int width, int height, int dimension) {
         return new GUIElementAtlases(loc, startX, startY, width, height, dimension);

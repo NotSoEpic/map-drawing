@@ -6,6 +6,8 @@ import foundry.veil.api.client.render.rendertype.VeilRenderType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import wawa.wayfinder.Rendering;
@@ -82,20 +84,25 @@ public class StampEntryWidget extends AbstractStampScreenWidget {
         //TODO:center
         ps.translate(getX() + 1, getY() + 1, 0);
 
-        float scale = Math.min(60f / tex.getWidth() / 2f, 60f / tex.getHeight() / 2f);
+        float scale = Math.min(56f / tex.getWidth() / 2f, 56f / tex.getHeight() / 2f);
         ps.scale(scale, scale, 1);
 
-        Rendering.renderTypeBlit(guiGraphics, renderType, 0, 0, 0, 0f, 0f,
+        Rendering.renderTypeBlit(guiGraphics, renderType, 4.1, 4, 0, 0f, 0f,
                 manager.getTexture().getWidth(), manager.getTexture().getHeight(), manager.getTexture().getWidth(), manager.getTexture().getHeight(), 1);
         ps.popPose();
 
         ps.pushPose();
         guiGraphics.enableScissor(getX() + 36, getY() + 5, getX() + 123, getY() + 27);
-        ps.translate(getX() + 38, getY() + 10, 0);
-        ps.scale(1.5f, 1.5f, 1);
+        ps.translate(getX() + 38, getY() + 8, 0);
+        if (Minecraft.getInstance().font.width(stampInformation.getCustomName()) < 85) {
+            ps.translate(0, 4, 0);
+        }
+
+        // slight scale to handle wordwrap weirdness
+        ps.scale(1.05f, 1.05f, 1);
 
         //TODO: scroll
-        guiGraphics.drawString(Minecraft.getInstance().font, stampInformation.getCustomName(), 0, 0, Color.BLACK.getRGB(), false);
+        guiGraphics.drawWordWrap(Minecraft.getInstance().font, FormattedText.of(stampInformation.getCustomName()), 0, 0, 85, Color.WHITE.getRGB());
         guiGraphics.disableScissor();
         ps.popPose();
 

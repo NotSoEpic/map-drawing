@@ -143,7 +143,7 @@ public class StampBagScreen {
 				refreshStamps();
 			});
 
-			entry.favorite = new GUIElementButton(0, 0, 16, GUIElementAtlases.STAMP_BAG_BROWSE_FAVORITE, (b) -> {
+			entry.favorite = new GUIElementButton(0, 0, 16, GUIElementAtlases.STAMP_BAG_BROWSE_UNFAVORITE, (b) -> {
 				StampInformation si = entry.self.stampInformation;
 				if (si != null) {
 					si.setFavorited(!si.isFavorited());
@@ -355,7 +355,7 @@ public class StampBagScreen {
 						maxPageCount = WayfinderClient.STAMP_HANDLER.getTotalEntryCount();
 					}
 
-					guiGraphics.drawString(Minecraft.getInstance().font, "%s/%s".formatted(maxPageCount == 0 ? 0 : page, (int) Math.ceil(maxPageCount / 3f)), browseBGX + GUIElementAtlases.STAMP_BAG_BROWSE_ENTRY.width() + 27, browseBGY + 74, Color.BLACK.getRGB(), false);
+					guiGraphics.drawString(Minecraft.getInstance().font, "%s/%s".formatted(maxPageCount == 0 ? 0 : page, (int) Math.ceil(maxPageCount / 3f)), browseBGX + GUIElementAtlases.STAMP_BAG_BROWSE_ENTRY.width() + 27, browseBGY + 74, Color.WHITE.getRGB(), true);
 				}
 			}
 		}

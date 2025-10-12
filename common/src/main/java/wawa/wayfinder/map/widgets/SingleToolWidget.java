@@ -6,6 +6,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.data.Pin;
@@ -14,6 +15,7 @@ import wawa.wayfinder.map.tool.PinTool;
 import wawa.wayfinder.map.tool.Tool;
 
 import java.awt.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
@@ -21,18 +23,25 @@ public class SingleToolWidget extends AbstractWidget {
     private final ResourceLocation sprite;
     private final ResourceLocation highlight;
     protected final Function<SingleToolWidget, Tool> toolFunction;
+    private String id = "";
+
     public SingleToolWidget(final int x, final int y, final ResourceLocation sprite, final ResourceLocation highlight,
                             final Function<SingleToolWidget, Tool> toolFunction, final Component message) {
         super(x, y, 16, 16, message);
         this.sprite = sprite;
         this.highlight = highlight;
         this.toolFunction = toolFunction;
+
+        if (sprite != null) {
+            this.id = "wayfinder.tool." + Arrays.stream(sprite.getPath().split("/")).toList().get(sprite.getPath().split("/").length - 1);
+        }
     }
 
     @Override
     protected void renderWidget(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
         if (this.isMouseOver(mouseX, mouseY)) {
             guiGraphics.blitSprite(this.highlight, this.getX() - 1, this.getY() - 1, 18, 18);
+            guiGraphics.renderTooltip(Minecraft.getInstance().font, Component.translatable(id), id.contains("brush") ? this.getX() - 60 - Minecraft.getInstance().font.width(Component.translatable(id)) : mouseX, mouseY);
         }
         guiGraphics.blitSprite(this.sprite, this.getX(), this.getY(), 16, 16);
     }
@@ -47,7 +56,8 @@ public class SingleToolWidget extends AbstractWidget {
     }
 
     @Override
-    protected void updateWidgetNarration(final NarrationElementOutput narrationElementOutput) {}
+    protected void updateWidgetNarration(final NarrationElementOutput narrationElementOutput) {
+    }
 
     public static class BrushWidget extends SingleToolWidget {
         public PaletteDrawTool last;
@@ -58,7 +68,7 @@ public class SingleToolWidget extends AbstractWidget {
             super(x, y,
                     WayfinderClient.id("tool/brush/brush"),
                     WayfinderClient.id("tool/brush/brush_highlight"),
-                    w -> ((BrushWidget)w).last,
+                    w -> ((BrushWidget) w).last,
                     Component.literal("brush")
             );
             this.colorPicker = new ColorPickerWidget(this.getX() - 5, this.getY(), this);
@@ -95,9 +105,9 @@ public class SingleToolWidget extends AbstractWidget {
 
         @Override
         public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
-	        if (!this.colorPicker.isActive()) {
-		        return false;
-	        }
+            if (!this.colorPicker.isActive()) {
+                return false;
+            }
 
             if (!super.mouseClicked(mouseX, mouseY, button)) {
                 return this.colorPicker.mouseClicked(mouseX, mouseY, button);
@@ -118,7 +128,7 @@ public class SingleToolWidget extends AbstractWidget {
         }
 
         public PinTool getTool() {
-            return ((PinTool)this.toolFunction.apply(this));
+            return ((PinTool) this.toolFunction.apply(this));
         }
 
         @Override
@@ -140,9 +150,9 @@ public class SingleToolWidget extends AbstractWidget {
 
         @Override
         public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
-			if (!this.pinPicker.isActive()) {
-				return false;
-			}
+            if (!this.pinPicker.isActive()) {
+                return false;
+            }
 
             if (!super.mouseClicked(mouseX, mouseY, button)) {
                 return this.pinPicker.mouseClicked(mouseX, mouseY, button);

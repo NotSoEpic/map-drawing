@@ -8,5 +8,12 @@
   "key.wayfinder.pencil": "Pick Pencil",
   "key.wayfinder.redo": "Redo",
   "key.wayfinder.swap": "Swap to Previous Tool",
-  "key.wayfinder.undo": "Undo"
+  "key.wayfinder.undo": "Undo",
+  "wayfinder.tool.pan": "Deselect Tool",
+  "wayfinder.tool.pencil": "Pen",
+  "wayfinder.tool.brush": "Brush",
+  "wayfinder.tool.eraser": "Eraser",
+  "wayfinder.tool.pin": "Pin",
+  "wayfinder.tool.scissors": "Copy",
+  "wayfinder.tool.stamp": "Stamp Bag"
 }
