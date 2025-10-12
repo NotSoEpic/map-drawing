@@ -47,7 +47,7 @@ public class MultithreadedDHTerrainAccess {
 	}
 
 	public synchronized void clearThreadCache() {
-		executor.clearCache();
+//		executor.clearCache();
 	}
 
 	public synchronized void voidRequests() {

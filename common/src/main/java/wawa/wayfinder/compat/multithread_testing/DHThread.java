@@ -51,7 +51,7 @@ public class DHThread extends Thread {
 	}
 
 	@Nullable
-	public Vector3d clip(final Vec3 origin, final Vec3 direction, final int length) {
+	private Vector3d clip(final Vec3 origin, final Vec3 direction, final int length) {
 		if (!DhApi.Delayed.worldProxy.worldLoaded()) {
 			return null;
 		}
@@ -75,7 +75,7 @@ public class DHThread extends Thread {
 		return null;
 	}
 
-	public synchronized void clearCache() {
+	private synchronized void clearCache() {
 //		cache = null;
 //		cache = DhApi.Delayed.terrainRepo.getSoftCache();
 	}
