@@ -270,10 +270,14 @@ public class StampBagScreen {
 			StampEntry entry = entries[i];
 
 			if (!requestedInfo.isEmpty() && index >= 0 && index <= requestedInfo.size() - 1) {
-				entry.self.changeStampInformation(requestedInfo.get(index));
+				StampInformation si = requestedInfo.get(index);
+
+				entry.self.changeStampInformation(si);
 				addWidget(entry.self);
 				addWidget(entry.delete);
 				addWidget(entry.favorite);
+				entry.favorite.imageSwitch = si.isFavorited();
+
 				entry.addedWidgets = true;
 			} else {
 				removeWidget(entry.self);
