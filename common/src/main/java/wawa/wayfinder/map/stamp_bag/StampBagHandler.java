@@ -160,6 +160,7 @@ public class StampBagHandler {
 	private Future<MetaDataRecord> loadStableMetaData() {
 		if (state == SavingState.LOADING) {
 			return Util.ioPool().submit(() -> {
+				WayfinderClient.LOGGER.info("attempting to load stamps");
 				MetaDataRecord loadedRecord = null;
 
 				try {
@@ -186,6 +187,8 @@ public class StampBagHandler {
 	private Future<?> saveStableMetaData(MetaDataRecord record) {
 		if (state == SavingState.SAVING) {
 			return Util.ioPool().submit(() -> {
+				WayfinderClient.LOGGER.info("attempting to save stamps");
+
 				try {
 					JsonElement ele = META_DATA_CODEC.encodeStart(JsonOps.INSTANCE, record).getOrThrow();
 					JsonWriter jwriter = WayfinderClient.WAYFINDER_GSON.newJsonWriter(Files.newBufferedWriter(metaDataPath));
@@ -263,6 +266,7 @@ public class StampBagHandler {
 		stampThreads.add(Util.ioPool().submit(() -> {
 			Path stampPath = this.stampPath.resolve(si.getFileName());
 			try {
+				WayfinderClient.LOGGER.info("attempting to load stamp image for: {}", si.getFileName());
 				InputStream inputStream = Files.newInputStream(stampPath);
 				NativeImage image = NativeImage.read(inputStream);
 				si.setStampTexture(image);

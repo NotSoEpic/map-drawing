@@ -10,8 +10,8 @@ import net.minecraft.network.chat.Component;
 import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.gui.GUIElementAtlases;
 import wawa.wayfinder.map.stamp_bag.StampInformation;
+import wawa.wayfinder.map.stamp_bag.widgets.DualGUIElement;
 import wawa.wayfinder.map.stamp_bag.widgets.GUIElementButton;
-import wawa.wayfinder.map.stamp_bag.widgets.StampBagWidget;
 import wawa.wayfinder.map.stamp_bag.widgets.StampEntryWidget;
 import wawa.wayfinder.map.tool.StampBagDebuggerTool;
 
@@ -86,9 +86,12 @@ public class StampBagScreen {
 			refreshStamps();
 		});
 
-		favorites = new GUIElementButton(0, 0, 16, GUIElementAtlases.STAMP_BAG_BROWSE_FAVORITE, b -> {
+		favorites = new DualGUIElement(0, 0, 16, GUIElementAtlases.STAMP_BAG_BROWSE_UNFAVORITE, GUIElementAtlases.STAMP_BAG_BROWSE_FAVORITE, b -> {
 			usingFavorites ^= true;
 			page = 1;
+
+			((DualGUIElement) b).imageSwitch = usingFavorites;
+
 			refreshStamps();
 		});
 
@@ -134,6 +137,12 @@ public class StampBagScreen {
 			entries[i] = new StampEntry();
 			StampEntry entry = entries[i];
 
+			entry.self = new StampEntryWidget(0, 0, this, (wid) -> {
+//				if (wid.stampInformation != null && wid.stampInformation.getTextureManager().getTexture() != null) {
+//                    CopyTool.INSTANCE.clipboard = wid.stampInformation.getTextureManager().getTexture();
+//				}
+			}, WayfinderClient.id("stamp_widget_" + i));
+
 			entry.delete = new GUIElementButton(0, 0, 16, GUIElementAtlases.STAMP_BAG_BROWSE_TRASH, (b) -> {
 				StampInformation si = entry.self.stampInformation;
 				if (si != null) {
@@ -143,19 +152,14 @@ public class StampBagScreen {
 				refreshStamps();
 			});
 
-			entry.favorite = new GUIElementButton(0, 0, 16, GUIElementAtlases.STAMP_BAG_BROWSE_UNFAVORITE, (b) -> {
+			entry.favorite = new DualGUIElement(0, 0, 16, GUIElementAtlases.STAMP_BAG_BROWSE_UNFAVORITE, GUIElementAtlases.STAMP_BAG_BROWSE_FAVORITE, (b) -> {
 				StampInformation si = entry.self.stampInformation;
 				if (si != null) {
 					si.setFavorited(!si.isFavorited());
+					((DualGUIElement) b).imageSwitch = si.isFavorited();
 					WayfinderClient.STAMP_HANDLER.setDirty();
 				}
 			});
-
-			entry.self = new StampEntryWidget(0, 0, this, (wid) -> {
-				if (wid.stampInformation != null && wid.stampInformation.getTextureManager().getTexture() != null) {
-//                    CopyTool.INSTANCE.clipboard = wid.stampInformation.getTextureManager().getTexture();
-				}
-			}, WayfinderClient.id("stamp_widget_" + i));
 		}
 	}
 
@@ -393,7 +397,7 @@ public class StampBagScreen {
 
 	public class StampEntry {
 
-		public GUIElementButton favorite;
+		public DualGUIElement favorite;
 		public GUIElementButton delete;
 		public StampEntryWidget self;
 
