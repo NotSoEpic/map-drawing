@@ -16,12 +16,12 @@ import java.util.concurrent.locks.LockSupport;
 public class DHThread extends Thread {
 
 	private final Queue<DhRequest> requests;
-//	private IDhApiTerrainDataCache cache;
+	private final IDhApiTerrainDataCache cache;
 	//cache clearing casues crashes, just going to remove it entirely
 
 	public DHThread(Queue<DhRequest> requests) {
 		this.requests = requests;
-//		this.cache = DhApi.Delayed.terrainRepo.getSoftCache();
+		this.cache = DhApi.Delayed.terrainRepo.getSoftCache();
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class DHThread extends Thread {
 				origin.x, origin.y, origin.z,
 				(float) direction.x, (float) direction.y, (float) direction.z,
 				length,
-				null
+				cache
 		);
 
 		if (result.success && result.payload != null) {
