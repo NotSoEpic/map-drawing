@@ -10,7 +10,8 @@ import org.joml.Vector3d;
 import wawa.wayfinder.DistantRaycast;
 import wawa.wayfinder.Helper;
 import wawa.wayfinder.WayfinderClient;
-import wawa.wayfinder.compat.DHTerrainAccess;
+import wawa.wayfinder.compat.multithread_testing.DhRequest;
+import wawa.wayfinder.compat.multithread_testing.MultithreadedDHTerrainAccess;
 import wawa.wayfinder.data.SpyglassPins;
 import wawa.wayfinder.map.MapScreen;
 import wawa.wayfinder.platform.Services;
@@ -24,12 +25,16 @@ public class InputListener {
             minecraft.level.playLocalSound(minecraft.getInstance().player, SoundEvents.BOOK_PAGE_TURN, SoundSource.MASTER, 0.5f, 1.0f);
 
             if (Helper.isUsingSpyglass(minecraft.player)) {
-                final Vector3d target = getEndingPosition(minecraft.player);
+                Vector3d target = getEndingPosition(minecraft.player);
                 if (target != null) {
                     WayfinderClient.PAGE_MANAGER.getSpyglassPins().add(target);
-                    minecraft.setScreen(new MapScreen(playerPosition, new Vector2d(target.x, target.z)));
+                } else {
+					target = new Vector3d(minecraft.player.getX(), minecraft.player.getY(), minecraft.player.getZ());
+	                WayfinderClient.PAGE_MANAGER.getSpyglassPins().addDelayedRequest(MultithreadedDHTerrainAccess.createRequest(minecraft.player));
                 }
-                return;
+
+	            minecraft.setScreen(new MapScreen(playerPosition, new Vector2d(target.x, target.z)));
+	            return;
             } else {
                 final int numPins = WayfinderClient.PAGE_MANAGER.getSpyglassPins().getPins().size();
                 if (numPins >= 1) {
@@ -56,7 +61,7 @@ public class InputListener {
                 player.getEyePosition(),
                 player.getLookAngle(),
                 Minecraft.getInstance().options.getEffectiveRenderDistance() * 16,
-                DHTerrainAccess.INSTANCE.getViewDistance()
+		        MultithreadedDHTerrainAccess.INSTANCE.getViewDistance()
         );
     }
 }

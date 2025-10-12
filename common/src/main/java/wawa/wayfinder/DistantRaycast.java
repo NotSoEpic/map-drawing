@@ -6,7 +6,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
-import wawa.wayfinder.compat.DHTerrainAccess;
 
 /**
  * Classloading-safe wrapper for optional Distant Horizons support
@@ -14,7 +13,7 @@ import wawa.wayfinder.compat.DHTerrainAccess;
 public class DistantRaycast {
     public static void clearCache() {
         if (WayfinderClient.isDHPresent()) {
-            DHTerrainAccess.INSTANCE.clearCache();
+//            DHTerrainAccess.INSTANCE.clearCache();
         }
     }
 
@@ -27,9 +26,9 @@ public class DistantRaycast {
             return new Vector3d(result.getLocation().x, result.getLocation().y, result.getLocation().z);
         }
         // todo maybe a config in case these raycasts are causing issues?
-        if (WayfinderClient.isDHPresent()) {
-            return DHTerrainAccess.INSTANCE.clip(start, direction, distantLength);
-        }
+//        if (WayfinderClient.isDHPresent()) {
+//            return DHTerrainAccess.INSTANCE.clip(start, direction, distantLength);
+//        }
         return null;
     }
 }
