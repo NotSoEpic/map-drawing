@@ -21,10 +21,11 @@ public final class WayfinderClient {
 
     public static final StampBagHandler STAMP_HANDLER = new StampBagHandler();
 
+	public static final int CHUNK_SIZE = 512;
+
     @ApiStatus.Internal
     public static final Gson WAYFINDER_GSON = new GsonBuilder().setLenient()
             .create();
-
 
     public static void init() {
         LOGGER.info("Hello from {}!", Services.PLATFORM.getPlatformName());

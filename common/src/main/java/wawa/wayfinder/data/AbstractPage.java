@@ -4,9 +4,10 @@ import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import org.jetbrains.annotations.Nullable;
+import wawa.wayfinder.WayfinderClient;
 
 /**
- * A 512x512 pixel/block region of map data
+ * A WayfinderClient.chunkSzexWayfinderClient.chunkSze pixel/block region of map data
  */
 public abstract class AbstractPage {
     // region coordinates
@@ -20,16 +21,16 @@ public abstract class AbstractPage {
     }
 
     public int left() {
-        return this.rx * 512;
+        return this.rx * WayfinderClient.CHUNK_SIZE;
     }
     public int top() {
-        return this.ry * 512;
+        return this.ry * WayfinderClient.CHUNK_SIZE;
     }
     public int right() {
-        return (this.rx + 1) * 512;
+        return (this.rx + 1) * WayfinderClient.CHUNK_SIZE;
     }
     public int bottom() {
-        return (this.ry + 1) * 512;
+        return (this.ry + 1) * WayfinderClient.CHUNK_SIZE;
     }
 
     /**

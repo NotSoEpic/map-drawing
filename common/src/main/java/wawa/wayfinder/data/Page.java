@@ -14,7 +14,7 @@ import wawa.wayfinder.Rendering;
 import wawa.wayfinder.WayfinderClient;
 
 /**
- * A 512x512 pixel area with associated {@link DynamicTexture} created from {@link EmptyPage}
+ * A WayfinderClient.chunkSzexWayfinderClient.chunkSze pixel area with associated {@link DynamicTexture} created from {@link EmptyPage}
  */
 public class Page extends AbstractPage {
     private final ResourceLocation textureID;
@@ -30,8 +30,8 @@ public class Page extends AbstractPage {
     }
 
     public Page(final int rx, final int ry) {
-        this(rx, ry, new DynamicTexture(512, 512, false));
-        this.texture.getPixels().fillRect(0, 0, 512, 512, 0);
+        this(rx, ry, new DynamicTexture(WayfinderClient.CHUNK_SIZE, WayfinderClient.CHUNK_SIZE, false));
+        this.texture.getPixels().fillRect(0, 0, WayfinderClient.CHUNK_SIZE, WayfinderClient.CHUNK_SIZE, 0);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class Page extends AbstractPage {
 
     @Override
     public NativeImage unboChanges(final NativeImage replacement) {
-        final NativeImage previous = NativeImageTracker.newImage(512, 512, false);
+        final NativeImage previous = NativeImageTracker.newImage(WayfinderClient.CHUNK_SIZE, WayfinderClient.CHUNK_SIZE, false);
         previous.copyFrom(this.texture.getPixels());
         this.texture.getPixels().copyFrom(replacement);
         replacement.close();
@@ -75,7 +75,7 @@ public class Page extends AbstractPage {
         }
 
         Rendering.renderTypeBlit(guiGraphics, renderType,
-                this.left() + xOff, this.top() + yOff, 0, 0.0f, 0.0f, 512, 512, 512, 512, 1);
+                this.left() + xOff, this.top() + yOff, 0, 0.0f, 0.0f, WayfinderClient.CHUNK_SIZE, WayfinderClient.CHUNK_SIZE, WayfinderClient.CHUNK_SIZE, WayfinderClient.CHUNK_SIZE, 1);
     }
 
     /**

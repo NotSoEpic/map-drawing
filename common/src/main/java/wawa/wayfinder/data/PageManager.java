@@ -7,8 +7,8 @@ import net.minecraft.world.level.Level;
 import org.joml.Vector2dc;
 import org.joml.Vector2i;
 import wawa.wayfinder.NativeImageTracker;
+import wawa.wayfinder.WayfinderClient;
 import wawa.wayfinder.data.history.OperationHistory;
-import wawa.wayfinder.map.stamp_bag.StampBagHandler;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -118,7 +118,7 @@ public class PageManager {
 
             final Vector2i key = new Vector2i(page.rx, page.ry);
             if (history.get(key) == null) {
-                final NativeImage image = NativeImageTracker.newImage(512, 512, true);
+                final NativeImage image = NativeImageTracker.newImage(WayfinderClient.CHUNK_SIZE, WayfinderClient.CHUNK_SIZE, true);
                 final NativeImage pageImg = page.getImage();
                 if (pageImg != null) {
                     image.copyFrom(pageImg);
@@ -133,8 +133,8 @@ public class PageManager {
      * Absolute world coordinates
      */
     public void putPixel(final int x, final int y, final int RGBA) {
-        final int rx = Math.floorDiv(x, 512);
-        final int ry = Math.floorDiv(y, 512);
+        final int rx = Math.floorDiv(x, WayfinderClient.CHUNK_SIZE);
+        final int ry = Math.floorDiv(y, WayfinderClient.CHUNK_SIZE);
 
 
         final AbstractPage newPage = this.getOrCreatePage(rx, ry);
@@ -144,13 +144,13 @@ public class PageManager {
 
         this.snapshotPage(newPage);
 
-        newPage.setPixel(x - rx * 512, y - ry * 512, RGBA);
+        newPage.setPixel(x - rx * WayfinderClient.CHUNK_SIZE, y - ry * WayfinderClient.CHUNK_SIZE, RGBA);
     }
 
     public int getPixelARGB(final int x, final int y) {
-        final int rx = Math.floorDiv(x, 512);
-        final int ry = Math.floorDiv(y, 512);
-        return this.getOrCreatePage(rx, ry).getPixel(x - rx * 512, y - ry * 512);
+        final int rx = Math.floorDiv(x, WayfinderClient.CHUNK_SIZE);
+        final int ry = Math.floorDiv(y, WayfinderClient.CHUNK_SIZE);
+        return this.getOrCreatePage(rx, ry).getPixel(x - rx * WayfinderClient.CHUNK_SIZE, y - ry * WayfinderClient.CHUNK_SIZE);
     }
 
     public void putSquare(final int x, final int y, final int RGBA, final int r) {
@@ -167,22 +167,22 @@ public class PageManager {
     }
 
     public void forEachInRegion(final int x, final int y, final int w, final int h, final RegionGetter forEach) {
-        final int rx1 = Math.floorDiv(x, 512); // leftmost region
-        final int ry1 = Math.floorDiv(y, 512); // upmost region
-        final int rx2 = Math.floorDiv(x + w, 512); // rightmost region
-        final int ry2 = Math.floorDiv(y + h, 512); // bottommost region
+        final int rx1 = Math.floorDiv(x, WayfinderClient.CHUNK_SIZE); // leftmost region
+        final int ry1 = Math.floorDiv(y, WayfinderClient.CHUNK_SIZE); // upmost region
+        final int rx2 = Math.floorDiv(x + w, WayfinderClient.CHUNK_SIZE); // rightmost region
+        final int ry2 = Math.floorDiv(y + h, WayfinderClient.CHUNK_SIZE); // bottommost region
         for (int i = rx1; i <= rx2; i++) { // current region x
             for (int j = ry1; j <= ry2; j++) { // current region y
                 final AbstractPage page = this.getOrCreatePage(i, j);
-                final int dx1 = i == rx1 ? x - rx1 * 512 : 0; // leftmost relative pixel in region (0-511)
-                final int dy1 = j == ry1 ? y - ry1 * 512 : 0; // topmost relative pixel in region (0-511)
-                final int dx2 = i == rx2 ? x - rx2 * 512 + w : 512; // rightmost relative pixel in region (1-512)
-                final int dy2 = j == ry2 ? y - ry2 * 512 + h : 512; // bottommost relative pixel in region (1-512)
+                final int dx1 = i == rx1 ? x - rx1 * WayfinderClient.CHUNK_SIZE : 0; // leftmost relative pixel in region (0-511)
+                final int dy1 = j == ry1 ? y - ry1 * WayfinderClient.CHUNK_SIZE : 0; // topmost relative pixel in region (0-511)
+                final int dx2 = i == rx2 ? x - rx2 * WayfinderClient.CHUNK_SIZE + w : WayfinderClient.CHUNK_SIZE; // rightmost relative pixel in region (1-WayfinderClient.chunkSze)
+                final int dy2 = j == ry2 ? y - ry2 * WayfinderClient.CHUNK_SIZE + h : WayfinderClient.CHUNK_SIZE; // bottommost relative pixel in region (1-WayfinderClient.chunkSze)
                 for (int k = dx1; k < dx2; k++) { // current relative pixel x
                     for (int l = dy1; l < dy2; l++) { // current relative pixel y
                         forEach.of(
-                                k + i * 512 - x,
-                                l + j * 512 - y,
+                                k + i * WayfinderClient.CHUNK_SIZE - x,
+                                l + j * WayfinderClient.CHUNK_SIZE - y,
                                 page.getPixel(k, l)
                         );
                     }
@@ -198,23 +198,23 @@ public class PageManager {
 
     public void putRegion(final int x, final int y, final int w, final int h, final RegionMapping regionMapping) {
         startSnapshot();
-        final int rx1 = Math.floorDiv(x, 512); // leftmost region
-        final int ry1 = Math.floorDiv(y, 512); // upmost region
-        final int rx2 = Math.floorDiv(x + w, 512); // rightmost region
-        final int ry2 = Math.floorDiv(y + h, 512); // bottommost region
+        final int rx1 = Math.floorDiv(x, WayfinderClient.CHUNK_SIZE); // leftmost region
+        final int ry1 = Math.floorDiv(y, WayfinderClient.CHUNK_SIZE); // upmost region
+        final int rx2 = Math.floorDiv(x + w, WayfinderClient.CHUNK_SIZE); // rightmost region
+        final int ry2 = Math.floorDiv(y + h, WayfinderClient.CHUNK_SIZE); // bottommost region
         for (int i = rx1; i <= rx2; i++) { // current region x
             for (int j = ry1; j <= ry2; j++) { // current region y
                 final AbstractPage page = this.getOrCreatePage(i, j);
                 this.snapshotPage(page);
-                final int dx1 = i == rx1 ? x - rx1 * 512 : 0; // leftmost relative pixel in region (0-511)
-                final int dy1 = j == ry1 ? y - ry1 * 512 : 0; // topmost relative pixel in region (0-511)
-                final int dx2 = i == rx2 ? x - rx2 * 512 + w : 512; // rightmost relative pixel in region (1-512)
-                final int dy2 = j == ry2 ? y - ry2 * 512 + h : 512; // bottommost relative pixel in region (1-512)
+                final int dx1 = i == rx1 ? x - rx1 * WayfinderClient.CHUNK_SIZE : 0; // leftmost relative pixel in region (0-511)
+                final int dy1 = j == ry1 ? y - ry1 * WayfinderClient.CHUNK_SIZE : 0; // topmost relative pixel in region (0-511)
+                final int dx2 = i == rx2 ? x - rx2 * WayfinderClient.CHUNK_SIZE + w : WayfinderClient.CHUNK_SIZE; // rightmost relative pixel in region (1-WayfinderClient.chunkSze)
+                final int dy2 = j == ry2 ? y - ry2 * WayfinderClient.CHUNK_SIZE + h : WayfinderClient.CHUNK_SIZE; // bottommost relative pixel in region (1-WayfinderClient.chunkSze)
                 for (int k = dx1; k < dx2; k++) { // current relative pixel x
                     for (int l = dy1; l < dy2; l++) { // current relative pixel y
                         page.setPixel(k, l, regionMapping.apply(
-                                k + i * 512 - x,
-                                l + j * 512 - y,
+                                k + i * WayfinderClient.CHUNK_SIZE - x,
+                                l + j * WayfinderClient.CHUNK_SIZE - y,
                                 page.getPixel(k, l)
                         ));
                     }

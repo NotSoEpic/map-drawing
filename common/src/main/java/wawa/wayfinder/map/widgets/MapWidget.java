@@ -57,8 +57,8 @@ public class MapWidget extends AbstractWidget {
 
         final Vector2d topLeftWorld = this.parent.screenToWorld(new Vector2d(this.getX(), this.getY()));
         final Vector2d bottomRightWorld = this.parent.screenToWorld(new Vector2d(this.getRight(), this.getBottom()));
-        final Vector2i topLeft = new Vector2i(topLeftWorld.x / 512, topLeftWorld.y / 512, RoundingMode.FLOOR);
-        final Vector2i bottomRight = new Vector2i(bottomRightWorld.x / 512, bottomRightWorld.y / 512, RoundingMode.CEILING);
+        final Vector2i topLeft = new Vector2i(topLeftWorld.x / WayfinderClient.CHUNK_SIZE, topLeftWorld.y / WayfinderClient.CHUNK_SIZE, RoundingMode.FLOOR);
+        final Vector2i bottomRight = new Vector2i(bottomRightWorld.x / WayfinderClient.CHUNK_SIZE, bottomRightWorld.y / WayfinderClient.CHUNK_SIZE, RoundingMode.CEILING);
 
         for (int x = topLeft.x; x < bottomRight.x; x++) {
             for (int y = topLeft.y; y < bottomRight.y; y++) {
