@@ -4,6 +4,7 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class DhRequest {
 	private final Vec3 origin;
@@ -13,7 +14,7 @@ public final class DhRequest {
 	private final Vector3d finishedLoc;
 	private final AtomicBoolean finished;
 
-	public volatile int ticksSinceRequested = 0;
+	public volatile AtomicInteger ticksSinceRequested;
 
 	public DhRequest(Vec3 origin, Vec3 direction, int length) {
 		this.origin = origin;
@@ -22,6 +23,7 @@ public final class DhRequest {
 
 		finishedLoc = new Vector3d();
 		finished = new AtomicBoolean();
+		ticksSinceRequested = new AtomicInteger();
 	}
 
 	public Vec3 origin() {
