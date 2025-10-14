@@ -27,7 +27,7 @@ public class MultithreadedDHTerrainAccess {
 	}
 
 	/**
-	 * Adds a request for the DH clip thread to perform a clip. <B/>
+	 * Adds a request for the DH clip thread to perform a clip.
 	 * Make sure to hold onto the object passed in, as it will contain the finished Vector3D location.
 	 *
 	 * @param request The request to perform a clip on.
