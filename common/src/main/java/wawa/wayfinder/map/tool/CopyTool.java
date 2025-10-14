@@ -19,7 +19,7 @@ import wawa.wayfinder.map.widgets.MapWidget;
 
 public class CopyTool extends Tool {
     public static CopyTool INSTANCE = new CopyTool(WayfinderClient.id("copy_tool"));
-    private static final ResourceLocation TEXTURE = WayfinderClient.id("cursor/scissors");
+    private static final ResourceLocation TEXTURE = WayfinderClient.id("tool/copy/copy");
     private final ResourceLocation textureID;
     public NativeImage clipboard = null;
     private Vector2ic start = null;

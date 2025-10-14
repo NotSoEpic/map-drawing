@@ -68,8 +68,8 @@ public class ToolPickerWidget extends AbstractWidget {
 
         this.tools.add(new SingleToolWidget(
                 this.getX(), offsetFinalY(20),
-                WayfinderClient.id("tool/scissors"),
-                WayfinderClient.id("tool/scissors_highlight"),
+                WayfinderClient.id("tool/copy/copy"),
+                WayfinderClient.id("tool/copy/copy_highlight"),
                 (w) -> CopyTool.INSTANCE,
                 Component.literal("copy")
         ));

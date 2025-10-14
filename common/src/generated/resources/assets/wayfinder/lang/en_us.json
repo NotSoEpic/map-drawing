@@ -14,6 +14,6 @@
   "wayfinder.tool.brush": "Brush",
   "wayfinder.tool.eraser": "Eraser",
   "wayfinder.tool.pin": "Pin",
-  "wayfinder.tool.scissors": "Copy",
+  "wayfinder.tool.copy": "Copy",
   "wayfinder.tool.stamp": "Stamp Bag"
 }
