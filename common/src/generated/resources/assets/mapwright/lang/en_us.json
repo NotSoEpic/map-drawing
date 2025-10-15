@@ -9,11 +9,11 @@
   "key.mapwright.redo": "Redo",
   "key.mapwright.swap": "Swap to Previous Tool",
   "key.mapwright.undo": "Undo",
-  "mapwright.tool.pan": "Deselect Tool",
-  "mapwright.tool.pencil": "Pen",
   "mapwright.tool.brush": "Brush",
-  "mapwright.tool.eraser": "Eraser",
-  "mapwright.tool.pin": "Pin",
   "mapwright.tool.copy": "Copy",
+  "mapwright.tool.eraser": "Eraser",
+  "mapwright.tool.pan": "Deselect Tool",
+  "mapwright.tool.pen": "Pen",
+  "mapwright.tool.pin": "Pin",
   "mapwright.tool.stamp": "Stamp Bag"
 }

@@ -14,6 +14,7 @@ import net.minecraft.util.GsonHelper;
 import org.jetbrains.annotations.Nullable;
 import wawa.mapwright.MapwrightClient;
 import wawa.mapwright.data.PageIO;
+import wawa.mapwright.platform.Services;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,7 +71,9 @@ public class StampBagHandler {
 	private boolean metaDataLoadingRequested = false;
 
 	public StampBagHandler() {
-		createStampDirectory();
+		if(!Services.PLATFORM.isRunningDatagen()) {
+			createStampDirectory();
+		}
 	}
 
 	private void createStampDirectory() {

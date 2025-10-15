@@ -30,7 +30,7 @@ neoForge {
             data()
             gameDirectory = project.file('runs/data')
             programArguments.addAll '--all',
-                    '--mod', 'wayfinder',
+                    '--mod', 'mapwright',
                     '--output', generatedResources.absolutePath,
                     '--existing', commonResources.absolutePath
         }
