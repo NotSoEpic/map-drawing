@@ -90,7 +90,7 @@ public class SpyglassPins {
 				boolean oneTookLong = false;
 				for (DhRequest delayedPin : delayedPins) {
 					int ticks = delayedPin.ticksSinceRequested.incrementAndGet();
-					if (ticks > 4) {
+					if (ticks > 20) {
 						oneTookLong = true;
 					}
 				}
