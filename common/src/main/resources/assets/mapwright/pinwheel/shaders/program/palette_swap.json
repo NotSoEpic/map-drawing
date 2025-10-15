@@ -1,0 +1,7 @@
+{
+  "vertex": "mapwright:palette_swap",
+  "fragment": "mapwright:palette_swap",
+  "textures": {
+    "Palette": "mapwright:textures/gui/palette.png"
+  }
+}

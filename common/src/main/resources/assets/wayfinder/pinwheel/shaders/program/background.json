@@ -1,7 +1,0 @@
-{
-  "vertex": "wayfinder:background",
-  "fragment": "wayfinder:background",
-  "textures": {
-    "Noise": "wayfinder:textures/shader/techno_1.png"
-  }
-}

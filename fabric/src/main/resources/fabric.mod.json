@@ -8,15 +8,14 @@
     "${mod_author}"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "sources": "https://github.com/NotSoEpic/map-drawing"
   },
   "license": "${license}",
   "icon": "${mod_id}.png",
   "environment": "*",
   "entrypoints": {
     "client": [
-      "wawa.wayfinder.fabric.WayfinderFabricClient"
+      "wawa.mapwright.fabric.MapwrightFabricClient"
     ]
   },
   "mixins": [

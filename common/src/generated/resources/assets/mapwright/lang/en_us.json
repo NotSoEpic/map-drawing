@@ -1,0 +1,19 @@
+{
+  "item.mapwright.spyglass.use_tooltip": "Attack while scoped in to place a temporary pin",
+  "key.categories.mapwright": "Mapwright",
+  "key.mapwright.brush": "Pick Brush",
+  "key.mapwright.eraser": "Pick Eraser",
+  "key.mapwright.hand": "Pick Hand",
+  "key.mapwright.map": "Open Map",
+  "key.mapwright.pencil": "Pick Pencil",
+  "key.mapwright.redo": "Redo",
+  "key.mapwright.swap": "Swap to Previous Tool",
+  "key.mapwright.undo": "Undo",
+  "mapwright.tool.pan": "Deselect Tool",
+  "mapwright.tool.pencil": "Pen",
+  "mapwright.tool.brush": "Brush",
+  "mapwright.tool.eraser": "Eraser",
+  "mapwright.tool.pin": "Pin",
+  "mapwright.tool.copy": "Copy",
+  "mapwright.tool.stamp": "Stamp Bag"
+}

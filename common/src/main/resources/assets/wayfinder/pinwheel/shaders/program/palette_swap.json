@@ -1,7 +1,0 @@
-{
-  "vertex": "wayfinder:palette_swap",
-  "fragment": "wayfinder:palette_swap",
-  "textures": {
-    "Palette": "wayfinder:textures/gui/palette.png"
-  }
-}

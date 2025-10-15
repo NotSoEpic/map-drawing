@@ -1,0 +1,25 @@
+{
+  "required": true,
+  "package": "wawa.mapwright.mixin",
+  "refmap": "${mod_id}.refmap.json",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
+  "client": [
+    "BiomeManagerAccessor",
+    "KeyBindingAccessor",
+    "LevelRendererAccessor",
+    "MinecraftMixin",
+    "NativeImageAccessor",
+    "ScreenAccessor",
+    "SpyglassItemMixin",
+    "VeilImGuiImplMixin",
+    "VeilRenderSystemMixin",
+    "coordinates_config.DebugScreenOverlayMixin",
+    "coordinates_config.GuiMixin",
+    "coordinates_config.KeyboardHandlerMixin",
+    "coordinates_config.PlayerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "format": "POSITION_TEX_COLOR",
+  "mode": "QUADS",
+  "bufferSize": "SMALL",
+  "layers": [
+    {
+      "type": "minecraft:multi_texture",
+      "textures": [
+        {
+          "texture": "%1$s"
+        },
+        {
+          "texture": "%2$s"
+        }
+      ]
+    },
+    {
+      "type": "veil:shader",
+      "name": "mapwright:uv_remap"
+    },
+    {
+      "type": "minecraft:transparency",
+      "mode": "translucent"
+    },
+    {
+      "type": "minecraft:depth_test",
+      "mode": "lequal"
+    },
+    {
+      "type": "minecraft:write_mask",
+      "color": true
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "vertex": "mapwright:background",
+  "fragment": "mapwright:background",
+  "textures": {
+    "Noise": "mapwright:textures/shader/techno_1.png"
+  }
+}
