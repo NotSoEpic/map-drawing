@@ -22,7 +22,7 @@ public class ClientEventsRuntime {
 
     @SubscribeEvent
     public static void levelLoad(final LevelEvent.Load event) {
-        if (event.getLevel() instanceof final ClientLevel level && Minecraft.getInstance().isLocalServer()) {
+        if (event.getLevel() instanceof final ClientLevel level) {
             ClientEvents.loadLevel(level, Minecraft.getInstance());
         }
     }

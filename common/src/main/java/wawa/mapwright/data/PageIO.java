@@ -5,20 +5,19 @@ import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
 import wawa.mapwright.MapwrightClient;
 import wawa.mapwright.mixin.BiomeManagerAccessor;
+import wawa.mapwright.mixin.MinecraftServerAccessor;
+import wawa.mapwright.mixin.MultiPlayerGameModeAccessor;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Holds file path information and helper functions for reading and writing image data
@@ -32,7 +31,7 @@ public class PageIO {
         try {
             Files.createDirectories(this.pagePath);
         } catch (final IOException e) {
-            MapwrightClient.LOGGER.error("Could not create map directory\n{}", e);
+            MapwrightClient.LOGGER.error("Could not create map directory", e);
         }
     }
 
@@ -43,15 +42,18 @@ public class PageIO {
         Path path = client.gameDirectory.toPath()
                 .resolve(mapName);
         final long seed = ((BiomeManagerAccessor) level.getBiomeManager()).getBiomeZoomSeed();
-        final UUID uuid = Mth.createInsecureUUID(RandomSource.create(seed));
         if (client.isLocalServer()) {
             path = path.resolve("singleplayer")
-                    .resolve(uuid + "_" + client.getSingleplayerServer().getWorldData().getLevelName());
+                    // [level_path], e.g. level name "Awa/\:waw" -> "Awa___waw"
+                    .resolve(((MinecraftServerAccessor)client.getSingleplayerServer()).getStorageSource().getLevelId());
         } else {
             path = path.resolve("multiplayer")
-                    .resolve(uuid + "_" + client.getCurrentServer().name);
+                    // [server_ip], e.g. "127.0.0.1:25565" -> "127.0.0.1_25565"
+                    .resolve(((MultiPlayerGameModeAccessor)client.gameMode).getConnection().getServerData().ip.replace(":", "_"));
         }
-        return path.resolve(level.dimension().location().toDebugFileName());
+        // minecraft_overworld_123456789
+        // (not actual level seed, clientside seed for visual randomization)
+        return path.resolve(level.dimension().location().toDebugFileName() + "_" + seed);
     }
 
     public Path getPagePath() {

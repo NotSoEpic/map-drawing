@@ -9,6 +9,7 @@
     "KeyBindingAccessor",
     "LevelRendererAccessor",
     "MinecraftMixin",
+    "MultiPlayerGameModeAccessor",
     "NativeImageAccessor",
     "ScreenAccessor",
     "SpyglassItemMixin",
@@ -21,5 +22,8 @@
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "mixins": [
+    "MinecraftServerAccessor"
+  ]
 }
