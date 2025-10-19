@@ -74,6 +74,7 @@ public class SpyglassPins {
 		if (Minecraft.getInstance().player != null) {
 			//filter and move all delayed requests into pin data
 
+			int size = delayedPins.size();
 			Iterator<DhRequest> iter = delayedPins.iterator();
 			while (iter.hasNext()) {
 				DhRequest req = iter.next();
@@ -82,6 +83,10 @@ public class SpyglassPins {
 
 					if (!req.finishedLoc().equals(EMPTY)) {
 						add(req.finishedLoc());
+
+						if (size == 1) {
+							MapwrightClient.targetPanningPosition.set(req.finishedLoc().x, req.finishedLoc().z);
+						}
 					}
 				}
 			}

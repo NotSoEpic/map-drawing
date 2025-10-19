@@ -32,7 +32,9 @@ public class InputListener {
 	                MapwrightClient.PAGE_MANAGER.getSpyglassPins().addDelayedRequest(MultithreadedDHTerrainAccess.createRequest(minecraft.player));
                 }
 
-	            minecraft.setScreen(new MapScreen(playerPosition, new Vector2d(target.x, target.z)));
+				MapwrightClient.targetPanningPosition.set(target.x, target.z);
+	            minecraft.setScreen(new MapScreen(playerPosition));
+
 	            return;
             } else {
                 final int numPins = MapwrightClient.PAGE_MANAGER.getSpyglassPins().getPins().size();
@@ -44,12 +46,15 @@ public class InputListener {
                         avgX += pin.position().x() / numPins;
                         avgZ += pin.position().z() / numPins;
                     }
-                    minecraft.setScreen(new MapScreen(playerPosition, new Vector2d(avgX, avgZ)));
+
+					MapwrightClient.targetPanningPosition.set(avgX, avgZ);
+                    minecraft.setScreen(new MapScreen(playerPosition));
                     return;
                 }
             }
 
-            minecraft.setScreen(new MapScreen(playerPosition, playerPosition));
+	        MapwrightClient.targetPanningPosition.set(playerPosition);
+            minecraft.setScreen(new MapScreen(playerPosition));
         }
     }
 

@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
+import org.joml.Vector2d;
+import org.joml.Vector3d;
 import org.slf4j.Logger;
 import wawa.mapwright.data.PageManager;
 import wawa.mapwright.map.stamp_bag.StampBagHandler;
@@ -18,6 +20,8 @@ public final class MapwrightClient {
     public static PageManager PAGE_MANAGER = new PageManager();
     public static ToolManager TOOL_MANAGER = new ToolManager(PanTool.INSTANCE);
     private static boolean DH_PRESENT = false;
+
+	public static Vector2d targetPanningPosition = new Vector2d();
 
     public static final StampBagHandler STAMP_HANDLER = new StampBagHandler();
 
