@@ -46,9 +46,9 @@ public class MapScreen extends Screen {
 
     public static boolean cursorAdjusted;
 
-    public MapScreen(final Vector2d openingPos, final Vector2d endingPos) {
+    public MapScreen(final Vector2d openingPos) {
         super(Component.literal("Mapwright Map"));
-        this.lerpedPanning = new LerpedVector2d(openingPos, endingPos);
+        this.lerpedPanning = new LerpedVector2d(openingPos, MapwrightClient.targetPanningPosition);
         cursorAdjusted = false;
     }
 
