@@ -19,7 +19,7 @@ public class ClientEventsStartup {
         event.register(NeoKeyMappings.UNDO.get());
         event.register(NeoKeyMappings.REDO.get());
         event.register(NeoKeyMappings.HAND.get());
-        event.register(NeoKeyMappings.PENCIL.get());
+        event.register(NeoKeyMappings.PEN.get());
         event.register(NeoKeyMappings.BRUSH.get());
         event.register(NeoKeyMappings.ERASER.get());
         event.register(NeoKeyMappings.SWAP.get());

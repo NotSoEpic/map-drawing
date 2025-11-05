@@ -45,8 +45,8 @@ public class FabricKeyMappings implements IKeyMappings {
                     "hand", GLFW.GLFW_KEY_H
             )),
 
-            PENCIL = KeyBindingHelper.registerKeyBinding(createNonBlocking(
-                    "pencil", GLFW.GLFW_KEY_N
+            PEN = KeyBindingHelper.registerKeyBinding(createNonBlocking(
+                    "pen", GLFW.GLFW_KEY_N
             )),
 
             BRUSH = KeyBindingHelper.registerKeyBinding(createNonBlocking(
@@ -92,8 +92,8 @@ public class FabricKeyMappings implements IKeyMappings {
         if (HAND.matches(keysym, scancode)) {
             return ToolSwap.HAND;
         }
-        if (PENCIL.matches(keysym, scancode)) {
-            return ToolSwap.PENCIL;
+        if (PEN.matches(keysym, scancode)) {
+            return ToolSwap.PEN;
         }
         if (BRUSH.matches(keysym, scancode)) {
             return ToolSwap.BRUSH;

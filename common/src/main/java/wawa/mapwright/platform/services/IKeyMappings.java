@@ -16,7 +16,7 @@ public interface IKeyMappings {
     enum ToolSwap {
         HAND,
         BRUSH,
-        PENCIL,
+        PEN,
         ERASER
     }
 

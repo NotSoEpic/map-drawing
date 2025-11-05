@@ -68,7 +68,7 @@ public class StampBagScreen {
 				maxPageCount = MapwrightClient.STAMP_HANDLER.getTotalEntryCount();
 			}
 
-			page = (int) Math.clamp(page - 1, 1, Math.ceil(maxPageCount / 3f));
+			page = (int) Math.clamp(page - 1, 1, maxPageCount == 0 ? 1 : Math.ceil(maxPageCount / 3f));
 			refreshStamps();
 		});
 
@@ -82,7 +82,7 @@ public class StampBagScreen {
 				maxPageCount = MapwrightClient.STAMP_HANDLER.getTotalEntryCount();
 			}
 
-			page = (int) Math.clamp(page + 1, 1, Math.ceil(maxPageCount / 3f));
+			page = (int) Math.clamp(page + 1, 1, maxPageCount == 0 ? 1 : Math.ceil(maxPageCount / 3f));
 			refreshStamps();
 		});
 

@@ -20,7 +20,7 @@ public class LangGen extends LanguageProvider {
         this.add(NeoKeyMappings.UNDO, "Undo");
         this.add(NeoKeyMappings.REDO, "Redo");
         this.add(NeoKeyMappings.HAND, "Pick Hand");
-        this.add(NeoKeyMappings.PENCIL, "Pick Pencil");
+        this.add(NeoKeyMappings.PEN, "Pick Pencil");
         this.add(NeoKeyMappings.BRUSH, "Pick Brush");
         this.add(NeoKeyMappings.ERASER, "Pick Eraser");
 

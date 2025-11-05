@@ -61,8 +61,8 @@ public class NeoKeyMappings implements IKeyMappings {
             HAND = Lazy.of(() -> create(
                 "hand", KeyConflictContext.GUI, KeyModifier.NONE, GLFW.GLFW_KEY_H
             )),
-            PENCIL = Lazy.of(() -> create(
-                "pencil", KeyConflictContext.GUI, KeyModifier.NONE, GLFW.GLFW_KEY_N
+            PEN = Lazy.of(() -> create(
+                "pen", KeyConflictContext.GUI, KeyModifier.NONE, GLFW.GLFW_KEY_N
             )),
             BRUSH = Lazy.of(() -> create(
                 "brush", KeyConflictContext.GUI, KeyModifier.NONE, GLFW.GLFW_KEY_B
@@ -77,8 +77,8 @@ public class NeoKeyMappings implements IKeyMappings {
         if (HAND.get().isActiveAndMatches(key)) {
             return ToolSwap.HAND;
         }
-        if (PENCIL.get().isActiveAndMatches(key)) {
-            return ToolSwap.PENCIL;
+        if (PEN.get().isActiveAndMatches(key)) {
+            return ToolSwap.PEN;
         }
         if (BRUSH.get().isActiveAndMatches(key)) {
             return ToolSwap.BRUSH;

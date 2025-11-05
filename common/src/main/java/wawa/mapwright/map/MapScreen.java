@@ -166,7 +166,7 @@ public class MapScreen extends Screen {
             switch (Services.KEY_MAPPINGS.getToolSwap(keyCode, scanCode, modifiers)) {
                 case HAND -> this.toolPicker.pickHand();
                 case BRUSH -> this.toolPicker.pickBrush();
-                case PENCIL -> this.toolPicker.pickPencil();
+                case PEN -> this.toolPicker.pickPen();
                 case ERASER -> this.toolPicker.pickEraser();
                 case null -> {
                 }

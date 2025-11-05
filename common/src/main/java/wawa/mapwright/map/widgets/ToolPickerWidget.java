@@ -15,7 +15,7 @@ import java.util.List;
 
 public class ToolPickerWidget extends AbstractWidget {
     private final List<SingleToolWidget> tools = new ArrayList<>();
-    private final DrawTool pencil = new DrawTool(MapwrightClient.id("tool/pencil/pencil_cursor"), 0xFF000000, 0xFF000000);
+    private final DrawTool pen = new DrawTool(MapwrightClient.id("tool/pen/pen_cursor"), 0xFF000000, 0xFF000000);
     private final DrawTool eraser = new DrawTool(MapwrightClient.id("tool/eraser/eraser_cursor"), 0, 0);
     private final SingleToolWidget.BrushWidget brushWidget;
     private final PinTool pin = new PinTool();
@@ -43,10 +43,10 @@ public class ToolPickerWidget extends AbstractWidget {
 
         this.tools.add(new SingleToolWidget(
                 this.getX(), offsetFinalY(20),
-                MapwrightClient.id("tool/pencil/pencil"),
-                MapwrightClient.id("tool/pencil/pencil_highlight"),
-                (w) -> this.pencil,
-                Component.literal("pencil")
+                MapwrightClient.id("tool/pen/pen"),
+                MapwrightClient.id("tool/pen/pen_highlight"),
+                (w) -> this.pen,
+                Component.literal("pen")
         ));
 
         this.brushWidget = new SingleToolWidget.BrushWidget(this.getX(), offsetFinalY(20));
@@ -91,8 +91,8 @@ public class ToolPickerWidget extends AbstractWidget {
         MapwrightClient.TOOL_MANAGER.set(PanTool.INSTANCE);
     }
 
-    public void pickPencil() {
-        MapwrightClient.TOOL_MANAGER.set(this.pencil);
+    public void pickPen() {
+        MapwrightClient.TOOL_MANAGER.set(this.pen);
     }
 
     public void pickBrush() {
@@ -110,7 +110,7 @@ public class ToolPickerWidget extends AbstractWidget {
 
     public void pickColor(final int color) {
         if (color == 0xFF000000) {
-            MapwrightClient.TOOL_MANAGER.set(this.pencil);
+            MapwrightClient.TOOL_MANAGER.set(this.pen);
         } else {
             for (final DrawTool tool : this.brushWidget.getBrushes()) {
                 if (tool.getInternalColor() == color) {
