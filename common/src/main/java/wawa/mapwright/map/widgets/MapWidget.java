@@ -17,16 +17,27 @@ import wawa.mapwright.Rendering;
 import wawa.mapwright.data.Pin;
 import wawa.mapwright.data.SpyglassPins;
 import wawa.mapwright.map.MapScreen;
+import wawa.mapwright.map.background.MapBackground;
 import wawa.mapwright.map.tool.PanTool;
 import wawa.mapwright.map.tool.PinTool;
 
 public class MapWidget extends AbstractWidget {
     private static final int OUTER_PADDING = 30;
     private static final int INNER_PADDING = 10;
+    private static final int CORNER_SIZE = 8;
     private final MapScreen parent;
+    private final MapBackground background;
 
     public MapWidget(final MapScreen parent) {
         super(OUTER_PADDING, OUTER_PADDING, parent.width - OUTER_PADDING * 2, parent.height - OUTER_PADDING * 2, Component.literal("Map Display"));
+        this.background = new MapBackground(this.width - CORNER_SIZE * 2, this.height - CORNER_SIZE * 2);
+        MapwrightClient.LOGGER.info("Size difference: {}, {}",
+                this.width - this.background.getTrueWidth() - CORNER_SIZE * 2,
+                this.height - this.background.getTrueHeight() - CORNER_SIZE * 2);
+        this.setWidth(this.background.getTrueWidth() + CORNER_SIZE * 2);
+        this.setHeight(this.background.getTrueHeight() + CORNER_SIZE * 2);
+        this.setX((parent.width - this.width) / 2);
+        this.setY((parent.height - this.height) / 2);
         this.parent = parent;
     }
 
@@ -42,7 +53,10 @@ public class MapWidget extends AbstractWidget {
         final Vector2d panning = this.parent.lerpedPanning.get();
         final float scale = this.parent.getScale();
 
-        Rendering.renderMapNineslice(guiGraphics, this.getX(), this.getY(), this.width, this.height, -1, this.parent.backgroundPanning, scale);
+        this.background.render(guiGraphics, this.getX(), this.getY(),
+                CORNER_SIZE, this.width, this.height,
+                this.parent.backgroundPanning, -1
+        );
 
         guiGraphics.pose().pushPose();
         final double hw = this.width / 2d;
