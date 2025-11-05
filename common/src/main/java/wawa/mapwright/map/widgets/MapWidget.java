@@ -23,19 +23,28 @@ import wawa.mapwright.map.tool.PinTool;
 
 public class MapWidget extends AbstractWidget {
     private static final int OUTER_PADDING = 30;
-    private static final int INNER_PADDING = 10;
-    private static final int CORNER_SIZE = 8;
+
+    private static final int TOP_MARGIN = 40;
+    private static final int LEFT_MARGIN = 96;
+    private static final int RIGHT_MARGIN = 96;
+    private static final int BOTTOM_MARGIN = 40;
+
+    private static final int TOP_SCISSOR = 20;
+    private static final int LEFT_SCISSOR = 50;
+    private static final int RIGHT_SCISSOR = 20;
+    private static final int BOTTOM_SCISSOR = 20;
+
     private final MapScreen parent;
     private final MapBackground background;
 
     public MapWidget(final MapScreen parent) {
         super(OUTER_PADDING, OUTER_PADDING, parent.width - OUTER_PADDING * 2, parent.height - OUTER_PADDING * 2, Component.literal("Map Display"));
-        this.background = new MapBackground(this.width - CORNER_SIZE * 2, this.height - CORNER_SIZE * 2);
+        this.background = new MapBackground(this.width, this.height, TOP_MARGIN, LEFT_MARGIN, RIGHT_MARGIN, BOTTOM_MARGIN);
         MapwrightClient.LOGGER.info("Size difference: {}, {}",
-                this.width - this.background.getTrueWidth() - CORNER_SIZE * 2,
-                this.height - this.background.getTrueHeight() - CORNER_SIZE * 2);
-        this.setWidth(this.background.getTrueWidth() + CORNER_SIZE * 2);
-        this.setHeight(this.background.getTrueHeight() + CORNER_SIZE * 2);
+                this.width - this.background.getTrueWidth() - LEFT_MARGIN - RIGHT_MARGIN * 2,
+                this.height - this.background.getTrueHeight() - TOP_MARGIN - BOTTOM_MARGIN * 2);
+        this.setWidth(this.background.getTrueWidth() + LEFT_MARGIN + RIGHT_MARGIN);
+        this.setHeight(this.background.getTrueHeight() + TOP_MARGIN + BOTTOM_MARGIN);
         this.setX((parent.width - this.width) / 2);
         this.setY((parent.height - this.height) / 2);
         this.parent = parent;
@@ -54,7 +63,7 @@ public class MapWidget extends AbstractWidget {
         final float scale = this.parent.getScale();
 
         this.background.render(guiGraphics, this.getX(), this.getY(),
-                CORNER_SIZE, this.width, this.height,
+                this.width, this.height,
                 this.parent.backgroundPanning, -1
         );
 
@@ -67,7 +76,8 @@ public class MapWidget extends AbstractWidget {
         // offset for rendering elements relative to the world, prevents floating point imprecision at extreme values
         final double xOff = -panning.x;
         final double yOff = -panning.y;
-        guiGraphics.enableScissor(this.getX() + INNER_PADDING, this.getY() + INNER_PADDING, this.getRight() - INNER_PADDING, this.getBottom() - INNER_PADDING);
+        guiGraphics.enableScissor(this.getX() + LEFT_SCISSOR, this.getY() + TOP_SCISSOR ,
+                this.getRight() - RIGHT_SCISSOR, this.getBottom() - BOTTOM_SCISSOR);
 
         final Vector2d topLeftWorld = this.parent.screenToWorld(new Vector2d(this.getX(), this.getY()));
         final Vector2d bottomRightWorld = this.parent.screenToWorld(new Vector2d(this.getRight(), this.getBottom()));
@@ -91,7 +101,7 @@ public class MapWidget extends AbstractWidget {
 
         final Vector2dc mouseScreen = new Vector2d(mouseX - this.getX() - hw, mouseY - this.getY() - hh);
         final Vector4dc transformedScreenBounds = new Vector4d(
-                -hw + INNER_PADDING, -hh + INNER_PADDING, this.width - hw - INNER_PADDING, this.height - hh - INNER_PADDING
+                -hw + LEFT_SCISSOR, -hh + TOP_SCISSOR, this.width - hw - RIGHT_SCISSOR, this.height - hh - BOTTOM_SCISSOR
         );
 
         for (final Pin pin : MapwrightClient.PAGE_MANAGER.getPins()) {
