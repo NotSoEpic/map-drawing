@@ -22,7 +22,7 @@ public class SingleToolWidget extends AbstractWidget {
     private final ResourceLocation sprite;
     private final ResourceLocation highlight;
     protected final Function<SingleToolWidget, Tool> toolFunction;
-    private String id = "";
+    protected String id = "";
 
     public SingleToolWidget(final int x, final int y, final ResourceLocation sprite, final ResourceLocation highlight,
                             final Function<SingleToolWidget, Tool> toolFunction, final Component message) {
@@ -40,9 +40,13 @@ public class SingleToolWidget extends AbstractWidget {
     protected void renderWidget(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
         if (this.isMouseOver(mouseX, mouseY)) {
             guiGraphics.blitSprite(this.highlight, this.getX() - 1, this.getY() - 1, 18, 18);
-            guiGraphics.renderTooltip(Minecraft.getInstance().font, Component.translatable(id), id.contains("brush") ? this.getX() - 60 - Minecraft.getInstance().font.width(Component.translatable(id)) : mouseX, mouseY);
+            this.renderTooltip(guiGraphics, mouseX, mouseY);
         }
         guiGraphics.blitSprite(this.sprite, this.getX(), this.getY(), 16, 16);
+    }
+
+    protected void renderTooltip(final GuiGraphics guiGraphics, final int mouseX, final int mouseY) {
+        guiGraphics.renderTooltip(Minecraft.getInstance().font, Component.translatable(this.id), mouseX, mouseY);
     }
 
     @Override
@@ -62,6 +66,7 @@ public class SingleToolWidget extends AbstractWidget {
         public PaletteDrawTool last;
         private static final TextureAtlasSprite mask = Minecraft.getInstance().getGuiSprites().getSprite(MapwrightClient.id("tool/brush/brush_mask"));
         private final ColorPickerWidget colorPicker;
+        private boolean atMouse = false;
 
         public BrushWidget(final int x, final int y) {
             super(x, y,
@@ -80,6 +85,7 @@ public class SingleToolWidget extends AbstractWidget {
 
         public void openToMouse(final double mouseX, final double mouseY) {
             this.colorPicker.openToMouse(mouseX, mouseY);
+            this.atMouse = true;
         }
 
         @Override
@@ -94,6 +100,14 @@ public class SingleToolWidget extends AbstractWidget {
             } else {
                 this.colorPicker.active = false;
                 this.colorPicker.resetPos();
+                this.atMouse = false;
+            }
+        }
+
+        @Override
+        protected void renderTooltip(final GuiGraphics guiGraphics, final int mouseX, final int mouseY) {
+            if (!this.atMouse) {
+                super.renderTooltip(guiGraphics, this.getX() - 60 - Minecraft.getInstance().font.width(Component.translatable(this.id)), mouseY);
             }
         }
 
