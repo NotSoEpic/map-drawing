@@ -38,12 +38,12 @@ public final class StampInformation {
 
     private boolean removed = false;
 
-    public StampInformation(String fileName, String customName, boolean favorite, NativeImage newStamp) {
+    public StampInformation(final String fileName, final String customName, final boolean favorite, final NativeImage newStamp) {
         this(fileName, customName, favorite);
-        stampTexture.setFirstStamp(newStamp);
+        this.stampTexture.setFirstStamp(newStamp);
     }
 
-    public StampInformation(String fileName, String customName, boolean favorite) {
+    public StampInformation(final String fileName, final String customName, final boolean favorite) {
         this.fileName = fileName;
         this.customName = customName;
 
@@ -52,36 +52,36 @@ public final class StampInformation {
     }
 
     public String getFileName() {
-        return fileName;
+        return this.fileName;
     }
 
     public String getCustomName() {
-        return customName;
+        return this.customName;
     }
 
     public boolean isFavorited() {
-        return favorited;
+        return this.favorited;
     }
 
-    public void setFavorited(boolean favorited) {
+    public void setFavorited(final boolean favorited) {
         this.favorited = favorited;
     }
 
     public @NotNull StampTexture getTextureManager() {
-        return stampTexture;
+        return this.stampTexture;
     }
 
-    public void setStampTexture(@NotNull NativeImage newImage) {
-        if (!removed) {
-            NativeImage texture = stampTexture.getTexture();
+    public void setStampTexture(@NotNull final NativeImage newImage) {
+        if (!this.removed) {
+            final NativeImage texture = this.stampTexture.getTexture();
             if (texture == null) {
-                stampTexture.setFirstStamp(newImage);
+                this.stampTexture.setFirstStamp(newImage);
             }
         }
     }
 
     public void setRemoved() {
-        removed = true;
-        getTextureManager().removeFromHandler();
+        this.removed = true;
+        this.getTextureManager().removeFromHandler();
     }
 }

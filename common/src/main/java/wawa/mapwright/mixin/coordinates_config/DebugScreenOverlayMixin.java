@@ -33,7 +33,7 @@ public class DebugScreenOverlayMixin {
 					@At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z", ordinal = 5),
 			}
 	)
-	private <E> boolean mapwright$getGameInformation1(List<E> instance, E e, Operation<Boolean> original) {
+	private <E> boolean mapwright$getGameInformation1(final List<E> instance, final E e, final Operation<Boolean> original) {
 		if(MapwrightClientConfig.REDUCED_DEBUG_LEVEL.get().allowsCoordinates()) {
 			return original.call(instance, e);
 		}
@@ -41,7 +41,7 @@ public class DebugScreenOverlayMixin {
 	}
 
 	@WrapOperation(method = "getGameInformation", at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z", ordinal = 6))
-	private <E> boolean mapwright$getGameInformation2(List<E> instance, E e, Operation<Boolean> original) {
+	private <E> boolean mapwright$getGameInformation2(final List<E> instance, final E e, final Operation<Boolean> original) {
 		if(MapwrightClientConfig.REDUCED_DEBUG_LEVEL.get().allowsRotation()) {
 			return original.call(instance, e);
 		}
@@ -49,7 +49,7 @@ public class DebugScreenOverlayMixin {
 	}
 
 	@Inject(method = "getSystemInformation", at = @At("HEAD"))
-	private void mapwright$getSystemInformation(CallbackInfoReturnable<List<String>> cir) {
+	private void mapwright$getSystemInformation(final CallbackInfoReturnable<List<String>> cir) {
 		if(!MapwrightClientConfig.REDUCED_DEBUG_LEVEL.get().allowsCoordinates()) {
 			this.block = mapwright$EMPTY;
 			this.liquid = mapwright$EMPTY;

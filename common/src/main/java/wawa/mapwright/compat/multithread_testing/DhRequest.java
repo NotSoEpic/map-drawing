@@ -16,49 +16,49 @@ public final class DhRequest {
 
 	public volatile AtomicInteger ticksSinceRequested;
 
-	public DhRequest(Vec3 origin, Vec3 direction, int length) {
+	public DhRequest(final Vec3 origin, final Vec3 direction, final int length) {
 		this.origin = origin;
 		this.direction = direction;
 		this.length = length;
 
-		finishedLoc = new Vector3d();
-		finished = new AtomicBoolean();
-		ticksSinceRequested = new AtomicInteger();
+        this.finishedLoc = new Vector3d();
+        this.finished = new AtomicBoolean();
+        this.ticksSinceRequested = new AtomicInteger();
 	}
 
 	public Vec3 origin() {
-		return origin;
+		return this.origin;
 	}
 
 	public Vec3 direction() {
-		return direction;
+		return this.direction;
 	}
 
 	public int length() {
-		return length;
+		return this.length;
 	}
 
 	public boolean isFinished() {
-		synchronized (finished) {
-			return finished.get();
+		synchronized (this.finished) {
+			return this.finished.get();
 		}
 	}
 
 	public void setFinished() {
-		synchronized (finished) {
-			finished.set(true);
+		synchronized (this.finished) {
+            this.finished.set(true);
 		}
 	}
 
-	public void setFinishedLoc(Vector3d vec) {
-		synchronized (finishedLoc) {
-			finishedLoc.set(vec);
+	public void setFinishedLoc(final Vector3d vec) {
+		synchronized (this.finishedLoc) {
+            this.finishedLoc.set(vec);
 		}
 	}
 
 	public synchronized Vector3d finishedLoc() {
-		synchronized (finishedLoc) {
-			return finishedLoc;
+		synchronized (this.finishedLoc) {
+			return this.finishedLoc;
 		}
 	}
 }

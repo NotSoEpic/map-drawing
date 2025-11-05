@@ -7,9 +7,9 @@ import java.util.Map;
 
 public record OperationHistory(Map<Vector2i, NativeImage> pagesModified) {
     public void clear() {
-        pagesModified.forEach((key, value) -> {
+        this.pagesModified.forEach((key, value) -> {
             value.close();
         });
-        pagesModified.clear();
+        this.pagesModified.clear();
     }
 }

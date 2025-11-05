@@ -72,78 +72,78 @@ public class StampBagHandler {
 
 	public StampBagHandler() {
 		if(!Services.PLATFORM.isRunningDatagen()) {
-			createStampDirectory();
+            this.createStampDirectory();
 		}
 	}
 
 	private void createStampDirectory() {
-		Path mainPath = Minecraft.getInstance().gameDirectory.toPath().resolve(PageIO.mapName);
+		final Path mainPath = Minecraft.getInstance().gameDirectory.toPath().resolve(PageIO.mapName);
 		this.stampPath = mainPath.resolve("stamps");
-		this.metaDataPath = stampPath.resolve("metadata.json");
+		this.metaDataPath = this.stampPath.resolve("metadata.json");
 
-		if (Files.notExists(stampPath)) {
+		if (Files.notExists(this.stampPath)) {
 			try {
-				Files.createDirectory(stampPath);
-			} catch (IOException e) {
+				Files.createDirectory(this.stampPath);
+			} catch (final IOException e) {
 				MapwrightClient.LOGGER.error("Could not create stamp directory\n{}", String.valueOf(e));
 			}
 		}
 
-		if (Files.notExists(metaDataPath)) {
-			metadataObject = new MetaDataRecord(new ArrayList<>(), new ArrayList<>());
-			dirty = true;
+		if (Files.notExists(this.metaDataPath)) {
+            this.metadataObject = new MetaDataRecord(new ArrayList<>(), new ArrayList<>());
+            this.dirty = true;
 		} else {
-			metaDataLoadingRequested = true;
+            this.metaDataLoadingRequested = true;
 		}
 	}
 
 	public void tick() {
-		switchStates();
-		state.stateManager.accept(this);
+        this.switchStates();
+        this.state.stateManager.accept(this);
 
-		if (metadataObject != null) {
-			metadataObject.allStamps.forEach(si -> si.getTextureManager().tick());
+		if (this.metadataObject != null) {
+            this.metadataObject.allStamps.forEach(si -> si.getTextureManager().tick());
 		}
 	}
 
 	private void switchStates() {
-		if (state == SavingState.NORMAL) {
-			if (!stampThreads.isEmpty()) {
-				state = SavingState.LOADING_IMAGES;
+		if (this.state == SavingState.NORMAL) {
+			if (!this.stampThreads.isEmpty()) {
+                this.state = SavingState.LOADING_IMAGES;
 				return;
 			}
 
-			if (dirty) {
-				state = SavingState.SAVING;
+			if (this.dirty) {
+                this.state = SavingState.SAVING;
 				return;
 			}
 
-			if (metaDataLoadingRequested) {
-				state = SavingState.LOADING;
+			if (this.metaDataLoadingRequested) {
+                this.state = SavingState.LOADING;
 			}
 		}
 	}
 
-	public void addNewStamp(NativeImage newStamp, String desiredName) {
+	public void addNewStamp(final NativeImage newStamp, final String desiredName) {
 		String adjustedName = slug(desiredName);
 		adjustedName = findFirstValidFilename(adjustedName, this.stampPath, "png");
 		MapwrightClient.LOGGER.debug("Saving new stamp image: {}; adjusted to:{}", desiredName, adjustedName);
-		Path imagePath = this.stampPath.resolve(adjustedName);
+		final Path imagePath = this.stampPath.resolve(adjustedName);
 
-		metadataObject.allStamps.add(new StampInformation(adjustedName, desiredName, false, newStamp));
-		dirty = true;
+        this.metadataObject.allStamps.add(new StampInformation(adjustedName, desiredName, false, newStamp));
+        this.dirty = true;
 
 		Util.ioPool().execute(() -> {
 			try {
 				newStamp.writeToFile(imagePath);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				MapwrightClient.LOGGER.error("Could not save stamp image\n{}", String.valueOf(e));
 			}
 		});
 	}
 
 	// thank you john create for these file management classes
-	private static String findFirstValidFilename(String name, Path folderPath, String extension) {
+	private static String findFirstValidFilename(final String name, final Path folderPath, final String extension) {
 		int index = 0;
 		String filename;
 		Path filepath;
@@ -156,19 +156,19 @@ public class StampBagHandler {
 	}
 
 	// thank you john create for these file management classes
-	private static String slug(String name) {
+	private static String slug(final String name) {
 		return name.replaceAll("\\W+", "_");
 	}
 
 	private Future<MetaDataRecord> loadStableMetaData() {
-		if (state == SavingState.LOADING) {
+		if (this.state == SavingState.LOADING) {
 			return Util.ioPool().submit(() -> {
 				MapwrightClient.LOGGER.info("attempting to load stamps");
 				MetaDataRecord loadedRecord = null;
 
 				try {
-					DataResult<MetaDataRecord> md = META_DATA_CODEC.parse(JsonOps.INSTANCE,
-							Streams.parse(MapwrightClient.MAPWRIGHT_GSON.newJsonReader(Files.newBufferedReader(metaDataPath))));
+					final DataResult<MetaDataRecord> md = META_DATA_CODEC.parse(JsonOps.INSTANCE,
+							Streams.parse(MapwrightClient.MAPWRIGHT_GSON.newJsonReader(Files.newBufferedReader(this.metaDataPath))));
 
 					if (md.isError()) {
 						MapwrightClient.LOGGER.error("Malformed metadata file! {}", md.error());
@@ -176,7 +176,7 @@ public class StampBagHandler {
 					}
 
 					loadedRecord = md.getOrThrow();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					MapwrightClient.LOGGER.error("Unable to read metadata file: {}", e.toString());
 				}
 
@@ -187,19 +187,19 @@ public class StampBagHandler {
 		return null;
 	}
 
-	private Future<?> saveStableMetaData(MetaDataRecord record) {
-		if (state == SavingState.SAVING) {
+	private Future<?> saveStableMetaData(final MetaDataRecord record) {
+		if (this.state == SavingState.SAVING) {
 			return Util.ioPool().submit(() -> {
 				MapwrightClient.LOGGER.info("attempting to save stamps");
 
 				try {
-					JsonElement ele = META_DATA_CODEC.encodeStart(JsonOps.INSTANCE, record).getOrThrow();
-					JsonWriter jwriter = MapwrightClient.MAPWRIGHT_GSON.newJsonWriter(Files.newBufferedWriter(metaDataPath));
+					final JsonElement ele = META_DATA_CODEC.encodeStart(JsonOps.INSTANCE, record).getOrThrow();
+					final JsonWriter jwriter = MapwrightClient.MAPWRIGHT_GSON.newJsonWriter(Files.newBufferedWriter(this.metaDataPath));
 					jwriter.setSerializeNulls(false);
 					jwriter.setIndent(" ".repeat(Math.max(0, 2)));
 					GsonHelper.writeValue(jwriter, ele, null);
 					jwriter.close();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					MapwrightClient.LOGGER.error("Unable to write metadata file: {}", e.toString());
 				}
 			});
@@ -208,20 +208,20 @@ public class StampBagHandler {
 		return null;
 	}
 
-	public void requestAllStamps(Collection<StampInformation> collection, boolean favoritesOnly) {
-		collection.addAll(getCorrectStampCollection(favoritesOnly));
+	public void requestAllStamps(final Collection<StampInformation> collection, final boolean favoritesOnly) {
+		collection.addAll(this.getCorrectStampCollection(favoritesOnly));
 
-		filterAndLoadStampsFromDisk(collection);
+        this.filterAndLoadStampsFromDisk(collection);
 	}
 
-	public void requestStampContaining(Collection<StampInformation> collection, String searchParam, boolean favoritesOnly) {
-		for (StampInformation si : getCorrectStampCollection(favoritesOnly)) {
+	public void requestStampContaining(final Collection<StampInformation> collection, final String searchParam, final boolean favoritesOnly) {
+		for (final StampInformation si : this.getCorrectStampCollection(favoritesOnly)) {
 			if (si.getCustomName().toLowerCase().contains(searchParam.toLowerCase())) {
 				collection.add(si);
 			}
 		}
 
-		filterAndLoadStampsFromDisk(collection);
+        this.filterAndLoadStampsFromDisk(collection);
 	}
 
 	/**
@@ -231,63 +231,63 @@ public class StampBagHandler {
 	 * @param collection The collection to populate with {@link StampInformation}
 	 * @param indices    An array of indices to grab
 	 */
-	public void bulkRequestStamps(Collection<StampInformation> collection, boolean favoritesOnly, int... indices) {
-		List<StampInformation> stampCollection = getCorrectStampCollection(favoritesOnly);
-		for (StampInformation si : stampCollection) {
-			for (int i : indices) {
+	public void bulkRequestStamps(final Collection<StampInformation> collection, final boolean favoritesOnly, final int... indices) {
+		final List<StampInformation> stampCollection = this.getCorrectStampCollection(favoritesOnly);
+		for (final StampInformation si : stampCollection) {
+			for (final int i : indices) {
 				if (stampCollection.indexOf(si) == i) {
 					collection.add(si);
 				}
 			}
 		}
 
-		filterAndLoadStampsFromDisk(collection);
+        this.filterAndLoadStampsFromDisk(collection);
 	}
 
-	private List<StampInformation> getCorrectStampCollection(boolean favoritesOnly) {
-		List<StampInformation> stampCollection;
+	private List<StampInformation> getCorrectStampCollection(final boolean favoritesOnly) {
+		final List<StampInformation> stampCollection;
 
 		if (favoritesOnly) {
-			metadataObject.bulkUpdateFavorites();
-			stampCollection = metadataObject.favorites();
+            this.metadataObject.bulkUpdateFavorites();
+			stampCollection = this.metadataObject.favorites();
 		} else {
-			stampCollection = metadataObject.allStamps();
+			stampCollection = this.metadataObject.allStamps();
 		}
 
 		return stampCollection;
 	}
 
-	private void filterAndLoadStampsFromDisk(Collection<StampInformation> collection) {
-		for (StampInformation si : collection) {
+	private void filterAndLoadStampsFromDisk(final Collection<StampInformation> collection) {
+		for (final StampInformation si : collection) {
 			if (si.getTextureManager().getTexture() == null) {
-				loadStampImage(si);
+                this.loadStampImage(si);
 			}
 		}
 	}
 
-	private void loadStampImage(StampInformation si) {
-		stampThreads.add(Util.ioPool().submit(() -> {
-			Path stampPath = this.stampPath.resolve(si.getFileName());
+	private void loadStampImage(final StampInformation si) {
+        this.stampThreads.add(Util.ioPool().submit(() -> {
+			final Path stampPath = this.stampPath.resolve(si.getFileName());
 			try {
 				MapwrightClient.LOGGER.info("attempting to load stamp image for: {}", si.getFileName());
-				InputStream inputStream = Files.newInputStream(stampPath);
-				NativeImage image = NativeImage.read(inputStream);
+				final InputStream inputStream = Files.newInputStream(stampPath);
+				final NativeImage image = NativeImage.read(inputStream);
 				si.setStampTexture(image);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				throw new RuntimeException(e);
 			}
 		}));
 	}
 
 	public int getTotalEntryCount() {
-		return getTotalEntryCount(false);
+		return this.getTotalEntryCount(false);
 	}
 
-	public int getTotalEntryCount(boolean favoritesOnly) {
+	public int getTotalEntryCount(final boolean favoritesOnly) {
 		if (favoritesOnly) {
 			int favoriteCount = 0;
 
-			for (StampInformation allStamp : metadataObject.allStamps()) {
+			for (final StampInformation allStamp : this.metadataObject.allStamps()) {
 				if (allStamp.isFavorited()) {
 					favoriteCount++;
 				}
@@ -297,17 +297,17 @@ public class StampBagHandler {
 		}
 
 
-		return metadataObject.allStamps().size();
+		return this.metadataObject.allStamps().size();
 	}
 
 	public void setDirty() {
-		dirty = true;
+        this.dirty = true;
 	}
 
-	public void removeStamp(StampInformation si) {
+	public void removeStamp(final StampInformation si) {
 		si.setRemoved();
-		metadataObject.allStamps().remove(si);
-		setDirty();
+        this.metadataObject.allStamps().remove(si);
+        this.setDirty();
 
 		//TODO: move removed stamps to deleted folder
 	}
@@ -362,7 +362,7 @@ public class StampBagHandler {
 
 		private final Consumer<StampBagHandler> stateManager;
 
-		SavingState(@Nullable Consumer<StampBagHandler> handler) {
+		SavingState(@Nullable final Consumer<StampBagHandler> handler) {
 			this.stateManager = Objects.requireNonNullElseGet(handler, () -> (sbh) -> {
 			});
 		}
@@ -375,10 +375,10 @@ public class StampBagHandler {
 	 */
 	public record MetaDataRecord(List<StampInformation> allStamps, List<StampInformation> favorites) {
 		public void bulkUpdateFavorites() {
-			favorites.clear();
-			for (StampInformation si : allStamps) {
+            this.favorites.clear();
+			for (final StampInformation si : this.allStamps) {
 				if (si.isFavorited()) {
-					favorites.add(si);
+                    this.favorites.add(si);
 				}
 			}
 		}

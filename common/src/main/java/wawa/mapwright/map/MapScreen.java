@@ -56,17 +56,17 @@ public class MapScreen extends Screen {
     protected void init() {
         super.init();
         this.mapWidget = new MapWidget(this);
-        allWidgets.add(mapWidget);
+        this.allWidgets.add(this.mapWidget);
         this.addRenderableWidget(this.mapWidget);
 
-        int toolX = this.width - 15 - 16 / 2;
+        final int toolX = this.width - 15 - 16 / 2;
         this.toolPicker = new ToolPickerWidget(toolX, 30);
-        allWidgets.add(toolPicker);
+        this.allWidgets.add(this.toolPicker);
         this.addRenderableWidget(this.toolPicker);
 
-        this.stampBag = new StampBagWidget(toolX, toolPicker.finalToolY + 20, this);
-        allWidgets.add(stampBag);
-        addRenderableWidget(stampBag);
+        this.stampBag = new StampBagWidget(toolX, this.toolPicker.finalToolY + 20, this);
+        this.allWidgets.add(this.stampBag);
+        this.addRenderableWidget(this.stampBag);
 
         this.compassWidget = new CompassWidget(this.width - 100, this.height - 90);
         this.addRenderableOnly(this.compassWidget);
@@ -84,9 +84,9 @@ public class MapScreen extends Screen {
 //            cursorAdjusted = true;
 //        }
 
-        stampScreen = StampBagScreen.INSTANCE;
-        stampScreen.setMapScreen(this);
-        stampScreen.changeStage(stampScreen.getState());
+        this.stampScreen = StampBagScreen.INSTANCE;
+        this.stampScreen.setMapScreen(this);
+        this.stampScreen.changeStage(this.stampScreen.getState());
     }
 
     @Override
@@ -97,7 +97,7 @@ public class MapScreen extends Screen {
 
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
-        stampScreen.renderScreen(guiGraphics, mouseX, mouseY, partialTick);
+        this.stampScreen.renderScreen(guiGraphics, mouseX, mouseY, partialTick);
 
         final Vec2 mouse = Helper.preciseMousePos();
         guiGraphics.pose().pushPose();
@@ -138,14 +138,14 @@ public class MapScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
         StampBagScreen.INSTANCE.mouseClicked(mouseX, mouseY, button);
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
     public boolean keyPressed(final int keyCode, final int scanCode, final int modifiers) {
-        if (!stampScreen.hasAnyTextBoxFoxused()) {
+        if (!this.stampScreen.hasAnyTextBoxFoxused()) {
             if (Services.KEY_MAPPINGS.matches(IKeyMappings.Normal.OPEN_MAP, keyCode, scanCode, modifiers)) {
                 this.onClose();
                 return true;
@@ -179,9 +179,9 @@ public class MapScreen extends Screen {
     @Override
     public void onClose() {
         super.onClose();
-        minecraft.level.playLocalSound(minecraft.getInstance().player, SoundEvents.BOOK_PUT, SoundSource.MASTER, 1f, 0.5f);
+        this.minecraft.level.playLocalSound(this.Minecraft.getInstance().player, SoundEvents.BOOK_PUT, SoundSource.MASTER, 1f, 0.5f);
         StampBagScreen.INSTANCE.changeStage(StampBagScreen.ScreenState.IDLE);
-        stampScreen.parentClose();
+        this.stampScreen.parentClose();
         MapwrightClient.PAGE_MANAGER.getSpyglassPins().clear();
     }
 
@@ -196,17 +196,17 @@ public class MapScreen extends Screen {
 
     //all these have been changed to public for usages in StampBagScreen
     @Override
-    public <T extends GuiEventListener & Renderable & NarratableEntry> T addRenderableWidget(T widget) {
+    public <T extends GuiEventListener & Renderable & NarratableEntry> T addRenderableWidget(final T widget) {
         return super.addRenderableWidget(widget);
     }
 
     @Override
-    public <T extends GuiEventListener & NarratableEntry> T addWidget(T listener) {
+    public <T extends GuiEventListener & NarratableEntry> T addWidget(final T listener) {
         return super.addWidget(listener);
     }
 
     @Override
-    public void removeWidget(GuiEventListener listener) {
+    public void removeWidget(final GuiEventListener listener) {
         super.removeWidget(listener);
     }
 

@@ -8,13 +8,13 @@ import wawa.mapwright.map.StampBagScreen;
 public abstract class AbstractStampScreenWidget extends AbstractWidget {
 
     public final StampBagScreen parentScreen;
-    public AbstractStampScreenWidget(int x, int y, int width, int height, StampBagScreen parentScreen) {
+    public AbstractStampScreenWidget(final int x, final int y, final int width, final int height, final StampBagScreen parentScreen) {
         super(x, y, width, height, Component.empty());
         this.parentScreen = parentScreen;
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+    protected void updateWidgetNarration(final NarrationElementOutput narrationElementOutput) {
 
     }
 }

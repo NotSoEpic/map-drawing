@@ -20,17 +20,17 @@ public class CompassWidget extends AbstractWidget {
 
     private float xOffset = 0.0f;
 
-	public CompassWidget(int x, int y) {
+	public CompassWidget(final int x, final int y) {
         super(x, y, WIDTH, HEIGHT, Component.literal("Compass"));
     }
 
     @Override
-    protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        int cx = (int) (this.getX() + width / 2.0f);
-        int cy = (int) (this.getY() + height / 2.0f);
-        double dist = Vector2d.distance(mouseX, mouseY, cx, cy);
+    protected void renderWidget(final GuiGraphics graphics, final int mouseX, final int mouseY, final float partialTick) {
+        final int cx = (int) (this.getX() + this.width / 2.0f);
+        final int cy = (int) (this.getY() + this.height / 2.0f);
+        final double dist = Vector2d.distance(mouseX, mouseY, cx, cy);
 
-		float xOffsetTarget;
+		final float xOffsetTarget;
 		if(dist < WIDTH * 0.8f) {
             xOffsetTarget = WIDTH + WIDTH / 3f;
         } else {
@@ -40,14 +40,14 @@ public class CompassWidget extends AbstractWidget {
         final float rot = ((Minecraft.getInstance().player.yRotO + 90) % 360) / 360.0f;
         final int frame = Math.round(rot * 32);
 
-        graphics.blit((int) (this.getX() + xOffset), this.getY(), 0, WIDTH, HEIGHT, COMPASS, 1.0f, 1.0f, 1.0f, 1.0f);
-        graphics.blit(POINTER, (int) (this.getX() + xOffset), this.getY(), 0.0f, HEIGHT * frame, WIDTH, HEIGHT, WIDTH, HEIGHT * 32);
+        graphics.blit((int) (this.getX() + this.xOffset), this.getY(), 0, WIDTH, HEIGHT, this.COMPASS, 1.0f, 1.0f, 1.0f, 1.0f);
+        graphics.blit(this.POINTER, (int) (this.getX() + this.xOffset), this.getY(), 0.0f, HEIGHT * frame, WIDTH, HEIGHT, WIDTH, HEIGHT * 32);
 
-        xOffset = Mth.clampedLerp(xOffset, xOffsetTarget, partialTick * 0.2f);
+        this.xOffset = Mth.clampedLerp(this.xOffset, xOffsetTarget, partialTick * 0.2f);
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+    protected void updateWidgetNarration(final NarrationElementOutput narrationElementOutput) {
 
     }
 }

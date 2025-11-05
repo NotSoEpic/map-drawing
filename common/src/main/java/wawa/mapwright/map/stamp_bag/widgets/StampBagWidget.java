@@ -15,39 +15,39 @@ public class StampBagWidget extends AbstractWidget {
 
     private final MapScreen mapScreen;
 
-    public StampBagWidget(int x, int y, MapScreen screen) {
+    public StampBagWidget(final int x, final int y, final MapScreen screen) {
         super(x, y, 16, 16, Component.literal("Stamp Bag"));
-        mapScreen = screen;
+        this.mapScreen = screen;
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float v) {
-        if ((mapScreen.toolPicker.getImageFromScissorTool() != null & MapwrightClient.TOOL_MANAGER.get() instanceof CopyTool)
+    protected void renderWidget(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float v) {
+        if ((this.mapScreen.toolPicker.getImageFromScissorTool() != null & MapwrightClient.TOOL_MANAGER.get() instanceof CopyTool)
                 || StampBagScreen.INSTANCE.getState() != StampBagScreen.ScreenState.IDLE) {
-            GUIElementAtlases.STAMP_BAG_OPEN.render(guiGraphics, getX(), getY());
-            if (isHovered) {
-                GUIElementAtlases.STAMP_BAG_OPEN_HIGHLIGHT.render(guiGraphics, getX() - 1, getY() - 1);
+            GUIElementAtlases.STAMP_BAG_OPEN.render(guiGraphics, this.getX(), this.getY());
+            if (this.isHovered) {
+                GUIElementAtlases.STAMP_BAG_OPEN_HIGHLIGHT.render(guiGraphics, this.getX() - 1, this.getY() - 1);
             }
         } else {
-            GUIElementAtlases.STAMP_BAG_CLOSED.render(guiGraphics, getX(), getY());
-            if (isHovered) {
-                GUIElementAtlases.STAMP_BAG_CLOSED_HIGHLIGHT.render(guiGraphics, getX() - 1, getY() - 1);
+            GUIElementAtlases.STAMP_BAG_CLOSED.render(guiGraphics, this.getX(), this.getY());
+            if (this.isHovered) {
+                GUIElementAtlases.STAMP_BAG_CLOSED_HIGHLIGHT.render(guiGraphics, this.getX() - 1, this.getY() - 1);
                 guiGraphics.renderTooltip(Minecraft.getInstance().font, Component.translatable("mapwright.tool.stamp"), mouseX, mouseY);
             }
         }
     }
 
     @Override
-    public void onClick(double mouseX, double mouseY) {
+    public void onClick(final double mouseX, final double mouseY) {
         super.onClick(mouseX, mouseY);
 
-        StampBagScreen ss = mapScreen.stampScreen;
+        final StampBagScreen ss = this.mapScreen.stampScreen;
         if (ss.getState() != StampBagScreen.ScreenState.IDLE) {
             ss.changeStage(StampBagScreen.ScreenState.IDLE);
             return;
         }
 
-        if (mapScreen.toolPicker.getImageFromScissorTool() != null && MapwrightClient.TOOL_MANAGER.get() instanceof CopyTool) {
+        if (this.mapScreen.toolPicker.getImageFromScissorTool() != null && MapwrightClient.TOOL_MANAGER.get() instanceof CopyTool) {
             ss.changeStage(StampBagScreen.ScreenState.SAVING);
         } else {
             ss.changeStage(StampBagScreen.ScreenState.BROWSING);
@@ -55,7 +55,7 @@ public class StampBagWidget extends AbstractWidget {
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+    protected void updateWidgetNarration(final NarrationElementOutput narrationElementOutput) {
 
     }
 }

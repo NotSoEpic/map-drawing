@@ -11,7 +11,7 @@ import wawa.mapwright.config.MapwrightClientConfig;
 @Mixin(Gui.class)
 public class GuiMixin {
     @WrapOperation(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/DebugScreenOverlay;showDebugScreen()Z"))
-	private boolean mapwright$showDebugScreen(DebugScreenOverlay instance, Operation<Boolean> original) {
+	private boolean mapwright$showDebugScreen(final DebugScreenOverlay instance, final Operation<Boolean> original) {
         if(!MapwrightClientConfig.REDUCED_DEBUG_LEVEL.get().allowsRotation()) {
             return false;
         }

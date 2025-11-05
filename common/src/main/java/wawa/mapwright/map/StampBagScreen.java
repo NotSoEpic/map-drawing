@@ -45,97 +45,97 @@ public class StampBagScreen {
 	private final EditBox searchWidget;
 
 	public StampEntry[] entries = new StampEntry[3];
-	private int browseBGWidth = 178;
-	private int browseBGY = 100;
-	private int browseBGHeight = 138;
+	private final int browseBGWidth = 178;
+	private final int browseBGY = 100;
+	private final int browseBGHeight = 138;
 
 	public StampBagScreen() {
-		saveText = new EditBox(Minecraft.getInstance().font, 72, 17, Component.empty());
-		saveText.setFocused(false);
-		saveText.setCanLoseFocus(true);
-		saveText.setMaxLength(72);
+        this.saveText = new EditBox(Minecraft.getInstance().font, 72, 17, Component.empty());
+        this.saveText.setFocused(false);
+        this.saveText.setCanLoseFocus(true);
+        this.saveText.setMaxLength(72);
 
-		createSaveWidgets();
-		createEntryWidgets();
+        this.createSaveWidgets();
+        this.createEntryWidgets();
 
-		up = new GUIElementButton(0, 0, 16, GUIElementAtlases.STAMP_BAG_BROWSE_UP, b -> {
-			int maxPageCount;
-			if (usingSearch) {
-				maxPageCount = requestedInfo.size();
-			} else if (usingFavorites) {
+        this.up = new GUIElementButton(0, 0, 16, GUIElementAtlases.STAMP_BAG_BROWSE_UP, b -> {
+			final int maxPageCount;
+			if (this.usingSearch) {
+				maxPageCount = this.requestedInfo.size();
+			} else if (this.usingFavorites) {
 				maxPageCount = MapwrightClient.STAMP_HANDLER.getTotalEntryCount(true);
 			} else {
 				maxPageCount = MapwrightClient.STAMP_HANDLER.getTotalEntryCount();
 			}
 
-			page = (int) Math.clamp(page - 1, 1, maxPageCount == 0 ? 1 : Math.ceil(maxPageCount / 3f));
-			refreshStamps();
+            this.page = (int) Math.clamp(this.page - 1, 1, maxPageCount == 0 ? 1 : Math.ceil(maxPageCount / 3f));
+            this.refreshStamps();
 		});
 
-		down = new GUIElementButton(0, 0, 16, GUIElementAtlases.STAMP_BAG_BROWSE_DOWN, b -> {
-			int maxPageCount;
-			if (usingSearch) {
-				maxPageCount = requestedInfo.size();
-			} else if (usingFavorites) {
+        this.down = new GUIElementButton(0, 0, 16, GUIElementAtlases.STAMP_BAG_BROWSE_DOWN, b -> {
+			final int maxPageCount;
+			if (this.usingSearch) {
+				maxPageCount = this.requestedInfo.size();
+			} else if (this.usingFavorites) {
 				maxPageCount = MapwrightClient.STAMP_HANDLER.getTotalEntryCount(true);
 			} else {
 				maxPageCount = MapwrightClient.STAMP_HANDLER.getTotalEntryCount();
 			}
 
-			page = (int) Math.clamp(page + 1, 1, maxPageCount == 0 ? 1 : Math.ceil(maxPageCount / 3f));
-			refreshStamps();
+            this.page = (int) Math.clamp(this.page + 1, 1, maxPageCount == 0 ? 1 : Math.ceil(maxPageCount / 3f));
+            this.refreshStamps();
 		});
 
-		favorites = new DualGUIElement(0, 0, 16, GUIElementAtlases.STAMP_BAG_BROWSE_UNFAVORITE, GUIElementAtlases.STAMP_BAG_BROWSE_FAVORITE, b -> {
-			usingFavorites ^= true;
-			page = 1;
+        this.favorites = new DualGUIElement(0, 0, 16, GUIElementAtlases.STAMP_BAG_BROWSE_UNFAVORITE, GUIElementAtlases.STAMP_BAG_BROWSE_FAVORITE, b -> {
+            this.usingFavorites ^= true;
+            this.page = 1;
 
-			((DualGUIElement) b).imageSwitch = usingFavorites;
+			((DualGUIElement) b).imageSwitch = this.usingFavorites;
 
-			refreshStamps();
+            this.refreshStamps();
 		});
 
-		searchWidget = new EditBox(Minecraft.getInstance().font, GUIElementAtlases.STAMP_BAG_BROWSE_ENTRY.width() - 1, 16, Component.empty());
-		searchWidget.setResponder(/*why not just call it a callback...*/ s -> {
-			usingSearch = !s.isEmpty();
+        this.searchWidget = new EditBox(Minecraft.getInstance().font, GUIElementAtlases.STAMP_BAG_BROWSE_ENTRY.width() - 1, 16, Component.empty());
+        this.searchWidget.setResponder(/*why not just call it a callback...*/ s -> {
+            this.usingSearch = !s.isEmpty();
 			if (!s.isEmpty()) {
-				page = 1;
+                this.page = 1;
 			}
-			refreshStamps();
+            this.refreshStamps();
 		});
-		searchWidget.setFocused(false);
-		searchWidget.setCanLoseFocus(true);
-		searchWidget.setMaxLength(72);
+        this.searchWidget.setFocused(false);
+        this.searchWidget.setCanLoseFocus(true);
+        this.searchWidget.setMaxLength(72);
 	}
 
 	private void createSaveWidgets() {
-		confirmSave = new GUIElementButton(0, 0, 16, GUIElementAtlases.STAMP_BAG_SAVE_CONFIRM, (b) -> {
-			if (!saveText.getValue().isEmpty() && mapScreen != null) {
-				NativeImage clipboard = mapScreen.toolPicker.getImageFromScissorTool();
+        this.confirmSave = new GUIElementButton(0, 0, 16, GUIElementAtlases.STAMP_BAG_SAVE_CONFIRM, (b) -> {
+			if (!this.saveText.getValue().isEmpty() && this.mapScreen != null) {
+				final NativeImage clipboard = this.mapScreen.toolPicker.getImageFromScissorTool();
 				if (clipboard != null) {
-					NativeImage copied = new NativeImage(clipboard.getWidth(), clipboard.getHeight(), false);
+					final NativeImage copied = new NativeImage(clipboard.getWidth(), clipboard.getHeight(), false);
 					copied.copyFrom(clipboard);
 
-					MapwrightClient.STAMP_HANDLER.addNewStamp(copied, saveText.getValue());
-					saveText.setValue("");
+					MapwrightClient.STAMP_HANDLER.addNewStamp(copied, this.saveText.getValue());
+                    this.saveText.setValue("");
 				}
 			}
 
-			changeStage(ScreenState.IDLE);
+            this.changeStage(ScreenState.IDLE);
 		});
 
-		cancelSave = new GUIElementButton(0, 0, 16, GUIElementAtlases.STAMP_BAG_SAVE_CANCEL, (b) -> {
-			saveText.setValue("");
-			changeStage(ScreenState.IDLE);
+        this.cancelSave = new GUIElementButton(0, 0, 16, GUIElementAtlases.STAMP_BAG_SAVE_CANCEL, (b) -> {
+            this.saveText.setValue("");
+            this.changeStage(ScreenState.IDLE);
 		});
 
-		allWidgets.addAll(List.of(saveText, confirmSave, cancelSave));
+        this.allWidgets.addAll(List.of(this.saveText, this.confirmSave, this.cancelSave));
 	}
 
 	private void createEntryWidgets() {
-		for (int i = 0; i < entries.length; i++) {
-			entries[i] = new StampEntry();
-			StampEntry entry = entries[i];
+		for (int i = 0; i < this.entries.length; i++) {
+            this.entries[i] = new StampEntry();
+			final StampEntry entry = this.entries[i];
 
 			entry.self = new StampEntryWidget(0, 0, this, (wid) -> {
 //				if (wid.stampInformation != null && wid.stampInformation.getTextureManager().getTexture() != null) {
@@ -144,16 +144,16 @@ public class StampBagScreen {
 			}, MapwrightClient.id("stamp_widget_" + i));
 
 			entry.delete = new GUIElementButton(0, 0, 16, GUIElementAtlases.STAMP_BAG_BROWSE_TRASH, (b) -> {
-				StampInformation si = entry.self.stampInformation;
+				final StampInformation si = entry.self.stampInformation;
 				if (si != null) {
 					MapwrightClient.STAMP_HANDLER.removeStamp(si);
 				}
 
-				refreshStamps();
+                this.refreshStamps();
 			});
 
 			entry.favorite = new DualGUIElement(0, 0, 16, GUIElementAtlases.STAMP_BAG_BROWSE_UNFAVORITE, GUIElementAtlases.STAMP_BAG_BROWSE_FAVORITE, (b) -> {
-				StampInformation si = entry.self.stampInformation;
+				final StampInformation si = entry.self.stampInformation;
 				if (si != null) {
 					si.setFavorited(!si.isFavorited());
 					((DualGUIElement) b).imageSwitch = si.isFavorited();
@@ -163,172 +163,172 @@ public class StampBagScreen {
 		}
 	}
 
-	public void setMapScreen(MapScreen screen) {
+	public void setMapScreen(final MapScreen screen) {
 		this.mapScreen = screen;
 	}
 
 	public void resetWidgetInfo() {
-		allWidgets.forEach(w -> {
+        this.allWidgets.forEach(w -> {
 			w.active = false;
 			w.setFocused(false);
 		});
 
 		//saving
-		int stampBagX = mapScreen.stampBag.getX();
-		int stampBagY = mapScreen.stampBag.getY();
+		final int stampBagX = this.mapScreen.stampBag.getX();
+		final int stampBagY = this.mapScreen.stampBag.getY();
 
-		setWidgetXY(saveText, stampBagX - 123, stampBagY - 1);
-		setWidgetXY(confirmSave, stampBagX - 49, stampBagY);
-		setWidgetXY(cancelSave, stampBagX - 28, stampBagY);
+		setWidgetXY(this.saveText, stampBagX - 123, stampBagY - 1);
+		setWidgetXY(this.confirmSave, stampBagX - 49, stampBagY);
+		setWidgetXY(this.cancelSave, stampBagX - 28, stampBagY);
 		//
 
 		//browsing
-		int backgroundX = (this.mapScreen.width - 15 - 16 / 2) - (148 + 16) - 21;
-		int backgroundY = 100;
+		final int backgroundX = (this.mapScreen.width - 15 - 16 / 2) - (148 + 16) - 21;
+		final int backgroundY = 100;
 
-		for (int i = 0; i < entries.length; i++) {
-			int entryY = backgroundY + 26 + (i * 37);
-			StampEntry entry = entries[i];
+		for (int i = 0; i < this.entries.length; i++) {
+			final int entryY = backgroundY + 26 + (i * 37);
+			final StampEntry entry = this.entries[i];
 			setWidgetXY(entry.self, backgroundX + 10, entryY);
 			setWidgetXY(entry.favorite, backgroundX + GUIElementAtlases.STAMP_BAG_BROWSE_ENTRY.width() + 9, entryY);
 			setWidgetXY(entry.delete, backgroundX + GUIElementAtlases.STAMP_BAG_BROWSE_ENTRY.width() + 9, entryY + 16);
 		}
 
-		setWidgetXY(up, backgroundX + GUIElementAtlases.STAMP_BAG_BROWSE_ENTRY.width() + 28, backgroundY + 26);
-		setWidgetXY(down, backgroundX + GUIElementAtlases.STAMP_BAG_BROWSE_ENTRY.width() + 28, backgroundY + 5 + (3 * 37));
-		setWidgetXY(favorites, backgroundX + GUIElementAtlases.STAMP_BAG_BROWSE_ENTRY.width() + 9, backgroundY + 5);
-		setWidgetXY(searchWidget, backgroundX + 10, backgroundY + 5);
+		setWidgetXY(this.up, backgroundX + GUIElementAtlases.STAMP_BAG_BROWSE_ENTRY.width() + 28, backgroundY + 26);
+		setWidgetXY(this.down, backgroundX + GUIElementAtlases.STAMP_BAG_BROWSE_ENTRY.width() + 28, backgroundY + 5 + (3 * 37));
+		setWidgetXY(this.favorites, backgroundX + GUIElementAtlases.STAMP_BAG_BROWSE_ENTRY.width() + 9, backgroundY + 5);
+		setWidgetXY(this.searchWidget, backgroundX + 10, backgroundY + 5);
 		//
 	}
 
-	private static void setWidgetXY(AbstractWidget w, int x, int y) {
+	private static void setWidgetXY(final AbstractWidget w, final int x, final int y) {
 		w.setX(x);
 		w.setY(y);
 	}
 
-	public void changeStage(ScreenState newStage) {
-		for (AbstractWidget w : activeWidgets) {
+	public void changeStage(final ScreenState newStage) {
+		for (final AbstractWidget w : this.activeWidgets) {
 			//TODO: properly fix this
-			mapScreen.removeWidget(w);
+            this.mapScreen.removeWidget(w);
 			w.setFocused(false);
 			w.active = false;
 		}
-		resetWidgetInfo();
-		activeWidgets.clear();
+        this.resetWidgetInfo();
+        this.activeWidgets.clear();
 
-		if (state == ScreenState.BROWSING) {
-			for (StampInformation si : requestedInfo) {
+		if (this.state == ScreenState.BROWSING) {
+			for (final StampInformation si : this.requestedInfo) {
 				si.getTextureManager().removeUser();
 			}
 		}
 
-		state = newStage;
+        this.state = newStage;
 		switch (newStage) {
 			case SAVING -> {
-				addWidget(saveText);
-				addWidget(confirmSave);
-				addWidget(cancelSave);
+                this.addWidget(this.saveText);
+                this.addWidget(this.confirmSave);
+                this.addWidget(this.cancelSave);
 
 				//we can comment this out if we don't want this behaviour when saving a stamp!
-				setMapScreenWidgetActivity(false);
+                this.setMapScreenWidgetActivity(false);
 			}
 
 			case BROWSING -> {
-				if (refreshStamps()) {
+				if (this.refreshStamps()) {
 					return;
 				}
 
-				addWidget(up);
-				addWidget(down);
-				addWidget(searchWidget);
-				addWidget(favorites);
+                this.addWidget(this.up);
+                this.addWidget(this.down);
+                this.addWidget(this.searchWidget);
+                this.addWidget(this.favorites);
 			}
 
-			case IDLE -> setMapScreenWidgetActivity(true);
+			case IDLE -> this.setMapScreenWidgetActivity(true);
 		}
 	}
 
 	private boolean refreshStamps() {
-		for (StampInformation si : requestedInfo) {
+		for (final StampInformation si : this.requestedInfo) {
 			si.getTextureManager().removeUser();
 		}
-		requestedInfo.clear();
+        this.requestedInfo.clear();
 
-		int pageLoc = 3 * page;
-		if (usingSearch) {
-			MapwrightClient.STAMP_HANDLER.requestStampContaining(requestedInfo, searchWidget.getValue(), usingFavorites);
+		final int pageLoc = 3 * this.page;
+		if (this.usingSearch) {
+			MapwrightClient.STAMP_HANDLER.requestStampContaining(this.requestedInfo, this.searchWidget.getValue(), this.usingFavorites);
 		} else {
-			MapwrightClient.STAMP_HANDLER.bulkRequestStamps(requestedInfo, usingFavorites, pageLoc - 3, pageLoc - 2, pageLoc - 1);
+			MapwrightClient.STAMP_HANDLER.bulkRequestStamps(this.requestedInfo, this.usingFavorites, pageLoc - 3, pageLoc - 2, pageLoc - 1);
 		}
 
 		for (int i = 0; i < 3; i++) {
 			int index = i;
-			if (usingSearch) {
+			if (this.usingSearch) {
 				index = pageLoc - (3 - i);
 			}
 
-			StampEntry entry = entries[i];
+			final StampEntry entry = this.entries[i];
 
-			if (!requestedInfo.isEmpty() && index >= 0 && index <= requestedInfo.size() - 1) {
-				StampInformation si = requestedInfo.get(index);
+			if (!this.requestedInfo.isEmpty() && index >= 0 && index <= this.requestedInfo.size() - 1) {
+				final StampInformation si = this.requestedInfo.get(index);
 
 				entry.self.changeStampInformation(si);
-				addWidget(entry.self);
-				addWidget(entry.delete);
-				addWidget(entry.favorite);
+                this.addWidget(entry.self);
+                this.addWidget(entry.delete);
+                this.addWidget(entry.favorite);
 				entry.favorite.imageSwitch = si.isFavorited();
 
 				entry.addedWidgets = true;
 			} else {
-				removeWidget(entry.self);
-				removeWidget(entry.delete);
-				removeWidget(entry.favorite);
+                this.removeWidget(entry.self);
+                this.removeWidget(entry.delete);
+                this.removeWidget(entry.favorite);
 
 				entry.self.changeStampInformation(null);
 				entry.addedWidgets = false;
 			}
 		}
 
-		for (StampInformation si : requestedInfo) {
+		for (final StampInformation si : this.requestedInfo) {
 			si.getTextureManager().addUser();
 		}
 
 		return false;
 	}
 
-	private void setMapScreenWidgetActivity(boolean active) {
-		for (AbstractWidget w : mapScreen.allWidgets) {
+	private void setMapScreenWidgetActivity(final boolean active) {
+		for (final AbstractWidget w : this.mapScreen.allWidgets) {
 			w.active = active;
 		}
 
 		//always keep the stamp bag widget active
-		mapScreen.stampBag.active = true;
+        this.mapScreen.stampBag.active = true;
 	}
 
-	public void addWidget(AbstractWidget wid) {
+	public void addWidget(final AbstractWidget wid) {
 		wid.active = true;
-		mapScreen.addWidget(wid);
-		activeWidgets.add(wid);
+        this.mapScreen.addWidget(wid);
+        this.activeWidgets.add(wid);
 	}
 
-	public void removeWidget(AbstractWidget wid) {
-		mapScreen.removeWidget(wid);
-		activeWidgets.remove(wid);
+	public void removeWidget(final AbstractWidget wid) {
+        this.mapScreen.removeWidget(wid);
+        this.activeWidgets.remove(wid);
 		wid.setFocused(false);
 		wid.active = false;
 	}
 
 	public void renderScreen(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
-		PoseStack ps = guiGraphics.pose();
+		final PoseStack ps = guiGraphics.pose();
 
 		ps.pushPose();
 
 		ps.pushPose();
-		renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+        this.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
 		ps.popPose();
 
 		ps.pushPose();
-		for (AbstractWidget w : activeWidgets) {
+		for (final AbstractWidget w : this.activeWidgets) {
 			ps.pushPose();
 			w.render(guiGraphics, mouseX, mouseY, partialTick);
 			ps.popPose();
@@ -337,62 +337,62 @@ public class StampBagScreen {
 	}
 
 	public void renderBackground(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
-		switch (state) {
+		switch (this.state) {
 			case SAVING -> {
-				GUIElementAtlases background = GUIElementAtlases.STAMP_BAG_SAVE;
-				int x = mapScreen.stampBag.getX() - background.width();
-				int y = mapScreen.stampBag.getY() - 5;
+				final GUIElementAtlases background = GUIElementAtlases.STAMP_BAG_SAVE;
+				final int x = this.mapScreen.stampBag.getX() - background.width();
+				final int y = this.mapScreen.stampBag.getY() - 5;
 				background.render(guiGraphics, x, y);
 			}
 
 			case BROWSING -> {
-				int browseBGX = (this.mapScreen.width - 15 - 16 / 2) - (164) - 21;
-				guiGraphics.blitSprite(StampBagDebuggerTool.backgroundID, browseBGX, browseBGY, browseBGWidth, browseBGHeight);
+				final int browseBGX = (this.mapScreen.width - 15 - 16 / 2) - (164) - 21;
+				guiGraphics.blitSprite(StampBagDebuggerTool.backgroundID, browseBGX, this.browseBGY, this.browseBGWidth, this.browseBGHeight);
 
-				for (int i = 0; i < entries.length; i++) {
-					if (entries[i].addedWidgets) {
-						GUIElementAtlases.STAMP_BAG_BROWSE_ENTRY.render(guiGraphics, browseBGX + 10, browseBGY + 26 + (i * 37));
+				for (int i = 0; i < this.entries.length; i++) {
+					if (this.entries[i].addedWidgets) {
+						GUIElementAtlases.STAMP_BAG_BROWSE_ENTRY.render(guiGraphics, browseBGX + 10, this.browseBGY + 26 + (i * 37));
 					}
 
-					int maxPageCount;
-					if (usingSearch) {
-						maxPageCount = requestedInfo.size();
-					} else if (usingFavorites) {
+					final int maxPageCount;
+					if (this.usingSearch) {
+						maxPageCount = this.requestedInfo.size();
+					} else if (this.usingFavorites) {
 						maxPageCount = MapwrightClient.STAMP_HANDLER.getTotalEntryCount(true);
 					} else {
 						maxPageCount = MapwrightClient.STAMP_HANDLER.getTotalEntryCount();
 					}
 
-					guiGraphics.drawString(Minecraft.getInstance().font, "%s/%s".formatted(maxPageCount == 0 ? 0 : page, (int) Math.ceil(maxPageCount / 3f)), browseBGX + GUIElementAtlases.STAMP_BAG_BROWSE_ENTRY.width() + 27, browseBGY + 74, Color.WHITE.getRGB(), true);
+					guiGraphics.drawString(Minecraft.getInstance().font, "%s/%s".formatted(maxPageCount == 0 ? 0 : this.page, (int) Math.ceil(maxPageCount / 3f)), browseBGX + GUIElementAtlases.STAMP_BAG_BROWSE_ENTRY.width() + 27, this.browseBGY + 74, Color.WHITE.getRGB(), true);
 				}
 			}
 		}
 	}
 
-	public void mouseClicked(double mouseX, double mouseY, int button) {
-		if (state != ScreenState.IDLE && state != ScreenState.SAVING) {
-			int browseBGX = (this.mapScreen.width - 15 - 16 / 2) - (164) - 21;
-			if ((mouseX < browseBGX || mouseX > browseBGX + browseBGWidth || mouseY < browseBGY || mouseY > browseBGY + browseBGHeight) && !this.mapScreen.stampBag.isHovered()) {
-				changeStage(ScreenState.IDLE);
+	public void mouseClicked(final double mouseX, final double mouseY, final int button) {
+		if (this.state != ScreenState.IDLE && this.state != ScreenState.SAVING) {
+			final int browseBGX = (this.mapScreen.width - 15 - 16 / 2) - (164) - 21;
+			if ((mouseX < browseBGX || mouseX > browseBGX + this.browseBGWidth || mouseY < this.browseBGY || mouseY > this.browseBGY + this.browseBGHeight) && !this.mapScreen.stampBag.isHovered()) {
+                this.changeStage(ScreenState.IDLE);
 			}
 		}
 	}
 
 	public void parentClose() {
-		for (AbstractWidget w : activeWidgets) {
+		for (final AbstractWidget w : this.activeWidgets) {
 			w.setFocused(false);
-			mapScreen.removeWidget(w);
+            this.mapScreen.removeWidget(w);
 		}
 
-		mapScreen = null;
+        this.mapScreen = null;
 	}
 
 	public ScreenState getState() {
-		return state;
+		return this.state;
 	}
 
 	public boolean hasAnyTextBoxFoxused() {
-		return saveText.isFocused() || searchWidget.isFocused();
+		return this.saveText.isFocused() || this.searchWidget.isFocused();
 	}
 
 	public enum ScreenState {
@@ -408,9 +408,9 @@ public class StampBagScreen {
 		public boolean addedWidgets = false;
 
 		public void addAllWidgets() {
-			addWidget(favorite);
-			addWidget(delete);
-			addWidget(self);
+            StampBagScreen.this.addWidget(this.favorite);
+            StampBagScreen.this.addWidget(this.delete);
+            StampBagScreen.this.addWidget(this.self);
 		}
 	}
 }

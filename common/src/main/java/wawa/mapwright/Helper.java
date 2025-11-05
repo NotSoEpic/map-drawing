@@ -36,7 +36,7 @@ public class Helper {
         return value;
     }
 
-    public static boolean isUsingSpyglass(Player player) {
+    public static boolean isUsingSpyglass(final Player player) {
         return player.isUsingItem() && player.getItemInHand(player.getUsedItemHand()).is(Items.SPYGLASS);
     }
 

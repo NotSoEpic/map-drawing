@@ -137,7 +137,7 @@ public class MapWidget extends AbstractWidget {
         if (this.isMouseOver(mouseX, mouseY)) {
             this.oldMouseX = mouseX;
             this.oldMouseY = mouseY;
-            MouseType newType = switch (button) {
+            final MouseType newType = switch (button) {
                 case GLFW.GLFW_MOUSE_BUTTON_LEFT -> MouseType.LEFT;
                 case GLFW.GLFW_MOUSE_BUTTON_RIGHT -> MouseType.RIGHT;
                 case GLFW.GLFW_MOUSE_BUTTON_MIDDLE -> MouseType.MIDDLE;

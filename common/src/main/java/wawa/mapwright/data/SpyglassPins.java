@@ -40,8 +40,8 @@ public class SpyglassPins {
 		return this.pins;
 	}
 
-	public void addDelayedRequest(DhRequest request) {
-		delayedPins.add(request);
+	public void addDelayedRequest(final DhRequest request) {
+        this.delayedPins.add(request);
 		MultithreadedDHTerrainAccess.INSTANCE.addRequest(request);
 	}
 
@@ -63,7 +63,7 @@ public class SpyglassPins {
 		if (!this.pins.isEmpty()) {
 			Minecraft.getInstance().player.playSound(SoundEvents.AMETHYST_BLOCK_RESONATE, 0.25f, 1f);
 			this.pins.clear();
-			delayedPins.clear();
+            this.delayedPins.clear();
 
 			MultithreadedDHTerrainAccess.INSTANCE.voidRequests();
 			DistantRaycast.clearCache();
@@ -74,15 +74,15 @@ public class SpyglassPins {
 		if (Minecraft.getInstance().player != null) {
 			//filter and move all delayed requests into pin data
 
-			int size = delayedPins.size();
-			Iterator<DhRequest> iter = delayedPins.iterator();
+			final int size = this.delayedPins.size();
+			final Iterator<DhRequest> iter = this.delayedPins.iterator();
 			while (iter.hasNext()) {
-				DhRequest req = iter.next();
+				final DhRequest req = iter.next();
 				if (req.isFinished()) {
 					iter.remove();
 
 					if (!req.finishedLoc().equals(EMPTY)) {
-						add(req.finishedLoc());
+                        this.add(req.finishedLoc());
 
 						if (size == 1) {
 							MapwrightClient.targetPanningPosition.set(req.finishedLoc().x, req.finishedLoc().z);
@@ -91,10 +91,10 @@ public class SpyglassPins {
 				}
 			}
 
-			if (!delayedPins.isEmpty()) {
+			if (!this.delayedPins.isEmpty()) {
 				boolean oneTookLong = false;
-				for (DhRequest delayedPin : delayedPins) {
-					int ticks = delayedPin.ticksSinceRequested.incrementAndGet();
+				for (final DhRequest delayedPin : this.delayedPins) {
+					final int ticks = delayedPin.ticksSinceRequested.incrementAndGet();
 					if (ticks > 20) {
 						oneTookLong = true;
 					}

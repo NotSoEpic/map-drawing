@@ -23,36 +23,36 @@ public class StampTexture extends AbstractTexture {
     private NativeImage stamp;
 
     public void tick() {
-        if (removedFromHandler) {
-            if (stamp != null) {
-                releaseStamp();
+        if (this.removedFromHandler) {
+            if (this.stamp != null) {
+                this.releaseStamp();
             }
 
             return;
         }
 
-        if (stamp != null) {
-            if (usages <= 0 && ticksUntilRemoval-- <= 0) {
-                releaseStamp();
-            } else if (usages > 0) {
-                ticksUntilRemoval = MAX_LIFE;
+        if (this.stamp != null) {
+            if (this.usages <= 0 && this.ticksUntilRemoval-- <= 0) {
+                this.releaseStamp();
+            } else if (this.usages > 0) {
+                this.ticksUntilRemoval = MAX_LIFE;
             }
 
             return;
         }
 
-        ticksUntilRemoval = MAX_LIFE;
+        this.ticksUntilRemoval = MAX_LIFE;
     }
 
     public void addUser() {
-        if (!removedFromHandler) {
-            usages++;
+        if (!this.removedFromHandler) {
+            this.usages++;
         }
     }
 
     public void removeUser() {
-        if (usages > 0) {
-            usages--;
+        if (this.usages > 0) {
+            this.usages--;
         }
     }
 
@@ -61,21 +61,21 @@ public class StampTexture extends AbstractTexture {
     }
 
     public void releaseStamp() {
-        if (stamp != null) {
-            stamp.close();
+        if (this.stamp != null) {
+            this.stamp.close();
             super.releaseId();
-            stamp = null;
+            this.stamp = null;
         }
     }
 
-    public void setFirstStamp(@NotNull NativeImage image) {
-        if (!removedFromHandler && stamp == null) {
-            stamp = image;
-            prepareStamp(stamp);
+    public void setFirstStamp(@NotNull final NativeImage image) {
+        if (!this.removedFromHandler && this.stamp == null) {
+            this.stamp = image;
+            this.prepareStamp(this.stamp);
         }
     }
 
-    private void prepareStamp(@NotNull NativeImage stamp) {
+    private void prepareStamp(@NotNull final NativeImage stamp) {
         if (!RenderSystem.isOnRenderThread()) {
             RenderSystem.recordRenderCall(() -> {
                 TextureUtil.prepareImage(this.getId(), stamp.getWidth(), stamp.getHeight());
@@ -97,9 +97,9 @@ public class StampTexture extends AbstractTexture {
     }
 
     public void removeFromHandler() {
-        removedFromHandler = true;
-        releaseStamp();
-        usages = 0;
+        this.removedFromHandler = true;
+        this.releaseStamp();
+        this.usages = 0;
     }
 
     @Override
@@ -107,7 +107,7 @@ public class StampTexture extends AbstractTexture {
     }
 
     @Override
-    public void load(ResourceManager resourceManager) throws IOException {
+    public void load(final ResourceManager resourceManager) throws IOException {
 
     }
 }

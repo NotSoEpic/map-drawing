@@ -112,7 +112,7 @@ public class PageManager {
         }
     }
 
-    public void snapshotPage(AbstractPage page) {
+    public void snapshotPage(final AbstractPage page) {
         if (this.state == SnapshotState.SNAPSHOTTING) {
             final Map<Vector2i, NativeImage> history = this.currentHistory.pagesModified();
 
@@ -197,7 +197,7 @@ public class PageManager {
     }
 
     public void putRegion(final int x, final int y, final int w, final int h, final RegionMapping regionMapping) {
-        startSnapshot();
+        this.startSnapshot();
         final int rx1 = Math.floorDiv(x, MapwrightClient.CHUNK_SIZE); // leftmost region
         final int ry1 = Math.floorDiv(y, MapwrightClient.CHUNK_SIZE); // upmost region
         final int rx2 = Math.floorDiv(x + w, MapwrightClient.CHUNK_SIZE); // rightmost region
@@ -221,7 +221,7 @@ public class PageManager {
                 }
             }
         }
-        endSnapshot();
+        this.endSnapshot();
     }
 
     public void putConditionalSquare(final int x, final int y, final int RGBA, final int r, final Predicate<Integer> shouldReplace) {
@@ -310,6 +310,6 @@ public class PageManager {
         this.futureHistories.forEach(OperationHistory::clear);
         this.futureHistories.clear();
 
-        pageIO = null;
+        this.pageIO = null;
     }
 }

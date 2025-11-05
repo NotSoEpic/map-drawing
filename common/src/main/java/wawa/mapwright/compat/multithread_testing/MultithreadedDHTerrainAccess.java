@@ -23,7 +23,7 @@ public class MultithreadedDHTerrainAccess {
 	private final DHThread executor;
 
 	public MultithreadedDHTerrainAccess() {
-		executor = new DHThread(requests);
+        this.executor = new DHThread(this.requests);
 	}
 
 	/**
@@ -32,15 +32,15 @@ public class MultithreadedDHTerrainAccess {
 	 *
 	 * @param request The request to perform a clip on.
 	 */
-	public void addRequest(DhRequest request) {
-		synchronized (requests) {
-			requests.add(request);
+	public void addRequest(final DhRequest request) {
+		synchronized (this.requests) {
+            this.requests.add(request);
 
-			if (!executor.isAlive()) {
-				executor.start();
+			if (!this.executor.isAlive()) {
+                this.executor.start();
 			} else {
-				if (executor.getState() == Thread.State.WAITING) {
-					LockSupport.unpark(executor);
+				if (this.executor.getState() == Thread.State.WAITING) {
+					LockSupport.unpark(this.executor);
 				}
 			}
 		}
@@ -51,12 +51,12 @@ public class MultithreadedDHTerrainAccess {
 	}
 
 	public synchronized void voidRequests() {
-		synchronized (requests) {
-			requests.clear();
+		synchronized (this.requests) {
+            this.requests.clear();
 		}
 	}
 
-	public static DhRequest createRequest(LocalPlayer player) {
+	public static DhRequest createRequest(final LocalPlayer player) {
 		return new DhRequest(player.getEyePosition(), player.getLookAngle(), MultithreadedDHTerrainAccess.INSTANCE.getViewDistance());
 	}
 

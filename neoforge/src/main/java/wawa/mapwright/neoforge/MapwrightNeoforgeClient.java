@@ -11,7 +11,7 @@ import wawa.mapwright.config.MapwrightClientConfig;
 
 @Mod(value = MapwrightClient.MOD_ID, dist = Dist.CLIENT)
 public final class MapwrightNeoforgeClient {
-    public MapwrightNeoforgeClient(ModContainer container, final IEventBus modBus) {
+    public MapwrightNeoforgeClient(final ModContainer container, final IEventBus modBus) {
         MapwrightClient.init();
         modBus.register(ClientEventsStartup.class);
         NeoForge.EVENT_BUS.register(ClientEventsRuntime.class);

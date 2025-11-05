@@ -83,7 +83,7 @@ public class DrawTool extends Tool {
     }
 
     @Override
-    public void mouseRelease(final PageManager activePage, MapWidget.MouseType mouseType, final Vector2d world) {
+    public void mouseRelease(final PageManager activePage, final MapWidget.MouseType mouseType, final Vector2d world) {
         activePage.endSnapshot();
     }
 

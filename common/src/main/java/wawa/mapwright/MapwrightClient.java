@@ -6,7 +6,6 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 import org.joml.Vector2d;
-import org.joml.Vector3d;
 import org.slf4j.Logger;
 import wawa.mapwright.data.PageManager;
 import wawa.mapwright.map.stamp_bag.StampBagHandler;

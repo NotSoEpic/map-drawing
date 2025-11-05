@@ -21,7 +21,7 @@ public class InputListener {
         while (minecraft.level != null && Services.KEY_MAPPINGS.consume(IKeyMappings.Normal.OPEN_MAP)) {
             final Vector2d playerPosition = new Vector2d((int) minecraft.player.getX(), (int) minecraft.player.getZ());
 
-            minecraft.level.playLocalSound(minecraft.getInstance().player, SoundEvents.BOOK_PAGE_TURN, SoundSource.MASTER, 0.5f, 1.0f);
+            minecraft.level.playLocalSound(Minecraft.getInstance().player, SoundEvents.BOOK_PAGE_TURN, SoundSource.MASTER, 0.5f, 1.0f);
 
             MapwrightClient.PAGE_MANAGER.reloadPageIO(minecraft.level, minecraft);
 
@@ -44,7 +44,7 @@ public class InputListener {
                     // If pins exist, move camera to average position
                     double avgX = 0;
                     double avgZ = 0;
-                    for (SpyglassPins.PinData pin : MapwrightClient.PAGE_MANAGER.getSpyglassPins().getPins()) {
+                    for (final SpyglassPins.PinData pin : MapwrightClient.PAGE_MANAGER.getSpyglassPins().getPins()) {
                         avgX += pin.position().x() / numPins;
                         avgZ += pin.position().z() / numPins;
                     }

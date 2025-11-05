@@ -18,7 +18,7 @@ public class DHThread extends Thread {
 	private final IDhApiTerrainDataCache cache;
 	//cache clearing casues crashes, just going to remove it entirely
 
-	public DHThread(Queue<DhRequest> requests) {
+	public DHThread(final Queue<DhRequest> requests) {
 		this.requests = requests;
 		this.cache = DhApi.Delayed.terrainRepo.getSoftCache();
 	}
@@ -27,10 +27,10 @@ public class DHThread extends Thread {
 	public void run() {
 		while (true) {
 			DhRequest request = null;
-			synchronized (requests) {
-				if (!requests.isEmpty()) {
+			synchronized (this.requests) {
+				if (!this.requests.isEmpty()) {
 					//gather request
-					request = requests.poll();
+					request = this.requests.poll();
 				}
 			}
 
@@ -39,7 +39,7 @@ public class DHThread extends Thread {
 				LockSupport.park(this);
 			} else {
 				//execute clip and set finished location inside the request
-				Vector3d clip = clip(request.origin(), request.direction(), request.length());
+				final Vector3d clip = this.clip(request.origin(), request.direction(), request.length());
 				if (clip != null) {
 					request.setFinishedLoc(clip);
 				}
@@ -65,7 +65,7 @@ public class DHThread extends Thread {
 				origin.x, origin.y, origin.z,
 				(float) direction.x, (float) direction.y, (float) direction.z,
 				length,
-				cache
+                this.cache
 		);
 
 		if (result.success && result.payload != null) {

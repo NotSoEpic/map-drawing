@@ -31,11 +31,11 @@ public record GUIElementAtlases(
             STAMP_BAG_BROWSE_FAVORITE = create(STAMP_BAG_SAVE_LOC, 0, 80, 16, 16, STAMP_BAG_SAVE_SCREEN_DIMENSIONS),
     STAMP_BAG_BROWSE_TRASH = create(STAMP_BAG_SAVE_LOC, 16, 64, 16, 16, STAMP_BAG_SAVE_SCREEN_DIMENSIONS);
 
-    public static GUIElementAtlases create(ResourceLocation loc, int startX, int startY, int width, int height, int dimension) {
+    public static GUIElementAtlases create(final ResourceLocation loc, final int startX, final int startY, final int width, final int height, final int dimension) {
         return new GUIElementAtlases(loc, startX, startY, width, height, dimension);
     }
 
-    public void render(GuiGraphics guiGraphics, int x, int y) {
-        guiGraphics.blit(loc, x, y, startX, startY, width(), height(), stampBagSaveScreenDimensions, stampBagSaveScreenDimensions);
+    public void render(final GuiGraphics guiGraphics, final int x, final int y) {
+        guiGraphics.blit(this.loc, x, y, this.startX, this.startY, this.width(), this.height(), this.stampBagSaveScreenDimensions, this.stampBagSaveScreenDimensions);
     }
 }

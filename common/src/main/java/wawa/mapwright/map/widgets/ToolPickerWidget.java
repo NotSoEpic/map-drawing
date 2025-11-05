@@ -31,10 +31,10 @@ public class ToolPickerWidget extends AbstractWidget {
         super(x, y, 0, 0, Component.literal("tool picker"));
         //updated after every tool entry
         //make sure of it!!
-        finalToolY = this.getY();
+        this.finalToolY = this.getY();
 
         this.tools.add(new SingleToolWidget(
-                this.getX(), offsetFinalY(0),
+                this.getX(), this.offsetFinalY(0),
                 MapwrightClient.id("tool/pan"),
                 MapwrightClient.id("tool/pan_highlight"),
                 (w) -> PanTool.INSTANCE,
@@ -42,18 +42,18 @@ public class ToolPickerWidget extends AbstractWidget {
         ));
 
         this.tools.add(new SingleToolWidget(
-                this.getX(), offsetFinalY(20),
+                this.getX(), this.offsetFinalY(20),
                 MapwrightClient.id("tool/pen/pen"),
                 MapwrightClient.id("tool/pen/pen_highlight"),
                 (w) -> this.pen,
                 Component.literal("pen")
         ));
 
-        this.brushWidget = new SingleToolWidget.BrushWidget(this.getX(), offsetFinalY(20));
+        this.brushWidget = new SingleToolWidget.BrushWidget(this.getX(), this.offsetFinalY(20));
         this.tools.add(this.brushWidget);
 
         this.tools.add(new SingleToolWidget(
-                this.getX(), offsetFinalY(20),
+                this.getX(), this.offsetFinalY(20),
                 MapwrightClient.id("tool/eraser/eraser"),
                 MapwrightClient.id("tool/eraser/eraser_highlight"),
                 (w) -> this.eraser,
@@ -61,13 +61,13 @@ public class ToolPickerWidget extends AbstractWidget {
         ));
 
         this.tools.add(new SingleToolWidget.PinWidget(
-                this.getX(), offsetFinalY(20),
+                this.getX(), this.offsetFinalY(20),
                 (w) -> this.pin,
                 Component.literal("pin")
         ));
 
         this.tools.add(new SingleToolWidget(
-                this.getX(), offsetFinalY(20),
+                this.getX(), this.offsetFinalY(20),
                 MapwrightClient.id("tool/copy/copy"),
                 MapwrightClient.id("tool/copy/copy_highlight"),
                 (w) -> CopyTool.INSTANCE,
@@ -83,8 +83,8 @@ public class ToolPickerWidget extends AbstractWidget {
         this.updateBounds();
     }
 
-    private int offsetFinalY(int offset) {
-        return finalToolY += offset;
+    private int offsetFinalY(final int offset) {
+        return this.finalToolY += offset;
     }
 
     public void pickHand() {
@@ -149,7 +149,7 @@ public class ToolPickerWidget extends AbstractWidget {
 
     @Override
     public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
-        if (!active) {
+        if (!this.active) {
             return false;
         }
 

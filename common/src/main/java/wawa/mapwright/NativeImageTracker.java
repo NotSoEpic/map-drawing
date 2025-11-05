@@ -12,7 +12,7 @@ public class NativeImageTracker {
     public static boolean tracking = true;
 
     public static NativeImage newImage(final int width, final int height, final boolean calloc) {
-        NativeImage image = new NativeImage(width, height, calloc);
+        final NativeImage image = new NativeImage(width, height, calloc);
         if (tracking) {
             images.add(new ImageAllocation(Thread.currentThread().getStackTrace(), image));
         }
@@ -22,7 +22,7 @@ public class NativeImageTracker {
     public static void checkAllocationAndClose() {
         int closed = 0;
         int unclosed = 0;
-        for (ImageAllocation image : images) {
+        for (final ImageAllocation image : images) {
             if (((NativeImageAccessor)(Object)image.image).getPixels() != 0) {
                 MapwrightClient.LOGGER.warn("Native image was not closed. Initialised at: {}", Arrays.toString(image.stackTrace));
                 unclosed++;

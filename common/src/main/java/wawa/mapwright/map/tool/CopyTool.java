@@ -39,7 +39,7 @@ public class CopyTool extends Tool {
             } else {
                 activePage.putRegion(end.x() - this.clipboard.getWidth() / 2, end.y() - this.clipboard.getHeight() / 2, this.clipboard.getWidth(), this.clipboard.getHeight(),
                         (dx, dy, old) -> {
-                            int pixelColor = this.clipboard.getPixelRGBA(dx, dy);
+                            final int pixelColor = this.clipboard.getPixelRGBA(dx, dy);
                             if (pixelColor == 0) {
                                 return activePage.getPixelARGB((end.x() - this.clipboard.getWidth() / 2) + dx, (end.y() - this.clipboard.getHeight() / 2) + dy);
                             } else {
@@ -58,7 +58,7 @@ public class CopyTool extends Tool {
     }
 
     @Override
-    public void mouseRelease(final PageManager activePage, MapWidget.MouseType mouseType, final Vector2d world) {
+    public void mouseRelease(final PageManager activePage, final MapWidget.MouseType mouseType, final Vector2d world) {
         final Vector2ic end = new Vector2i(world, RoundingMode.FLOOR);
 
         if (this.start != null) {

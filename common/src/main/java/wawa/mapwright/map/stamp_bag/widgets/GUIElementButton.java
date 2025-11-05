@@ -9,13 +9,13 @@ public class GUIElementButton extends Button {
 
     private final GUIElementAtlases texture;
 
-    public GUIElementButton(int x, int y, int scale, GUIElementAtlases element, OnPress onPress) {
+    public GUIElementButton(final int x, final int y, final int scale, final GUIElementAtlases element, final OnPress onPress) {
         super(x, y, scale, scale, Component.empty(), onPress, ($) -> Component.empty());
         this.texture = element;
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        texture.render(guiGraphics, getX(), getY());
+    protected void renderWidget(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick) {
+        this.texture.render(guiGraphics, this.getX(), this.getY());
     }
 }

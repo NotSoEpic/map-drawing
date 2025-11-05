@@ -11,8 +11,8 @@ import org.joml.RoundingMode;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
-import wawa.mapwright.Rendering;
 import wawa.mapwright.MapwrightClient;
+import wawa.mapwright.Rendering;
 import wawa.mapwright.data.PageManager;
 import wawa.mapwright.map.stamp_bag.StampInformation;
 import wawa.mapwright.map.stamp_bag.StampTexture;
@@ -27,22 +27,22 @@ public class StampTool extends Tool {
 	private ResourceLocation textureLoc = null;
 
 	//effectively our on select now!
-	public void setActiveStamp(@Nullable StampInformation stampInformation) {
-		changeStamp(stampInformation);
+	public void setActiveStamp(@Nullable final StampInformation stampInformation) {
+        this.changeStamp(stampInformation);
 	}
 
 	@Override
 	public void onDeselect() {
-		changeStamp(null);
-		Minecraft.getInstance().getTextureManager().release(textureLoc);
-		registeredTexture = false;
-		textureLoc = null;
+        this.changeStamp(null);
+		Minecraft.getInstance().getTextureManager().release(this.textureLoc);
+        this.registeredTexture = false;
+        this.textureLoc = null;
 	}
 
-	private void changeStamp(@Nullable StampInformation stampInformation) {
-		if (information != stampInformation) {
-			if (information != null) {
-				information.getTextureManager().removeUser();
+	private void changeStamp(@Nullable final StampInformation stampInformation) {
+		if (this.information != stampInformation) {
+			if (this.information != null) {
+                this.information.getTextureManager().removeUser();
 			}
 
 			if (stampInformation != null) {
@@ -54,23 +54,23 @@ public class StampTool extends Tool {
 	}
 
 	@Override
-	public void mouseDown(PageManager activePage, MapWidget.MouseType mouseType, Vector2d world) {
+	public void mouseDown(final PageManager activePage, final MapWidget.MouseType mouseType, Vector2d world) {
 		if (mouseType == MapWidget.MouseType.LEFT) {
-			if (information != null) { //idk how this would be the case...
-				StampTexture manager = information.getTextureManager();
-				NativeImage texture = manager.getTexture();
+			if (this.information != null) { //idk how this would be the case...
+				final StampTexture manager = this.information.getTextureManager();
+				final NativeImage texture = manager.getTexture();
 				if (texture == null) {
 					return;
 				}
 
 				//just making sure we can actually see the texture AND minecraft knows about it first
-				if (registeredTexture) {
+				if (this.registeredTexture) {
 					world = world.add(0, 8);
 					final Vector2ic end = new Vector2i(world, RoundingMode.FLOOR);
 
 					activePage.putRegion(end.x() - texture.getWidth() / 2, end.y() - texture.getHeight() / 2, texture.getWidth(), texture.getHeight(),
 							(dx, dy, old) -> {
-								int pixelColor = texture.getPixelRGBA(dx, dy);
+								final int pixelColor = texture.getPixelRGBA(dx, dy);
 								if (pixelColor == 0) {
 									return activePage.getPixelARGB((end.x() - texture.getWidth() / 2) + dx, (end.y() - texture.getHeight() / 2) + dy);
 								} else {
@@ -84,23 +84,23 @@ public class StampTool extends Tool {
 	}
 
 	@Override
-	public void renderWorld(GuiGraphics graphics, int worldX, int worldY, double xOff, double yOff) {
-		if (information != null) {
-			StampTexture manager = information.getTextureManager();
-			NativeImage texture = manager.getTexture();
+	public void renderWorld(final GuiGraphics graphics, final int worldX, int worldY, final double xOff, final double yOff) {
+		if (this.information != null) {
+			final StampTexture manager = this.information.getTextureManager();
+			final NativeImage texture = manager.getTexture();
 			if (texture == null) {
 				return;
 			}
 
-			if (!registeredTexture) {
-				registeredTexture = true;
-				ResourceLocation managerLocation = MapwrightClient.id("stamp_tool_image");
+			if (!this.registeredTexture) {
+                this.registeredTexture = true;
+				final ResourceLocation managerLocation = MapwrightClient.id("stamp_tool_image");
 				this.textureLoc = managerLocation;
 
 				Minecraft.getInstance().getTextureManager().register(managerLocation, manager);
 			}
 
-			final RenderType renderType = VeilRenderType.get(Rendering.RenderTypes.PALETTE_SWAP, textureLoc);
+			final RenderType renderType = VeilRenderType.get(Rendering.RenderTypes.PALETTE_SWAP, this.textureLoc);
 			if (renderType == null) {
 				return;
 			}
@@ -117,7 +117,7 @@ public class StampTool extends Tool {
 	}
 
 	@Override
-	public void renderScreen(GuiGraphics graphics, double mouseX, double mouseY) {
+	public void renderScreen(final GuiGraphics graphics, final double mouseX, final double mouseY) {
 		graphics.blitSprite(TEXTURE, (int) mouseX - 8, (int) mouseY - 8, 16, 16);
 	}
 }
