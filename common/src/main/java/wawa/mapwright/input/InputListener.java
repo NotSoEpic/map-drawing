@@ -23,6 +23,8 @@ public class InputListener {
 
             minecraft.level.playLocalSound(minecraft.getInstance().player, SoundEvents.BOOK_PAGE_TURN, SoundSource.MASTER, 0.5f, 1.0f);
 
+            MapwrightClient.PAGE_MANAGER.reloadPageIO(minecraft.level, minecraft);
+
             if (Helper.isUsingSpyglass(minecraft.player)) {
                 Vector3d target = getEndingPosition(minecraft.player);
                 if (target != null) {
