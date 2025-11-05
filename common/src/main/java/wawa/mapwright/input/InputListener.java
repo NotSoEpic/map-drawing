@@ -11,6 +11,7 @@ import wawa.mapwright.DistantRaycast;
 import wawa.mapwright.Helper;
 import wawa.mapwright.MapwrightClient;
 import wawa.mapwright.compat.multithread_testing.MultithreadedDHTerrainAccess;
+import wawa.mapwright.data.PageIO;
 import wawa.mapwright.data.SpyglassPins;
 import wawa.mapwright.map.MapScreen;
 import wawa.mapwright.platform.Services;
@@ -23,7 +24,9 @@ public class InputListener {
 
             minecraft.level.playLocalSound(Minecraft.getInstance().player, SoundEvents.BOOK_PAGE_TURN, SoundSource.MASTER, 0.5f, 1.0f);
 
-            MapwrightClient.PAGE_MANAGER.reloadPageIO(minecraft.level, minecraft);
+            if (MapwrightClient.PAGE_MANAGER.pageIO.getPagePath().endsWith("_0")) {
+                MapwrightClient.PAGE_MANAGER.reloadPageIO(minecraft.level, minecraft);
+            }
 
             if (Helper.isUsingSpyglass(minecraft.player)) {
                 Vector3d target = getEndingPosition(minecraft.player);
