@@ -18,7 +18,7 @@ void main() {
     }
 
     float average = (color.r + color.g + color.b) / 3.0f;
-    float offsetToAccountForTheRealKnowledge = 0.003;
+    float offsetToAccountForTheRealKnowledge = 0.005;
     vec3 outColor = samplePalette(average + offsetToAccountForTheRealKnowledge);
 
     fragColor = vec4(outColor, 1.0);

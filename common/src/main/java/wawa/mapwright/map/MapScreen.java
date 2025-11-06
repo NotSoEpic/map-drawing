@@ -68,7 +68,7 @@ public class MapScreen extends Screen {
         this.allWidgets.add(this.stampBag);
         this.addRenderableWidget(this.stampBag);
 
-        this.compassWidget = new CompassWidget(this.width - 100, this.height - 90);
+        this.compassWidget = new CompassWidget(this.width - 110, this.height - 110);
         this.addRenderableOnly(this.compassWidget);
         this.addRenderableOnly(new DebugTextRenderable(this));
 
@@ -121,7 +121,7 @@ public class MapScreen extends Screen {
     }
 
     public void deltaZoom(final int delta) {
-        this.zoomNum = Mth.clamp(this.zoomNum + delta, -2, 2);
+        this.zoomNum = Mth.clamp(this.zoomNum + delta, -2, 3);
         this.zoom = (float) Math.pow(2, this.zoomNum);
     }
 

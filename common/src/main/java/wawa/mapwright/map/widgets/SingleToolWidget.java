@@ -107,7 +107,7 @@ public class SingleToolWidget extends AbstractWidget {
         @Override
         protected void renderTooltip(final GuiGraphics guiGraphics, final int mouseX, final int mouseY) {
             if (!this.atMouse) {
-                super.renderTooltip(guiGraphics, this.getX() - 60 - Minecraft.getInstance().font.width(Component.translatable(this.id)), mouseY);
+                super.renderTooltip(guiGraphics, this.getX() - 70 - Minecraft.getInstance().font.width(Component.translatable(this.id)), mouseY);
             }
         }
 

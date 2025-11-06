@@ -86,9 +86,9 @@ public class Pin {
             return new Type(
                     MapwrightClient.id(name),
                     MapwrightClient.id("pin/" + name + "/" + name),
-                    MapwrightClient.id("pin/" + name + "/" + name + "_highlight"),
+                    MapwrightClient.id("pin/pin_highlight"),
                     MapwrightClient.id("pin/" + name + "/" + name + "_positioned"),
-                    MapwrightClient.id("pin/" + name + "/" + name + "_positioned_highlight")
+                    MapwrightClient.id("pin/pin_positioned_highlight")
             );
         }
 
