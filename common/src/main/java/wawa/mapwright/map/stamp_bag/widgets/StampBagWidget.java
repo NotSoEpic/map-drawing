@@ -9,7 +9,9 @@ import wawa.mapwright.MapwrightClient;
 import wawa.mapwright.gui.GUIElementAtlases;
 import wawa.mapwright.map.MapScreen;
 import wawa.mapwright.map.StampBagScreen;
+import wawa.mapwright.map.stamp_bag.StampInformation;
 import wawa.mapwright.map.tool.CopyTool;
+import wawa.mapwright.map.tool.StampTool;
 
 public class StampBagWidget extends AbstractWidget {
 
@@ -47,7 +49,7 @@ public class StampBagWidget extends AbstractWidget {
             return;
         }
 
-        if (this.mapScreen.toolPicker.getImageFromScissorTool() != null && MapwrightClient.TOOL_MANAGER.get() instanceof CopyTool) {
+	    if (MapwrightClient.TOOL_MANAGER.get() instanceof StampTool st && st.isTempStamp()) {
             ss.changeStage(StampBagScreen.ScreenState.SAVING);
         } else {
             ss.changeStage(StampBagScreen.ScreenState.BROWSING);

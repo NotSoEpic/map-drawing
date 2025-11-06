@@ -29,6 +29,11 @@ public class StampTool extends Tool {
 	@Override
 	public void onDeselect() {
 		setActiveStamp(null);
+
+		if (isTempStamp()) {
+			//make sure we release the stamp if this is a temp one
+			information.getTextureManager().releaseStamp();
+		}
 	}
 
 	public void setActiveStamp(@Nullable final StampInformation stampInformation) {
@@ -121,5 +126,9 @@ public class StampTool extends Tool {
 	@Override
 	public void renderScreen(final GuiGraphics graphics, final double mouseX, final double mouseY) {
 		graphics.blitSprite(TEXTURE, (int) mouseX - 8, (int) mouseY - 8, 16, 16);
+	}
+
+	public boolean isTempStamp() {
+		return information == MapwrightClient.STAMP_HANDLER.temporaryStampInformation;
 	}
 }

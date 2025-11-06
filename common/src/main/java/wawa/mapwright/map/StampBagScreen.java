@@ -111,10 +111,10 @@ public class StampBagScreen {
 	private void createSaveWidgets() {
         this.confirmSave = new GUIElementButton(0, 0, 16, GUIElementAtlases.STAMP_BAG_SAVE_CONFIRM, (b) -> {
 			if (!this.saveText.getValue().isEmpty() && this.mapScreen != null) {
-				final NativeImage clipboard = this.mapScreen.toolPicker.getImageFromScissorTool();
-				if (clipboard != null) {
-					final NativeImage copied = new NativeImage(clipboard.getWidth(), clipboard.getHeight(), false);
-					copied.copyFrom(clipboard);
+				final NativeImage texture = MapwrightClient.STAMP_HANDLER.temporaryStampInformation.getTextureManager().getTexture();
+				if (texture != null) {
+					final NativeImage copied = new NativeImage(texture.getWidth(), texture.getHeight(), false);
+					copied.copyFrom(texture);
 
 					MapwrightClient.STAMP_HANDLER.addNewStamp(copied, this.saveText.getValue());
                     this.saveText.setValue("");
@@ -140,11 +140,7 @@ public class StampBagScreen {
             this.entries[i] = new StampEntry();
 			final StampEntry entry = this.entries[i];
 
-			entry.self = new StampEntryWidget(0, 0, this, (wid) -> {
-//				if (wid.stampInformation != null && wid.stampInformation.getTextureManager().getTexture() != null) {
-//                    CopyTool.INSTANCE.clipboard = wid.stampInformation.getTextureManager().getTexture();
-//				}
-			}, MapwrightClient.id("stamp_widget_" + i));
+			entry.self = new StampEntryWidget(0, 0, this, (wid) -> {}, MapwrightClient.id("stamp_widget_" + i));
 
 			entry.delete = new GUIElementButton(0, 0, 16, GUIElementAtlases.STAMP_BAG_BROWSE_TRASH, (b) -> {
 				final StampInformation si = entry.self.stampInformation;
@@ -211,11 +207,11 @@ public class StampBagScreen {
 
 	public void changeStage(final ScreenState newStage) {
 		for (final AbstractWidget w : this.activeWidgets) {
-			//TODO: properly fix this
             this.mapScreen.removeWidget(w);
 			w.setFocused(false);
 			w.active = false;
 		}
+
         this.resetWidgetInfo();
         this.activeWidgets.clear();
 
