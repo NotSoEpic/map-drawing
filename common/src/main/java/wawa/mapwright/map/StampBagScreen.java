@@ -399,7 +399,7 @@ public class StampBagScreen {
 	}
 
 	public enum ScreenState {
-		IDLE, SAVING, BROWSING, SEARCHING, FAVORITING
+		IDLE, SAVING, BROWSING
 	}
 
 	public class StampEntry {

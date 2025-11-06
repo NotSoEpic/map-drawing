@@ -71,6 +71,11 @@ public final class StampInformation {
         return this.stampTexture;
     }
 
+	public void forceSetTexture(@NotNull final NativeImage newImage) {
+		stampTexture.releaseStamp();
+		stampTexture.setFirstStamp(newImage);
+	}
+
     public void setStampTexture(@NotNull final NativeImage newImage) {
         if (!this.removed) {
             final NativeImage texture = this.stampTexture.getTexture();

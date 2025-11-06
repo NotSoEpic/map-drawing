@@ -15,6 +15,8 @@ import wawa.mapwright.MapwrightClient;
 import wawa.mapwright.NativeImageTracker;
 import wawa.mapwright.Rendering;
 import wawa.mapwright.data.PageManager;
+import wawa.mapwright.map.stamp_bag.StampBagHandler;
+import wawa.mapwright.map.stamp_bag.StampInformation;
 import wawa.mapwright.map.widgets.MapWidget;
 
 public class CopyTool extends Tool {
@@ -30,13 +32,13 @@ public class CopyTool extends Tool {
 
     @Override
     public void mouseDown(final PageManager activePage, final MapWidget.MouseType mouseType, final Vector2d world) {
-        final Vector2ic end = new Vector2i(world, RoundingMode.FLOOR);
+//        final Vector2ic end = new Vector2i(world, RoundingMode.FLOOR);
         if (mouseType == MapWidget.MouseType.LEFT) {
             if (this.clipboard == null) {
                 if (this.start == null) {
                     this.start = new Vector2i(world, RoundingMode.FLOOR);
                 }
-            } else {
+            } /*else {
                 activePage.putRegion(end.x() - this.clipboard.getWidth() / 2, end.y() - this.clipboard.getHeight() / 2, this.clipboard.getWidth(), this.clipboard.getHeight(),
                         (dx, dy, old) -> {
                             final int pixelColor = this.clipboard.getPixelRGBA(dx, dy);
@@ -47,14 +49,14 @@ public class CopyTool extends Tool {
                             }
                         }
                 );
-            }
-        } else if (mouseType == MapWidget.MouseType.RIGHT) {
+            }*/
+        } /*else if (mouseType == MapWidget.MouseType.RIGHT) {
             if (this.clipboard != null) {
                 this.clipboard.close();
                 Minecraft.getInstance().getTextureManager().release(this.textureID);
                 this.clipboard = null;
             }
-        }
+        }*/
     }
 
     @Override
@@ -70,9 +72,16 @@ public class CopyTool extends Tool {
             }
 
             if (size.x() > 0 && size.y() > 0) {
-                this.clipboard = NativeImageTracker.newImage(size.x(), size.y(), false);
-                activePage.forEachInRegion(upper_left.x(), upper_left.y(), size.x(), size.y(), this.clipboard::setPixelRGBA);
-                Minecraft.getInstance().getTextureManager().register(this.textureID, new DynamicTexture(this.clipboard));
+	            NativeImage nativeImage = NativeImageTracker.newImage(size.x(), size.y(), false);
+                activePage.forEachInRegion(upper_left.x(), upper_left.y(), size.x(), size.y(), nativeImage::setPixelRGBA);
+
+	            StampInformation tempStamp = MapwrightClient.STAMP_HANDLER.temporaryStampInformation;
+	            StampTool stampTool = StampTool.INSTANCE;
+
+				stampTool.setActiveStamp(tempStamp); //allow the stamp tool to release texture before we do anything else
+	            tempStamp.forceSetTexture(nativeImage);
+				MapwrightClient.TOOL_MANAGER.set(stampTool);
+
             } else {
                 this.clipboard = null;
                 Minecraft.getInstance().getTextureManager().release(this.textureID);
@@ -93,7 +102,7 @@ public class CopyTool extends Tool {
             graphics.renderOutline((int) (this.start.x() + xOff), (int) (this.start.y() + yOff),
                     worldX - this.start.x(), worldY - this.start.y(),
                     0xff000000);
-        } else if (this.clipboard != null) {
+        } /*else if (this.clipboard != null) {
             final RenderType renderType = VeilRenderType.get(Rendering.RenderTypes.PALETTE_SWAP, this.textureID);
             if (renderType == null) return;
 
@@ -103,6 +112,6 @@ public class CopyTool extends Tool {
             graphics.renderOutline((int) (worldX + xOff - (double) (this.clipboard.getWidth() / 2)), (int) (worldY + yOff - (double) (this.clipboard.getHeight() / 2)),
                     this.clipboard.getWidth(), this.clipboard.getHeight(),
                     0xff000000);
-        }
+        }*/
     }
 }

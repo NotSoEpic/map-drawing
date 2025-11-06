@@ -26,17 +26,19 @@ public class StampTool extends Tool {
 	private boolean registeredTexture = false;
 	private ResourceLocation textureLoc = null;
 
-	//effectively our on select now!
-	public void setActiveStamp(@Nullable final StampInformation stampInformation) {
-        this.changeStamp(stampInformation);
-	}
-
 	@Override
 	public void onDeselect() {
-        this.changeStamp(null);
-		Minecraft.getInstance().getTextureManager().release(this.textureLoc);
-        this.registeredTexture = false;
-        this.textureLoc = null;
+		setActiveStamp(null);
+	}
+
+	public void setActiveStamp(@Nullable final StampInformation stampInformation) {
+		if (registeredTexture) { //always make sure we release the texture before we do anything else
+			registeredTexture = false;
+			Minecraft.getInstance().getTextureManager().release(textureLoc);
+			textureLoc = null;
+		}
+
+        this.changeStamp(stampInformation);
 	}
 
 	private void changeStamp(@Nullable final StampInformation stampInformation) {

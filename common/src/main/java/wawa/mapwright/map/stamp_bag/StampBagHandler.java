@@ -54,6 +54,13 @@ public class StampBagHandler {
 	 * @see MetaDataRecord
 	 */
 	private MetaDataRecord metadataObject;
+
+	/**
+	 * Stamp information handled separately from the metaDataOObject, used for saving images from the copy tool for use in the stamp tool
+	 */
+	//TODO: move somewhere better
+	public StampInformation temporaryStampInformation = new StampInformation("placeholder.png", "placeholder", false);
+
 	private Future<MetaDataRecord> loadingRecordThread;
 	private Future<?> savingRecordThread;
 
