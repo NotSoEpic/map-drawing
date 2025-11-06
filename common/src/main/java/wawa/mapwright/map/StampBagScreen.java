@@ -118,6 +118,9 @@ public class StampBagScreen {
 
 					MapwrightClient.STAMP_HANDLER.addNewStamp(copied, this.saveText.getValue());
                     this.saveText.setValue("");
+					this.mapScreen.toolPicker.pickHand();
+					this.changeStage(ScreenState.BROWSING);
+					return;
 				}
 			}
 
