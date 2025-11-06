@@ -70,8 +70,8 @@ public class Pin {
     public void draw(final GuiGraphics guiGraphics, final Vector2dc mouseScreen, final double xOff, final double yOff, final float scale, final boolean highlight, final Vector4dc worldBounds) {
         if (this.position != null) {
             final Vector2d pos = new Vector2d(this.position).add(xOff, yOff).mul(scale); // world position to screen position
-            final float alpha = Helper.getMouseProximityFade(mouseScreen, pos);
             Helper.clampWithin(pos, worldBounds);
+            final float alpha = Helper.getMouseProximityFade(mouseScreen, pos);
             this.type.draw(guiGraphics, pos.x, pos.y, highlight, true, alpha);
         }
     }
