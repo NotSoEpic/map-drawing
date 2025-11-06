@@ -71,7 +71,7 @@ public class Pin {
         if (this.position != null) {
             final Vector2d pos = new Vector2d(this.position).add(xOff, yOff).mul(scale); // world position to screen position
             Helper.clampWithin(pos, worldBounds);
-            final float alpha = Helper.getMouseProximityFade(mouseScreen, pos);
+            final float alpha = Helper.getMouseProximityFade(mouseScreen, pos, 35);
             this.type.draw(guiGraphics, pos.x, pos.y, highlight, true, alpha);
         }
     }

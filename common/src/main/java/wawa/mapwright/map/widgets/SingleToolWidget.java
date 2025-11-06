@@ -105,9 +105,10 @@ public class SingleToolWidget extends AbstractWidget {
         }
 
         @Override
-        protected void renderTooltip(final GuiGraphics guiGraphics, final int mouseX, final int mouseY) {
+        protected void renderTooltip(final GuiGraphics guiGraphics, int mouseX, final int mouseY) {
             if (!this.atMouse) {
-                super.renderTooltip(guiGraphics, this.getX() - 70 - Minecraft.getInstance().font.width(Component.translatable(this.id)), mouseY);
+                mouseX = this.colorPicker.getX() - Minecraft.getInstance().font.width(Component.translatable(this.id)) - 24;
+                super.renderTooltip(guiGraphics, mouseX, mouseY);
             }
         }
 
@@ -138,6 +139,7 @@ public class SingleToolWidget extends AbstractWidget {
             this.last = this.getTool().currentPin;
             this.pinPicker = new PinPickerWidget(this.getX() - 5, this.getY(), this);
             this.pinPicker.active = false;
+            this.id = "mapwright.tool.pin";
         }
 
         public PinTool getTool() {
@@ -151,9 +153,16 @@ public class SingleToolWidget extends AbstractWidget {
             if (this.isMouseOver(mouseX, mouseY)) {
                 this.pinPicker.active = true;
                 this.pinPicker.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+                this.renderTooltip(guiGraphics, mouseX, mouseY);
             } else {
                 this.pinPicker.active = false;
             }
+        }
+
+        @Override
+        protected void renderTooltip(final GuiGraphics guiGraphics, int mouseX, final int mouseY) {
+            mouseX = this.pinPicker.getX() - Minecraft.getInstance().font.width(Component.translatable(this.id)) - 24;
+            super.renderTooltip(guiGraphics, mouseX, mouseY);
         }
 
         @Override

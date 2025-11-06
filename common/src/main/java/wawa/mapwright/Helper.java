@@ -40,10 +40,10 @@ public class Helper {
         return player.isUsingItem() && player.getItemInHand(player.getUsedItemHand()).is(Items.SPYGLASS);
     }
 
-    public static float getMouseProximityFade(final Vector2dc mouseScreen, final Vector2dc posScreen) {
+    public static float getMouseProximityFade(final Vector2dc mouseScreen, final Vector2dc posScreen, final float startDist) {
         final double dist = mouseScreen.distance(posScreen);
-        if (dist < 35) {
-            return Mth.clamp(1.5f * (float) (dist / 35) - 0.5f, 0.11f, 1);
+        if (dist < startDist) {
+            return Mth.clamp(1.5f * (float) (dist / startDist) - 0.5f, 0.11f, 1);
         } else {
             return  1;
         }

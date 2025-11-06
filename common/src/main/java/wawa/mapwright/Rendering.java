@@ -45,8 +45,8 @@ public class Rendering {
 
 	public static void renderHead(final GuiGraphics guiGraphics, final Vector2dc playerPosition, final Vector2dc mouseScreen, final double xOff, final double yOff, final float scale, final Vector4dc worldBounds) {
 		final Vector2d pos = new Vector2d(playerPosition).add(xOff, yOff).mul(scale); // world position to screen position
-		final float alpha = Helper.getMouseProximityFade(mouseScreen, pos);
 		Helper.clampWithin(pos, worldBounds);
+		final float alpha = Helper.getMouseProximityFade(mouseScreen, pos, 35);
 		Rendering.renderPlayerIcon(guiGraphics, pos.x - 8, pos.y - 8, Minecraft.getInstance().player, alpha);
 	}
 
@@ -126,12 +126,12 @@ public class Rendering {
 		renderType.draw(bufferBuilder.buildOrThrow());
 	}
 
-	public static void croppedBlit(GuiGraphics graphics, ResourceLocation atlasLocation, int x1, int x2, int y1, int y2, int blitOffset, float minU, float maxU, float minV, float maxV, float red, float green, float blue, float alpha) {
+	public static void croppedBlit(final GuiGraphics graphics, final ResourceLocation atlasLocation, final int x1, final int x2, final int y1, final int y2, final int blitOffset, final float minU, final float maxU, final float minV, final float maxV, final float red, final float green, final float blue, final float alpha) {
 		RenderSystem.setShaderTexture(0, atlasLocation);
 		RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
 		RenderSystem.enableBlend();
-		Matrix4f matrix4f = graphics.pose().last().pose();
-		BufferBuilder bufferbuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+		final Matrix4f matrix4f = graphics.pose().last().pose();
+		final BufferBuilder bufferbuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
 		bufferbuilder.addVertex(matrix4f, (float)x1, (float)y1, (float)blitOffset).setUv(minU, minV).setColor(red, green, blue, alpha);
 		bufferbuilder.addVertex(matrix4f, (float)x1, (float)y2, (float)blitOffset).setUv(minU, maxV).setColor(red, green, blue, alpha);
 		bufferbuilder.addVertex(matrix4f, (float)x2, (float)y2, (float)blitOffset).setUv(maxU, maxV).setColor(red, green, blue, alpha);
