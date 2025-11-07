@@ -17,9 +17,9 @@ import java.util.Random;
 
 // this whole class is awful and hardcoded to hell and back
 public class MapBackground {
-    private static final int[] sizesA =  new int[]{8, 32, 96};
-    private static final int[] sizesB =  new int[]{8, 16, 48};
-    private static final int minSize = Arrays.stream(sizesA).min().getAsInt();
+    private static final int[] sizesHorizontal =  new int[]{8, 32, 96};
+    private static final int[] sizesVertical =  new int[]{8, 16, 48};
+    private static final int minSize = Arrays.stream(sizesHorizontal).min().getAsInt();
 
     public final int topMargin;
     public final int leftMargin;
@@ -117,10 +117,10 @@ public class MapBackground {
     }
 
     enum Edge {
-        TOP("top", true, sizesB),
-        LEFT("left", false, sizesB),
-        RIGHT("right", false, sizesB),
-        BOTTOM("bottom", true, sizesA);
+        TOP("top", true, sizesHorizontal),
+        LEFT("left", false, sizesVertical),
+        RIGHT("right", false, sizesVertical),
+        BOTTOM("bottom", true, sizesHorizontal);
 
         final boolean horizontal;
         final int[] textureSizes;
