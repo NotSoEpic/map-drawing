@@ -10,7 +10,7 @@ import org.joml.Vector3d;
 import wawa.mapwright.DistantRaycast;
 import wawa.mapwright.Helper;
 import wawa.mapwright.MapwrightClient;
-import wawa.mapwright.compat.multithread_testing.MultithreadedDHTerrainAccess;
+import wawa.mapwright.compat.multithread_testing.DHBridge;
 import wawa.mapwright.data.SpyglassPins;
 import wawa.mapwright.map.MapScreen;
 import wawa.mapwright.platform.MapWrightServices;
@@ -33,7 +33,7 @@ public class InputListener {
                     MapwrightClient.PAGE_MANAGER.getSpyglassPins().add(target);
                 } else {
 					target = new Vector3d(minecraft.player.getX(), minecraft.player.getY(), minecraft.player.getZ());
-	                MapwrightClient.PAGE_MANAGER.getSpyglassPins().addDelayedRequest(MultithreadedDHTerrainAccess.createRequest(minecraft.player));
+	                MapwrightClient.PAGE_MANAGER.getSpyglassPins().addDelayedRequest(DHBridge.createRequest(minecraft.player));
                 }
 
 				MapwrightClient.targetPanningPosition.set(target.x, target.z);
@@ -69,7 +69,7 @@ public class InputListener {
                 player.getEyePosition(),
                 player.getLookAngle(),
                 Minecraft.getInstance().options.getEffectiveRenderDistance() * 16,
-		        MultithreadedDHTerrainAccess.INSTANCE.getViewDistance()
+		        DHBridge.getViewDistance()
         );
     }
 }

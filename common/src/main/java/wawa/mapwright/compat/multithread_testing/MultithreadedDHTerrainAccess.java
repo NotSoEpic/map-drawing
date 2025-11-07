@@ -1,8 +1,6 @@
 package wawa.mapwright.compat.multithread_testing;
 
 import com.seibel.distanthorizons.api.DhApi;
-import net.minecraft.client.player.LocalPlayer;
-import wawa.mapwright.MapwrightClient;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
@@ -20,24 +18,14 @@ public class MultithreadedDHTerrainAccess {
 	/**
 	 * The clip executor thread.
 	 */
-	private final DHThread executor;
+	private final DHThread executor = new DHThread(requests);
 
-	public MultithreadedDHTerrainAccess() {
-        this.executor = new DHThread(this.requests);
-	}
-
-	/**
-	 * Adds a request for the DH clip thread to perform a clip.
-	 * Make sure to hold onto the object passed in, as it will contain the finished Vector3D location.
-	 *
-	 * @param request The request to perform a clip on.
-	 */
 	public void addRequest(final DhRequest request) {
 		synchronized (this.requests) {
-            this.requests.add(request);
+			this.requests.add(request);
 
 			if (!this.executor.isAlive()) {
-                this.executor.start();
+				this.executor.start();
 			} else {
 				if (this.executor.getState() == Thread.State.WAITING) {
 					LockSupport.unpark(this.executor);
@@ -46,24 +34,13 @@ public class MultithreadedDHTerrainAccess {
 		}
 	}
 
-	public synchronized void clearThreadCache() {
-//		executor.clearCache();
-	}
-
-	public synchronized void voidRequests() {
+	public void voidRequests() {
 		synchronized (this.requests) {
-            this.requests.clear();
+			this.requests.clear();
 		}
 	}
 
-	public static DhRequest createRequest(final LocalPlayer player) {
-		return new DhRequest(player.getEyePosition(), player.getLookAngle(), MultithreadedDHTerrainAccess.INSTANCE.getViewDistance());
-	}
-
-	public int getViewDistance() {
-		if (MapwrightClient.isDHPresent()) {
-			return DhApi.Delayed.configs.graphics().chunkRenderDistance().getValue() * 16;
-		}
-		return 0;
+	public static int getRenderDistance() {
+		return DhApi.Delayed.configs.graphics().chunkRenderDistance().getValue() * 16;
 	}
 }

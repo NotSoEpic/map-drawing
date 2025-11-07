@@ -19,7 +19,7 @@ import wawa.mapwright.DistantRaycast;
 import wawa.mapwright.Helper;
 import wawa.mapwright.MapwrightClient;
 import wawa.mapwright.compat.multithread_testing.DhRequest;
-import wawa.mapwright.compat.multithread_testing.MultithreadedDHTerrainAccess;
+import wawa.mapwright.compat.multithread_testing.DHBridge;
 import wawa.mapwright.map.MapScreen;
 
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class SpyglassPins {
 
 	public void addDelayedRequest(final DhRequest request) {
         this.delayedPins.add(request);
-		MultithreadedDHTerrainAccess.INSTANCE.addRequest(request);
+		DHBridge.addRequest(request);
 	}
 
 	public void add(final Vector3dc position) {
@@ -65,7 +65,7 @@ public class SpyglassPins {
 			this.pins.clear();
             this.delayedPins.clear();
 
-			MultithreadedDHTerrainAccess.INSTANCE.voidRequests();
+			DHBridge.voidRequests();
 			DistantRaycast.clearCache();
 		}
 	}

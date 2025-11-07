@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wawa.mapwright.Helper;
 import wawa.mapwright.MapwrightClient;
-import wawa.mapwright.compat.multithread_testing.MultithreadedDHTerrainAccess;
+import wawa.mapwright.compat.multithread_testing.DHBridge;
 import wawa.mapwright.input.InputListener;
 
 @Mixin(Minecraft.class)
@@ -39,7 +39,7 @@ public class MinecraftMixin {
 				if (raycast != null) {
 					MapwrightClient.PAGE_MANAGER.getSpyglassPins().add(raycast);
 				} else {
-					MapwrightClient.PAGE_MANAGER.getSpyglassPins().addDelayedRequest(MultithreadedDHTerrainAccess.createRequest(this.player));
+					MapwrightClient.PAGE_MANAGER.getSpyglassPins().addDelayedRequest(DHBridge.createRequest(this.player));
 				}
 			}
 			this.mapwright$wasPressed = true;
