@@ -40,9 +40,6 @@ public class MapWidget extends AbstractWidget {
     public MapWidget(final MapScreen parent) {
         super(OUTER_PADDING, OUTER_PADDING, parent.width - OUTER_PADDING * 2, parent.height - OUTER_PADDING * 2, Component.literal("Map Display"));
         this.background = new MapBackground(this.width, this.height, TOP_MARGIN, LEFT_MARGIN, RIGHT_MARGIN, BOTTOM_MARGIN);
-        MapwrightClient.LOGGER.info("Size difference: {}, {}",
-                this.width - this.background.getTrueWidth() - LEFT_MARGIN - RIGHT_MARGIN * 2,
-                this.height - this.background.getTrueHeight() - TOP_MARGIN - BOTTOM_MARGIN * 2);
         this.setWidth(this.background.getTrueWidth() + LEFT_MARGIN + RIGHT_MARGIN);
         this.setHeight(this.background.getTrueHeight() + TOP_MARGIN + BOTTOM_MARGIN);
         this.setX((parent.width - this.width) / 2);

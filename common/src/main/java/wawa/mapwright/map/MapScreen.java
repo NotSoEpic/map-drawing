@@ -59,8 +59,8 @@ public class MapScreen extends Screen {
         this.allWidgets.add(this.mapWidget);
         this.addRenderableWidget(this.mapWidget);
 
-        final int toolX = this.width - 15 - 16 / 2;
-        this.toolPicker = new ToolPickerWidget(toolX, 30);
+        final int toolX = this.width - 20 - 16 / 2;
+        this.toolPicker = new ToolPickerWidget(toolX, 50);
         this.allWidgets.add(this.toolPicker);
         this.addRenderableWidget(this.toolPicker);
 

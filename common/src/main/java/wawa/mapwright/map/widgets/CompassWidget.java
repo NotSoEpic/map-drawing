@@ -28,7 +28,7 @@ public class CompassWidget extends AbstractWidget {
         final int cx = (int) (this.getX() + this.width / 2.0f);
         final int cy = (int) (this.getY() + this.height / 2.0f);
 
-        final float rot = ((Minecraft.getInstance().player.yRotO + 90) % 360) / 360.0f;
+        final float rot = ((Minecraft.getInstance().player.yRotO + 101.25f) % 360) / 360.0f;
         final int frame = Math.round(rot * 32);
         final float alpha = Helper.getMouseProximityFade(new Vector2d(mouseX, mouseY), new Vector2d(cx, cy), 55);
 
