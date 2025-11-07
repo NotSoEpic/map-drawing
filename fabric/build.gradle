@@ -18,10 +18,10 @@ dependencies {
     }
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-    modImplementation("foundry.veil:veil-fabric-${minecraft_version}:${veil_version}") {
+    include(modImplementation("foundry.veil:veil-fabric-${minecraft_version}:${veil_version}") {
         exclude group: "maven.modrinth"
         exclude group: "me.fallenbreath"
-    }
+    })
     compileOnly("maven.modrinth:DistantHorizonsApi:${dh_api_version}")
     // for some reason fabric HATES distant horizons in a dev environment..... just download the jar and put it in run/mods yourself
 //    runtimeOnly("maven.modrinth:DistantHorizons:${dh_version}-${minecraft_version}")
