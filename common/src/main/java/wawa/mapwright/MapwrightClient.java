@@ -11,7 +11,7 @@ import wawa.mapwright.data.PageManager;
 import wawa.mapwright.map.stamp_bag.StampBagHandler;
 import wawa.mapwright.map.tool.PanTool;
 import wawa.mapwright.map.tool.ToolManager;
-import wawa.mapwright.platform.Services;
+import wawa.mapwright.platform.MapWrightServices;
 
 public final class MapwrightClient {
     public static final String MOD_ID = "mapwright";
@@ -19,6 +19,7 @@ public final class MapwrightClient {
     public static PageManager PAGE_MANAGER = new PageManager();
     public static ToolManager TOOL_MANAGER = new ToolManager(PanTool.INSTANCE);
     private static boolean DH_PRESENT = false;
+	private static Boolean SABLE_PRESENT = null;
 
 	public static Vector2d targetPanningPosition = new Vector2d();
 
@@ -31,7 +32,7 @@ public final class MapwrightClient {
             .create();
 
     public static void init() {
-        LOGGER.info("Hello from {}!", Services.PLATFORM.getPlatformName());
+        LOGGER.info("Hello from {}!", MapWrightServices.PLATFORM.getPlatformName());
 
         // https://gitlab.com/distant-horizons-team/distant-horizons-api-example/-/blob/main/Fabric-ApiDemo/src/main/java/com/example/ExampleMod.java
         try {
@@ -45,6 +46,14 @@ public final class MapwrightClient {
     public static boolean isDHPresent() {
         return DH_PRESENT;
     }
+
+	public static boolean isSablePresent() {
+		if (SABLE_PRESENT == null) {
+			SABLE_PRESENT = MapWrightServices.PLATFORM.isModLoaded("sable");
+		}
+
+		return SABLE_PRESENT;
+	}
 
     public static ResourceLocation id(final String path) {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);

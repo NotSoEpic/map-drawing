@@ -23,7 +23,7 @@ import wawa.mapwright.map.widgets.CompassWidget;
 import wawa.mapwright.map.widgets.DebugTextRenderable;
 import wawa.mapwright.map.widgets.MapWidget;
 import wawa.mapwright.map.widgets.ToolPickerWidget;
-import wawa.mapwright.platform.Services;
+import wawa.mapwright.platform.MapWrightServices;
 import wawa.mapwright.platform.services.IKeyMappings;
 
 import java.util.ArrayList;
@@ -146,24 +146,24 @@ public class MapScreen extends Screen {
     @Override
     public boolean keyPressed(final int keyCode, final int scanCode, final int modifiers) {
         if (!this.stampScreen.hasAnyTextBoxFoxused()) {
-            if (Services.KEY_MAPPINGS.matches(IKeyMappings.Normal.OPEN_MAP, keyCode, scanCode, modifiers)) {
+            if (MapWrightServices.KEY_MAPPINGS.matches(IKeyMappings.Normal.OPEN_MAP, keyCode, scanCode, modifiers)) {
                 this.onClose();
                 return true;
             }
 
-            if (Services.KEY_MAPPINGS.matches(IKeyMappings.Normal.SWAP, keyCode, scanCode, modifiers)) {
+            if (MapWrightServices.KEY_MAPPINGS.matches(IKeyMappings.Normal.SWAP, keyCode, scanCode, modifiers)) {
                 MapwrightClient.TOOL_MANAGER.swap();
             }
 
-            if (Services.KEY_MAPPINGS.matches(IKeyMappings.Normal.UNDO, keyCode, scanCode, modifiers)) {
+            if (MapWrightServices.KEY_MAPPINGS.matches(IKeyMappings.Normal.UNDO, keyCode, scanCode, modifiers)) {
                 MapwrightClient.PAGE_MANAGER.undoChanges();
             }
 
-            if (Services.KEY_MAPPINGS.matches(IKeyMappings.Normal.REDO, keyCode, scanCode, modifiers)) {
+            if (MapWrightServices.KEY_MAPPINGS.matches(IKeyMappings.Normal.REDO, keyCode, scanCode, modifiers)) {
                 MapwrightClient.PAGE_MANAGER.redoChanges();
             }
 
-            switch (Services.KEY_MAPPINGS.getToolSwap(keyCode, scanCode, modifiers)) {
+            switch (MapWrightServices.KEY_MAPPINGS.getToolSwap(keyCode, scanCode, modifiers)) {
                 case HAND -> this.toolPicker.pickHand();
                 case BRUSH -> this.toolPicker.pickBrush();
                 case PEN -> this.toolPicker.pickPen();

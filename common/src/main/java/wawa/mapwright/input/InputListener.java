@@ -11,15 +11,14 @@ import wawa.mapwright.DistantRaycast;
 import wawa.mapwright.Helper;
 import wawa.mapwright.MapwrightClient;
 import wawa.mapwright.compat.multithread_testing.MultithreadedDHTerrainAccess;
-import wawa.mapwright.data.PageIO;
 import wawa.mapwright.data.SpyglassPins;
 import wawa.mapwright.map.MapScreen;
-import wawa.mapwright.platform.Services;
+import wawa.mapwright.platform.MapWrightServices;
 import wawa.mapwright.platform.services.IKeyMappings;
 
 public class InputListener {
     public static void tick(final Minecraft minecraft) {
-        while (minecraft.level != null && Services.KEY_MAPPINGS.consume(IKeyMappings.Normal.OPEN_MAP)) {
+        while (minecraft.level != null && MapWrightServices.KEY_MAPPINGS.consume(IKeyMappings.Normal.OPEN_MAP)) {
             final Vector2d playerPosition = new Vector2d((int) minecraft.player.getX(), (int) minecraft.player.getZ());
 
             minecraft.level.playLocalSound(Minecraft.getInstance().player, SoundEvents.BOOK_PAGE_TURN, SoundSource.MASTER, 0.5f, 1.0f);
