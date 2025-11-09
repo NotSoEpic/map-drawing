@@ -1,21 +1,15 @@
 package wawa.mapwright.map.tool;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import foundry.veil.api.client.render.rendertype.VeilRenderType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.RoundingMode;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
 import wawa.mapwright.MapwrightClient;
-import wawa.mapwright.NativeImageTracker;
-import wawa.mapwright.Rendering;
 import wawa.mapwright.data.PageManager;
-import wawa.mapwright.map.stamp_bag.StampBagHandler;
 import wawa.mapwright.map.stamp_bag.StampInformation;
 import wawa.mapwright.map.widgets.MapWidget;
 
@@ -72,11 +66,11 @@ public class CopyTool extends Tool {
             }
 
             if (size.x() > 0 && size.y() > 0) {
-	            NativeImage nativeImage = NativeImageTracker.newImage(size.x(), size.y(), false);
+	            final NativeImage nativeImage = new NativeImage(size.x(), size.y(), false);
                 activePage.forEachInRegion(upper_left.x(), upper_left.y(), size.x(), size.y(), nativeImage::setPixelRGBA);
 
-	            StampInformation tempStamp = MapwrightClient.STAMP_HANDLER.temporaryStampInformation;
-	            StampTool stampTool = StampTool.INSTANCE;
+	            final StampInformation tempStamp = MapwrightClient.STAMP_HANDLER.temporaryStampInformation;
+	            final StampTool stampTool = StampTool.INSTANCE;
 
 				stampTool.setActiveStamp(tempStamp); //allow the stamp tool to release texture before we do anything else
 	            tempStamp.forceSetTexture(nativeImage);

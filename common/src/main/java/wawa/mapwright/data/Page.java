@@ -10,7 +10,6 @@ import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
 import wawa.mapwright.MapwrightClient;
-import wawa.mapwright.NativeImageTracker;
 import wawa.mapwright.Rendering;
 
 /**
@@ -48,7 +47,7 @@ public class Page extends AbstractPage {
 
     @Override
     public NativeImage unboChanges(final NativeImage replacement) {
-        final NativeImage previous = NativeImageTracker.newImage(MapwrightClient.CHUNK_SIZE, MapwrightClient.CHUNK_SIZE, false);
+        final NativeImage previous = new NativeImage(MapwrightClient.CHUNK_SIZE, MapwrightClient.CHUNK_SIZE, false);
         previous.copyFrom(this.texture.getPixels());
         this.texture.getPixels().copyFrom(replacement);
         replacement.close();
