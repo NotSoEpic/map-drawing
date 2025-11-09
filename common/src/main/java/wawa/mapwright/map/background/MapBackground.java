@@ -130,7 +130,6 @@ public class MapBackground {
             this.textureSizes = textureSizes;
             this.textures = Arrays.stream(textureSizes)
                     .mapToObj(i -> MapwrightClient.id("textures/gui/sprites/background/" + prefix + "/" + i + ".png"))
-//                    .mapToObj(i -> MapwrightClient.id("background/" + prefix + "/" + i))
                     .toArray(ResourceLocation[]::new);
         }
     }

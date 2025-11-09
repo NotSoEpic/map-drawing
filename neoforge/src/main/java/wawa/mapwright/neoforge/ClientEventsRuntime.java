@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
@@ -28,8 +29,8 @@ public class ClientEventsRuntime {
     }
 
     @SubscribeEvent
-    public static void levelUnload(final LevelEvent.Unload event) {
-        MapwrightClient.PAGE_MANAGER.saveAndClear();
+    public static void leaveServer(final ClientPlayerNetworkEvent.LoggingOut event) {
+        ClientEvents.leaveServer();
     }
 
     @SubscribeEvent
