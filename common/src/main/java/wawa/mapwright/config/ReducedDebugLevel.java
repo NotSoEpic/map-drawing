@@ -13,6 +13,6 @@ public enum ReducedDebugLevel {
 	}
 
 	public boolean allowsRotation() {
-		return (this != ALL && this != COORDINATES_AND_ROTATION) || !Minecraft.getInstance().player.isCreative() || Minecraft.getInstance().player.isSpectator();
+		return (this != ALL && this != COORDINATES_AND_ROTATION) || Minecraft.getInstance().player.isCreative() || Minecraft.getInstance().player.isSpectator();
 	}
 }
