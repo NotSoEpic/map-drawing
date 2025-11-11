@@ -23,8 +23,6 @@ public class ClientEvents {
     public static void leaveServer() {
         MapwrightClient.PAGE_MANAGER.saveAndClear();
         DistantRaycast.clearCache();
-
-        NativeImageTracker.checkAllocationAndClose();
     }
 
     public static void postWorldRender(final MultiBufferSource bufferSource, final PoseStack poseStack, final float partialTick) {

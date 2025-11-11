@@ -5,7 +5,6 @@ import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import wawa.mapwright.MapwrightClient;
-import wawa.mapwright.NativeImageTracker;
 
 /**
  * A MapwrightClient.chunkSzexMapwrightClient.chunkSze pixel/block area with no associated texture, asynchronously attempting to load a texture when first created
@@ -44,7 +43,7 @@ public class EmptyPage extends AbstractPage {
         // if the file loading is not complete, then either the loaded image or any edits made before will be lost if it does load
         if (!this.isLoading()) {
             if (this.loadedImage == null) {
-                this.loadedImage = NativeImageTracker.newImage(MapwrightClient.CHUNK_SIZE, MapwrightClient.CHUNK_SIZE, true);
+                this.loadedImage = new NativeImage(MapwrightClient.CHUNK_SIZE, MapwrightClient.CHUNK_SIZE, true);
             }
             this.loadedImage.setPixelRGBA(x, y, RGBA);
         }
@@ -66,11 +65,11 @@ public class EmptyPage extends AbstractPage {
             replacement.close();
             this.undoImage = null;
             this.redoImage = null;
-            return NativeImageTracker.newImage(MapwrightClient.CHUNK_SIZE, MapwrightClient.CHUNK_SIZE, true);
+            return new NativeImage(MapwrightClient.CHUNK_SIZE, MapwrightClient.CHUNK_SIZE, true);
         } else {
             this.attemptedUndo = true;
             this.undoImage = replacement;
-            this.redoImage = NativeImageTracker.newImage(MapwrightClient.CHUNK_SIZE, MapwrightClient.CHUNK_SIZE, true);
+            this.redoImage = new NativeImage(MapwrightClient.CHUNK_SIZE, MapwrightClient.CHUNK_SIZE, true);
             return this.redoImage; // will be modified once the page actually loads
         }
 

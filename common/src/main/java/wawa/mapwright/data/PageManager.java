@@ -7,7 +7,6 @@ import net.minecraft.world.level.Level;
 import org.joml.Vector2dc;
 import org.joml.Vector2i;
 import wawa.mapwright.MapwrightClient;
-import wawa.mapwright.NativeImageTracker;
 import wawa.mapwright.data.history.OperationHistory;
 
 import java.util.*;
@@ -118,7 +117,7 @@ public class PageManager {
 
             final Vector2i key = new Vector2i(page.rx, page.ry);
             if (history.get(key) == null) {
-                final NativeImage image = NativeImageTracker.newImage(MapwrightClient.CHUNK_SIZE, MapwrightClient.CHUNK_SIZE, true);
+                final NativeImage image = new NativeImage(MapwrightClient.CHUNK_SIZE, MapwrightClient.CHUNK_SIZE, true);
                 final NativeImage pageImg = page.getImage();
                 if (pageImg != null) {
                     image.copyFrom(pageImg);

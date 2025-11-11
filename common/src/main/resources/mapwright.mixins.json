@@ -10,7 +10,6 @@
     "LevelRendererAccessor",
     "MinecraftMixin",
     "MultiPlayerGameModeAccessor",
-    "NativeImageAccessor",
     "ScreenAccessor",
     "SpyglassItemMixin",
     "VeilImGuiImplMixin",
