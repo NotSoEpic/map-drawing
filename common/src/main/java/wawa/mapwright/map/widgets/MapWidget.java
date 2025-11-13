@@ -146,8 +146,6 @@ public class MapWidget extends AbstractWidget {
             }
             this.mouseType = newType;
             if (Screen.hasControlDown()) {
-                // noop
-            } else if (Screen.hasControlDown()) {
                 final int color = MapwrightClient.PAGE_MANAGER.getPixelARGB(Mth.floor(world.x), Mth.floor(world.y));
                 this.parent.toolPicker.pickColor(color);
             } else if (this.mouseType == MouseType.LEFT || this.mouseType == MouseType.RIGHT) {
