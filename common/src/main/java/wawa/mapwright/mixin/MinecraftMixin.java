@@ -12,7 +12,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wawa.mapwright.Helper;
 import wawa.mapwright.MapwrightClient;
 import wawa.mapwright.compat.multithread_testing.DHBridge;
 import wawa.mapwright.input.InputListener;
@@ -34,7 +33,7 @@ public class MinecraftMixin {
 	@Inject(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isUsingItem()Z", ordinal = 0))
 	private void placeSpyglassPin(final CallbackInfo ci) {
 		if (this.options.keyAttack.isDown()) {
-			if (!this.mapwright$wasPressed && Helper.isUsingSpyglass(this.player)) {
+			if (!this.mapwright$wasPressed && this.player.isScoping()) {
 				final Vector3d raycast = InputListener.getEndingPosition(this.player);
 				if (raycast != null) {
 					MapwrightClient.PAGE_MANAGER.getSpyglassPins().add(raycast);

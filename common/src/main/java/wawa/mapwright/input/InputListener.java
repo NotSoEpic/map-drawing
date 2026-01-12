@@ -8,7 +8,6 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2d;
 import org.joml.Vector3d;
 import wawa.mapwright.DistantRaycast;
-import wawa.mapwright.Helper;
 import wawa.mapwright.MapwrightClient;
 import wawa.mapwright.compat.multithread_testing.DHBridge;
 import wawa.mapwright.data.SpyglassPins;
@@ -27,7 +26,7 @@ public class InputListener {
                 MapwrightClient.PAGE_MANAGER.reloadPageIO(minecraft.level, minecraft);
             }
 
-            if (Helper.isUsingSpyglass(minecraft.player)) {
+            if (minecraft.player.isScoping()) {
                 Vector3d target = getEndingPosition(minecraft.player);
                 if (target != null) {
                     MapwrightClient.PAGE_MANAGER.getSpyglassPins().add(target);

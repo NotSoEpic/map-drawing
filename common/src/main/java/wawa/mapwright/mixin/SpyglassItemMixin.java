@@ -8,7 +8,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpyglassItem;
 import net.minecraft.world.item.TooltipFlag;
 import org.spongepowered.asm.mixin.Mixin;
-import wawa.mapwright.Helper;
 import wawa.mapwright.MapwrightClient;
 import wawa.mapwright.data.SpyglassPins;
 
@@ -22,7 +21,7 @@ public abstract class SpyglassItemMixin extends Item {
 
     @Override
     public boolean isBarVisible(final ItemStack stack) {
-        return !MapwrightClient.PAGE_MANAGER.getSpyglassPins().getPins().isEmpty() || Helper.isUsingSpyglass(Minecraft.getInstance().player);
+        return !MapwrightClient.PAGE_MANAGER.getSpyglassPins().getPins().isEmpty() || Minecraft.getInstance().player.isScoping();
     }
 
     @Override

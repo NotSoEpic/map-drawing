@@ -26,7 +26,7 @@ public class ClientEvents {
     }
 
     public static void postWorldRender(final MultiBufferSource bufferSource, final PoseStack poseStack, final float partialTick) {
-        if (Helper.isUsingSpyglass(Minecraft.getInstance().player)) {
+        if (Minecraft.getInstance().player.isScoping()) {
             MapwrightClient.PAGE_MANAGER.getSpyglassPins().render(bufferSource, poseStack, partialTick);
         }
     }

@@ -16,10 +16,9 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.block.Blocks;
 import org.joml.*;
 import wawa.mapwright.DistantRaycast;
-import wawa.mapwright.Helper;
 import wawa.mapwright.MapwrightClient;
-import wawa.mapwright.compat.multithread_testing.DhRequest;
 import wawa.mapwright.compat.multithread_testing.DHBridge;
+import wawa.mapwright.compat.multithread_testing.DhRequest;
 import wawa.mapwright.map.MapScreen;
 
 import java.util.ArrayList;
@@ -105,7 +104,7 @@ public class SpyglassPins {
 				}
 			}
 
-			if (Helper.isUsingSpyglass(Minecraft.getInstance().player) || Minecraft.getInstance().screen instanceof MapScreen) {
+			if (Minecraft.getInstance().player.isScoping() || Minecraft.getInstance().screen instanceof MapScreen) {
 				this.zoomlessTimer = 0;
 			} else if (!Minecraft.getInstance().isPaused()) {
 				this.zoomlessTimer++;
