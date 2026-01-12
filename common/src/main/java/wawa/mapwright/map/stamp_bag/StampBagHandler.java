@@ -89,12 +89,8 @@ public class StampBagHandler {
 		this.metaDataPath = this.stampPath.resolve("metadata.json");
 
 		if (Files.notExists(this.stampPath)) {
-			try {
-				Files.createDirectory(this.stampPath);
-			} catch (final IOException e) {
-				MapwrightClient.LOGGER.error("Could not create stamp directory\n{}", String.valueOf(e));
-			}
-		}
+            this.stampPath.toFile().mkdirs();
+        }
 
 		if (Files.notExists(this.metaDataPath)) {
             this.metadataObject = new MetaDataRecord(new ArrayList<>(), new ArrayList<>());
