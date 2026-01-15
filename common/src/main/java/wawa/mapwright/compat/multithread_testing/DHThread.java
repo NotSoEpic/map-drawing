@@ -20,7 +20,7 @@ public class DHThread extends Thread {
 
 	public DHThread(final Queue<DhRequest> requests) {
 		this.requests = requests;
-		this.cache = DhApi.Delayed.terrainRepo.getSoftCache();
+		this.cache = DhApi.Delayed.terrainRepo.createSoftCache();
 	}
 
 	@Override
