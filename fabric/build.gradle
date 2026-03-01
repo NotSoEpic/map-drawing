@@ -8,6 +8,10 @@ def commonResources = project(":common").file("src/main/resources")
 
 repositories {
     flatDir { dir 'libs' }
+    maven {
+        name = "RyanHCode Maven"
+        url = "https://maven.ryanhcode.dev/releases"
+    }
 }
 
 dependencies {
@@ -22,6 +26,7 @@ dependencies {
         exclude group: "maven.modrinth"
         exclude group: "me.fallenbreath"
     })
+    include(modApi("dev.ryanhcode.sable-companion:sable-companion-${project.minecraft_version}:${project.sable_companion_version}"))
     compileOnly("maven.modrinth:DistantHorizonsApi:${dh_api_version}")
     // for some reason fabric HATES distant horizons in a dev environment..... just download the jar and put it in run/mods yourself
 //    runtimeOnly("maven.modrinth:DistantHorizons:${dh_version}-${minecraft_version}")

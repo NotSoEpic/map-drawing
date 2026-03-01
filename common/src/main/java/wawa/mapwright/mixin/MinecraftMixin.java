@@ -1,5 +1,6 @@
 package wawa.mapwright.mixin;
 
+import dev.ryanhcode.sable.companion.SableCompanion;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.player.LocalPlayer;
@@ -36,7 +37,7 @@ public class MinecraftMixin {
 			if (!this.mapwright$wasPressed && this.player.isScoping()) {
 				final Vector3d raycast = InputListener.getEndingPosition(this.player);
 				if (raycast != null) {
-					MapwrightClient.PAGE_MANAGER.getSpyglassPins().add(raycast);
+					MapwrightClient.PAGE_MANAGER.getSpyglassPins().add(SableCompanion.INSTANCE.projectOutOfSubLevel(player.level(), raycast));
 				} else {
 					MapwrightClient.PAGE_MANAGER.getSpyglassPins().addDelayedRequest(DHBridge.createRequest(this.player));
 				}

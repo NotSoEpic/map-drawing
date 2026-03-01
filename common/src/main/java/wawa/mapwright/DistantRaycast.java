@@ -1,5 +1,6 @@
 package wawa.mapwright;
 
+import dev.ryanhcode.sable.companion.SableCompanion;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
@@ -23,7 +24,8 @@ public class DistantRaycast {
                 start.add(direction.scale(vanilla)),
                 ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY, player));
         if (result.getType() != HitResult.Type.MISS) {
-            return new Vector3d(result.getLocation().x, result.getLocation().y, result.getLocation().z);
+            Vector3d raycastPos = new Vector3d(result.getLocation().x, result.getLocation().y, result.getLocation().z);
+            return SableCompanion.INSTANCE.projectOutOfSubLevel(player.level(), raycastPos);
         }
         // todo maybe a config in case these raycasts are causing issues?
 //        if (MapwrightClient.isDHPresent()) {

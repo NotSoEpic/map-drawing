@@ -16,6 +16,13 @@ neoForge {
     }
 }
 
+repositories {
+    maven {
+        name = "RyanHCode Maven"
+        url = "https://maven.ryanhcode.dev/releases"
+    }
+}
+
 dependencies {
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
     // fabric and neoforge both bundle mixinextras, so it is safe to use it in common
@@ -26,6 +33,7 @@ dependencies {
     }
     api "fuzs.forgeconfigapiport:forgeconfigapiport-common-neoforgeapi:${fcap_version}"
     compileOnly "maven.modrinth:DistantHorizonsApi:${dh_api_version}"
+    api "dev.ryanhcode.sable-companion:sable-companion-${project.minecraft_version}:${project.sable_companion_version}"
 }
 
 configurations {

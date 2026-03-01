@@ -6,6 +6,13 @@ plugins {
 def generatedResources = project(":common").file("src/generated/resources")
 def commonResources = project(":common").file("src/main/resources")
 
+repositories {
+    maven {
+        name = "RyanHCode Maven"
+        url = "https://maven.ryanhcode.dev/releases"
+    }
+}
+
 neoForge {
     version = neoforge_version
     // Automatically enable neoforge AccessTransformers if the file exists
@@ -51,6 +58,11 @@ dependencies {
         exclude group: "maven.modrinth"
         exclude group: "me.fallenbreath"
     })
+    jarJar(api("dev.ryanhcode.sable-companion:sable-companion-${project.minecraft_version}:${project.sable_companion_version_range}")) {
+        version {
+            prefer project.sable_companion_version
+        }
+    }
     compileOnly("maven.modrinth:DistantHorizonsApi:${dh_api_version}")
     runtimeOnly("maven.modrinth:DistantHorizons:${dh_version}-${minecraft_version}")
 }
