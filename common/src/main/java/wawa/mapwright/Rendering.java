@@ -55,7 +55,7 @@ public class Rendering {
 
 		final RenderType renderType = VeilRenderType.get(RenderTypes.UV_REMAP, skinTexture, Textures.HEAD_ICON);
 		if(renderType == null) return;
-		final ShaderUniform xOffset = VeilRenderSystem.setShader(Shaders.UV_REMAP).getOrCreateUniform("XOffset");
+		final ShaderUniform xOffset = VeilRenderSystem.setShader(Shaders.UV_REMAP).getUniform("XOffset");
 
 		final float rot = ((player.yRotO + 90) % 360) / 360.0f;
 		final int frame = Math.round(rot * 16);

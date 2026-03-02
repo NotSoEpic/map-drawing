@@ -64,8 +64,8 @@ public class MapBackground {
     public void render(final GuiGraphics guiGraphics, final int x, final int y, final int width, final int height, final Vector2dc backgroundTranslation, final int blitOffset) {
         final ShaderProgram backgroundProgram = VeilRenderSystem.setShader(Rendering.Shaders.BACKGROUND);
         if (backgroundProgram == null) return;
-        backgroundProgram.getOrCreateUniform("ScreenCenter").setVectorI(x + width / 2, y + height / 2);
-        backgroundProgram.getOrCreateUniform("Translation").setVector((float) backgroundTranslation.x(), (float) backgroundTranslation.y());
+        backgroundProgram.getUniform("ScreenCenter").setVectorI(x + width / 2, y + height / 2);
+        backgroundProgram.getUniform("Translation").setVector((float) backgroundTranslation.x(), (float) backgroundTranslation.y());
 
         RenderType sprite = VeilRenderType.get(Rendering.RenderTypes.BACKGROUND, MapwrightClient.id("textures/gui/sprites/background/corner.png"));
         if (sprite == null) return;
