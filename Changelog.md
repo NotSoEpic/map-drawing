@@ -1,0 +1,1 @@
+- Setup publishing to modrinth and curseforge, for neoforge and fabric

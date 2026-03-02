@@ -1,10 +1,13 @@
 plugins {
     id 'multiloader-loader'
     id 'net.neoforged.moddev'
+
+    id "me.modmuss50.mod-publish-plugin" version "1.1.0"
 }
 
 def generatedResources = project(":common").file("src/generated/resources")
 def commonResources = project(":common").file("src/main/resources")
+def changelogFile = rootProject.file("Changelog.md")
 
 repositories {
     maven {
@@ -69,4 +72,26 @@ dependencies {
 
 sourceSets.main.resources {
     srcDir generatedResources.absolutePath
+}
+
+publishMods {
+//    dryRun = true
+    type = STABLE
+
+    setChangelog(changelogFile.text)
+
+    file = jar.archiveFile
+    modLoaders.add('neoforge')
+
+    modrinth {
+        accessToken = mapwrightPushTokenModrinth
+        projectId = "iDYmMWwn"
+        minecraftVersions.add(minecraft_version)
+    }
+
+    curseforge {
+        accessToken = mapwrightPushTokenCurse
+        projectId = "1361711"
+        minecraftVersions.add(minecraft_version)
+    }
 }
