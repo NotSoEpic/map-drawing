@@ -12,7 +12,6 @@
     "MultiPlayerGameModeAccessor",
     "ScreenAccessor",
     "SpyglassItemMixin",
-    "VeilImGuiImplMixin",
     "VeilRenderSystemMixin",
     "coordinates_config.DebugScreenOverlayMixin",
     "coordinates_config.GuiMixin",
